@@ -1,0 +1,11 @@
+/.idea/
+/vendor/phpdocumentor
+/vendor/phpspec
+/vendor/phpunit
+/vendor/sebastian
+/phpunit_log/
+/composer.lock
+/cache/*
+/composer_install_result.txt
+/parts/images
+/Tests/tests_config.php

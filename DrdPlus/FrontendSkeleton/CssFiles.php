@@ -1,0 +1,74 @@
+<?php
+declare(strict_types=1);
+/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
+
+namespace DrdPlus\FrontendSkeleton;
+
+class CssFiles extends AbstractPublicFiles
+{
+    /**
+     * @var string
+     */
+    private $dirWithCss;
+
+    public function __construct(string $dirWithCss)
+    {
+        $this->dirWithCss = rtrim($dirWithCss, '\/');
+    }
+
+    /**
+     * @return \Iterator
+     */
+    public function getIterator(): \Iterator
+    {
+        return new \ArrayIterator($this->scanForCssFiles($this->dirWithCss));
+    }
+
+    /**
+     * @param string $directory
+     * @param string $cssRelativeRoot
+     * @param int $level
+     * @return array|string[]|string[][]
+     */
+    private function scanForCssFiles(string $directory, string $cssRelativeRoot = '', int $level = 1): array
+    {
+        $cssRelativeRoot = \rtrim($cssRelativeRoot, '\/');
+        /** @var array|string[][] $cssFiles */
+        $cssFiles = [];
+        foreach (\scandir($directory, SCANDIR_SORT_NONE) as $folder) {
+            if ($folder === '.' || $folder === '..' || $folder === '.gitignore') {
+                continue;
+            }
+            $folderPath = $directory . '/' . $folder;
+            if (\is_dir($folderPath)) {
+                if ($folder === 'ignore') {
+                    continue;
+                }
+                $anotherCssFiles = $this->scanForCssFiles(
+                    $folderPath,
+                    ($cssRelativeRoot !== '' ? ($cssRelativeRoot . '/') : '') . $folder,
+                    $level + 1
+                );
+                foreach ($anotherCssFiles as $iteratedLevel => $sameLevelAnotherCssFiles) {
+                    /** @var array $sameLevelAnotherCssFiles */
+                    foreach ($sameLevelAnotherCssFiles as $sameLevelAnotherCssFile) {
+                        $cssFiles[$iteratedLevel][] = $sameLevelAnotherCssFile;
+                    }
+                }
+            } elseif (\is_file($folderPath) && \preg_match('~[.]css$~', $folder)) {
+                $cssFiles[$level][] = ($cssRelativeRoot !== '' ? ($cssRelativeRoot . '/') : '') . $folder; // intentionally relative path
+            }
+        }
+        if ($level > 1) {
+            return $cssFiles;
+        }
+        \krsort($cssFiles); // deeper means more generic and goes first
+        $flattenedCss = [];
+        foreach ($cssFiles as $sameLevelCssFiles) {
+            /** @noinspection SlowArrayOperationsInLoopInspection */
+            $flattenedCss = \array_merge($flattenedCss, $sameLevelCssFiles); // deeper files can be overloaded by shallow ones
+        }
+
+        return $flattenedCss;
+    }
+}
