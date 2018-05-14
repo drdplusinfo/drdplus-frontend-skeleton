@@ -94,6 +94,7 @@ class AnchorsTest extends AbstractContentTest
             if (\in_array($link, self::$checkedExternalAnchors, true)) {
                 continue;
             }
+            $link = $this->turnToLocalLink($link);
             $curl = \curl_init($link);
             \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
             \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);

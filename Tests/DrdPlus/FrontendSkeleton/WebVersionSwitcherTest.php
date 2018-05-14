@@ -6,14 +6,25 @@ use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
 use PHPUnit\Framework\TestCase;
 
-class VersionSwitcherTest extends TestCase
+class WebVersionSwitcherTest extends TestCase
 {
     private $currentWebVersion;
 
     protected function setUp()
     {
         parent::setUp();
+        if ($this->areThereUncommittedChanges()) {
+            self::markTestSkipped('There are uncommitted changes, so can not test version switching');
+        }
         $this->currentWebVersion = (new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
+    }
+
+    protected function areThereUncommittedChanges(): bool
+    {
+        \exec('git diff', $changedRows, $output);
+        self::assertSame(0, $output, 'Failed executing `git diff`');
+
+        return \count($changedRows) > 0;
     }
 
     protected function tearDown()
