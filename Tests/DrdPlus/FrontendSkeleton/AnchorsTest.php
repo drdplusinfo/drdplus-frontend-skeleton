@@ -32,7 +32,7 @@ class AnchorsTest extends AbstractContentTest
      * @param string $content
      * @return array
      */
-    private function parseInvalidAnchors(string $content): array
+    protected function parseInvalidAnchors(string $content): array
     {
         \preg_match_all('~(?<invalidAnchors><a[^>]+href="(?:(?![#?]|https?|[.]?/|mailto).)+[^>]+>)~', $content, $matches);
 
@@ -115,7 +115,7 @@ class AnchorsTest extends AbstractContentTest
     /**
      * @return array|Element[]
      */
-    private function getExternalAnchors(): array
+    protected function getExternalAnchors(): array
     {
         $html = $this->getHtmlDocument();
         $externalAnchors = [];
@@ -156,7 +156,7 @@ class AnchorsTest extends AbstractContentTest
         }
     }
 
-    private function turnToLocalLink(string $link): string
+    protected function turnToLocalLink(string $link): string
     {
         if (\strpos($link, 'drdplus.info') === false) {
             return $link;
@@ -319,27 +319,6 @@ class AnchorsTest extends AbstractContentTest
                 continue;
             }
             self::assertStringStartsWith('https', $link, "Every link to Altar should be via https: '$link'");
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function Links_to_vukogvazd_uses_https(): void
-    {
-        $linksToVukogvazd = [];
-        foreach ($this->getExternalAnchors() as $anchor) {
-            $link = $anchor->getAttribute('href');
-            if (\strpos($link, 'vukogvazd.cz')) {
-                $linksToVukogvazd[] = $link;
-            }
-        }
-        if (\count($linksToVukogvazd) === 0) {
-            self::assertFalse(false, 'No links to Vukogvazd have been found');
-        } else {
-            foreach ($linksToVukogvazd as $linkToVukogvazd) {
-                self::assertStringStartsWith('https', $linkToVukogvazd, "Every link to vukogvazd should be via https: '$linkToVukogvazd'");
-            }
         }
     }
 }
