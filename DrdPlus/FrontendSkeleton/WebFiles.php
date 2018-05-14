@@ -35,11 +35,12 @@ class WebFiles extends StrictObject implements \IteratorAggregate
 
     /**
      * @return array|string[]
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownWebFilesDir
      */
     private function getUnsortedWebFileNames(): array
     {
         if (!\is_dir($this->webFilesDir)) {
-            return [];
+            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->webFilesDir}' for web files");
         }
 
         return \array_filter(\scandir($this->webFilesDir, SCANDIR_SORT_NONE), function ($file) {
