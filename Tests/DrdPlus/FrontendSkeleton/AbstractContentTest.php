@@ -31,6 +31,7 @@ abstract class AbstractContentTest extends TestCase
             if ($get) {
                 $_GET = \array_merge($_GET, $get);
             }
+            $this->passIn();
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
@@ -40,6 +41,14 @@ abstract class AbstractContentTest extends TestCase
         }
 
         return self::$content[$key];
+    }
+
+    /**
+     * Intended for overwrite if protected content is accessed
+     */
+    protected function passIn()
+    {
+        return;
     }
 
     protected function getHtmlDocument(string $show = '', array $get = []): HTMLDocument
