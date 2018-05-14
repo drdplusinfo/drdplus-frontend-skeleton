@@ -7,6 +7,8 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractContentTest extends TestCase
 {
+    private static $content = [];
+
     protected function setUp()
     {
         if (!\defined('DRD_PLUS_INDEX_FILE_NAME_TO_TEST')) {
@@ -21,9 +23,8 @@ abstract class AbstractContentTest extends TestCase
      */
     protected function getContent(string $show = '', array $get = []): string
     {
-        static $content = [];
         $key = "$show-" . \serialize($get);
-        if (($content[$key] ?? null) === null) {
+        if ((self::$content[$key] ?? null) === null) {
             if ($show !== '') {
                 $_GET['show'] = $show;
             }
@@ -33,12 +34,12 @@ abstract class AbstractContentTest extends TestCase
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
-            $content[$key] = \ob_get_clean();
-            self::assertNotEmpty($content[$key]);
+            self::$content[$key] = \ob_get_clean();
+            self::assertNotEmpty(self::$content[$key]);
             unset($_GET['show']);
         }
 
-        return $content[$key];
+        return self::$content[$key];
     }
 
     protected function getHtmlDocument(string $show = '', array $get = []): HTMLDocument

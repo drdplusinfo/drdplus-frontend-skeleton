@@ -2,6 +2,7 @@
 namespace Tests\DrdPlus\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use DrdPlus\FrontendSkeleton\UsagePolicy;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
@@ -192,6 +193,8 @@ class AnchorsTest extends AbstractContentTest
                     \preg_match('~//(?<subDomain>[^.]+([.][^.]+)*)\.drdplus\.~', $link, $matches),
                     "Expected some sub-domain in link $link"
                 );
+                $cookieName = $this->getCookieNameForOwnershipConfirmation($matches['subDomain']);
+                curl_setopt($curl, CURLOPT_COOKIE, $cookieName . '=1');
             }
             $content = curl_exec($curl);
             curl_close($curl);
@@ -208,6 +211,21 @@ class AnchorsTest extends AbstractContentTest
         }
 
         return self::$externalHtmlDocuments[$link];
+    }
+
+    protected function getCookieNameForOwnershipConfirmation(string $rulesDirBasename): string
+    {
+        $usagePolicy = new UsagePolicy($rulesDirBasename);
+        try {
+            $reflectionClass = new \ReflectionClass(UsagePolicy::class);
+        } catch (\ReflectionException $reflectionException) {
+            self::fail($reflectionException->getMessage());
+            exit;
+        }
+        $getCookieName = $reflectionClass->getMethod('getOwnershipCookieName');
+        $getCookieName->setAccessible(true);
+
+        return $getCookieName->invoke($usagePolicy);
     }
 
     /**
