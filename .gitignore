@@ -1,8 +1,5 @@
 /.idea/
-/vendor/phpdocumentor
-/vendor/phpspec
-/vendor/phpunit
-/vendor/sebastian
+/vendor/
 /phpunit_log/
 /composer.lock
 /cache/*
