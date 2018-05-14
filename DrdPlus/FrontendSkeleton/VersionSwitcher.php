@@ -6,17 +6,17 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class RulesVersionSwitcher extends StrictObject
+class VersionSwitcher extends StrictObject
 {
 
     /** @var Versions */
-    private $rulesVersions;
+    private $versions;
     /** @var VersionSwitchMutex */
     private $versionSwitchMutex;
 
-    public function __construct(Versions $rulesVersions, VersionSwitchMutex $versionSwitchMutex)
+    public function __construct(Versions $versions, VersionSwitchMutex $versionSwitchMutex)
     {
-        $this->rulesVersions = $rulesVersions;
+        $this->versions = $versions;
         $this->versionSwitchMutex = $versionSwitchMutex;
     }
 
@@ -32,7 +32,7 @@ class RulesVersionSwitcher extends StrictObject
     public function switchToVersion(string $version): bool
     {
         // do NOT unlock it as we need the version to be locked until we fill or use the cache (lock will be unlocked automatically on script end)
-        if ($version === $this->rulesVersions->getCurrentVersion()) {
+        if ($version === $this->versions->getCurrentVersion()) {
             if (!$this->versionSwitchMutex->isLockedForId($version)) {
                 $this->versionSwitchMutex->lock($version);
             }
@@ -40,7 +40,7 @@ class RulesVersionSwitcher extends StrictObject
             return false;
         }
         $this->versionSwitchMutex->lock($version);
-        if (!$this->rulesVersions->hasVersion($version)) {
+        if (!$this->versions->hasVersion($version)) {
             throw new Exceptions\InvalidVersionToSwitchInto("Required version {$version} does not exist");
         }
         $command = 'git checkout ' . \escapeshellarg($version) . ' 2>&1';

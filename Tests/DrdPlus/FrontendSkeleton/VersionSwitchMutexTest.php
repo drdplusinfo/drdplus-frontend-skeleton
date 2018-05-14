@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\RulesSkeleton;
+namespace Tests\DrdPlus\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\VersionSwitchMutex;
 use PHPUnit\Framework\TestCase;

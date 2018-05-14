@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\RulesSkeleton;
+namespace Tests\DrdPlus\FrontendSkeleton;
 
 class DevModeTest extends AbstractContentTest
 {
@@ -9,8 +9,8 @@ class DevModeTest extends AbstractContentTest
      */
     public function I_see_content_marked_by_development_classes(): void
     {
-        $html = $this->getRulesForDevHtmlDocument();
-        if (!$this->checkingSkeleton($html)) {
+        $html = $this->getContentForDevHtmlDocument();
+        if (!$this->isSkeletonChecked($html)) {
             self::assertFalse(false, 'Intended for skeleton only');
 
             return;

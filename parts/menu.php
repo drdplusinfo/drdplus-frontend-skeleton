@@ -17,20 +17,20 @@ if (!empty($contactsFixed)) {
                 </span>
             <?php } ?>
             <div class="version">
-                <?php /** @var \DrdPlus\FrontendSkeleton\Versions $rulesVersions */
-                $allVersions = $rulesVersions->getAllVersions();
+                <?php /** @var \DrdPlus\FrontendSkeleton\Versions $versions */
+                $allVersions = $versions->getAllVersions();
                 if (count($allVersions) > 1) {
-                    $currentVersion = $rulesVersions->getCurrentVersion(); ?>
-                    <span class="current-version"><?= $rulesVersions->getVersionName($currentVersion) ?></span>
+                    $currentVersion = $versions->getCurrentVersion(); ?>
+                    <span class="current-version"><?= $versions->getVersionName($currentVersion) ?></span>
                     <ul class="other-versions">
                         <?php /** @var \DrdPlus\FrontendSkeleton\Versions $rulesVersions */
                         /** @var \DrdPlus\FrontendSkeleton\Request $request */
-                        foreach ($rulesVersions->getAllVersions() as $version) {
+                        foreach ($versions->getAllVersions() as $version) {
                             if ($version === $currentVersion) {
                                 continue;
                             } ?>
                             <li><a href="<?= $request->getCurrentUrl(['version' => $version]) ?>">
-                                    <?= $rulesVersions->getVersionName($version) ?>
+                                    <?= $versions->getVersionName($version) ?>
                                 </a></li>
                         <?php } ?>
                     </ul>

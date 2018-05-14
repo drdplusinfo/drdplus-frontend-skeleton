@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\RulesSkeleton;
+namespace Tests\DrdPlus\FrontendSkeleton;
 
 use Gt\Dom\Element;
 
@@ -14,16 +14,16 @@ class ContentTest extends AbstractContentTest
             0,
             \preg_match(
                 '~.{0,10}2k6\s*(?!<span class="upper-index">\+</span>).{0,20}\+~',
-                $this->getRulesContentWithoutIds(),
+                $this->getContentWithoutIds(),
                 $matches
             ),
             \var_export($matches, true)
         );
     }
 
-    private function getRulesContentWithoutIds(): string
+    private function getContentWithoutIds(): string
     {
-        $document = clone $this->getRulesHtmlDocument();
+        $document = clone $this->getHtmlDocument();
         /** @var Element $body */
         $body = $document->getElementsByTagName('body')[0];
         $this->removeIds($body);
@@ -50,7 +50,7 @@ class ContentTest extends AbstractContentTest
             0,
             \preg_match(
                 '~.{0,10}(?:(?<!<span class="upper-index">)\s*[®™]|[®™]\s*(?!</span>).{0,10})~u',
-                $this->getRulesContent(),
+                $this->getContent(),
                 $matches
             ),
             \var_export($matches, true)
@@ -62,7 +62,7 @@ class ContentTest extends AbstractContentTest
      */
     public function Authors_got_heading(): void
     {
-        $authorsHeading = $this->getRulesHtmlDocument()->getElementById('autori');
+        $authorsHeading = $this->getHtmlDocument()->getElementById('autori');
         self::assertNotEmpty($authorsHeading, 'Authors should have heading');
         self::assertSame(
             'h3',

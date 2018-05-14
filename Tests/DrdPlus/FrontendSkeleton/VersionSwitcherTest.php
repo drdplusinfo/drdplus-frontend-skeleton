@@ -2,7 +2,7 @@
 namespace DrdPlus\Tests\RulesSkeleton;
 
 use DrdPlus\FrontendSkeleton\Versions;
-use DrdPlus\FrontendSkeleton\RulesVersionSwitcher;
+use DrdPlus\FrontendSkeleton\VersionSwitcher;
 use DrdPlus\FrontendSkeleton\VersionSwitchMutex;
 use PHPUnit\Framework\TestCase;
 
@@ -13,14 +13,14 @@ class VersionSwitcherTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->currentVersion = (new Versions(\dirname(DRD_PLUS_RULES_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
+        $this->currentVersion = (new Versions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
     }
 
     protected function tearDown()
     {
         $versionSwitchMutex = new VersionSwitchMutex();
-        $rulesVersionSwitcher = new RulesVersionSwitcher(
-            new Versions(\dirname(DRD_PLUS_RULES_INDEX_FILE_NAME_TO_TEST)),
+        $rulesVersionSwitcher = new VersionSwitcher(
+            new Versions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)),
             $versionSwitchMutex
         );
         $rulesVersionSwitcher->switchToVersion($this->currentVersion);
@@ -33,7 +33,7 @@ class VersionSwitcherTest extends TestCase
      */
     public function I_can_switch_to_another_version(): void
     {
-        $rulesVersions = new Versions(\dirname(DRD_PLUS_RULES_INDEX_FILE_NAME_TO_TEST));
+        $rulesVersions = new Versions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
         $versions = $rulesVersions->getAllVersions();
         if (\defined('SINGLE_VERSION_ONLY') && SINGLE_VERSION_ONLY) {
             self::assertCount(1, 'Only a single version expected due to a config');
@@ -44,7 +44,7 @@ class VersionSwitcherTest extends TestCase
             'Expected at least two versions to test, got only ' . \implode($versions)
         );
         $versionSwitchMutex = new VersionSwitchMutex();
-        $rulesVersionSwitcher = new RulesVersionSwitcher($rulesVersions, $versionSwitchMutex);
+        $rulesVersionSwitcher = new VersionSwitcher($rulesVersions, $versionSwitchMutex);
         self::assertFalse(
             $rulesVersionSwitcher->switchToVersion($this->currentVersion),
             'Changing version to the same should result into false as nothing changed'

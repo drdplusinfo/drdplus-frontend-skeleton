@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\RulesSkeleton;
+namespace Tests\DrdPlus\FrontendSkeleton;
 
 class SourceCodeLinksTest extends AbstractContentTest
 {
@@ -38,7 +38,7 @@ class SourceCodeLinksTest extends AbstractContentTest
     private function getSourceUrls(): array
     {
         $sourceUrls = [];
-        foreach ($this->parseSourceUrls($this->getRulesContentForDev()) as $sourceUrl) {
+        foreach ($this->parseSourceUrls($this->getContentContentForDev()) as $sourceUrl) {
             $sourceUrls[] = $sourceUrl;
         }
 

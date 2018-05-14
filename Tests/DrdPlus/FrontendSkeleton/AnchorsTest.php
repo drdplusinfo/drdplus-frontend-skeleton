@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\RulesSkeleton;
+namespace Tests\DrdPlus\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use Granam\String\StringTools;
@@ -19,17 +19,11 @@ class AnchorsTest extends AbstractContentTest
      */
     public function All_anchors_point_to_syntactically_valid_links(): void
     {
-        $invalidAnchors = $this->parseInvalidAnchors($this->getOwnershipConfirmationContent());
+        $invalidAnchors = $this->parseInvalidAnchors($this->getContent());
         self::assertCount(
             0,
             $invalidAnchors,
-            'Some anchors from ownership confirmation points to invalid links ' . implode(',', $invalidAnchors)
-        );
-        $invalidAnchors = $this->parseInvalidAnchors($this->getRulesContent());
-        self::assertCount(
-            0,
-            $invalidAnchors,
-            'Some anchors from rules points to invalid links ' . implode(',', $invalidAnchors)
+            'Some anchors from content points to invalid links ' . implode(',', $invalidAnchors)
         );
     }
 
@@ -49,7 +43,7 @@ class AnchorsTest extends AbstractContentTest
      */
     public function Local_anchors_with_hashes_point_to_existing_ids(): void
     {
-        $html = $this->getRulesHtmlDocument();
+        $html = $this->getHtmlDocument();
         foreach ($this->getLocalAnchors() as $localAnchor) {
             $expectedId = \substr($localAnchor->getAttribute('href'), 1); // just remove leading #
             /** @var Element $target */
@@ -75,7 +69,7 @@ class AnchorsTest extends AbstractContentTest
      */
     private function getLocalAnchors(): array
     {
-        $html = $this->getRulesHtmlDocument();
+        $html = $this->getHtmlDocument();
         $localAnchors = [];
         /** @var Element $anchor */
         foreach ($html->getElementsByTagName('a') as $anchor) {
@@ -99,16 +93,16 @@ class AnchorsTest extends AbstractContentTest
             if (\in_array($link, self::$checkedExternalAnchors, true)) {
                 continue;
             }
-            $curl = curl_init($link);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-            curl_setopt($curl, CURLOPT_HEADER, 1);
-            curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
-            curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
-            curl_exec($curl);
-            $responseHttpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            $redirectUrl = curl_getinfo($curl, CURLINFO_REDIRECT_URL);
-            curl_close($curl);
+            $curl = \curl_init($link);
+            \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+            \curl_setopt($curl, CURLOPT_HEADER, 1);
+            \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
+            \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
+            \curl_exec($curl);
+            $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+            \curl_close($curl);
             self::assertTrue(
                 $responseHttpCode >= 200 && $responseHttpCode < 300,
                 "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl'"
@@ -122,7 +116,7 @@ class AnchorsTest extends AbstractContentTest
      */
     private function getExternalAnchors(): array
     {
-        $html = $this->getRulesHtmlDocument();
+        $html = $this->getHtmlDocument();
         $externalAnchors = [];
         /** @var Element $anchor */
         foreach ($html->getElementsByTagName('a') as $anchor) {
@@ -198,8 +192,6 @@ class AnchorsTest extends AbstractContentTest
                     \preg_match('~//(?<subDomain>[^.]+([.][^.]+)*)\.drdplus\.~', $link, $matches),
                     "Expected some sub-domain in link $link"
                 );
-                $cookieName = $this->getCookieNameForOwnershipConfirmation($matches['subDomain']);
-                curl_setopt($curl, CURLOPT_COOKIE, $cookieName . '=1');
             }
             $content = curl_exec($curl);
             curl_close($curl);
@@ -223,9 +215,9 @@ class AnchorsTest extends AbstractContentTest
      */
     public function Anchor_to_ID_self_is_not_created_if_contains_anchor_element(): void
     {
-        $document = $this->getRulesHtmlDocument();
+        $document = $this->getHtmlDocument();
         $noAnchorsForMe = $document->getElementById(StringTools::toConstant('no-anchor-for-me'));
-        if (!$noAnchorsForMe && !$this->checkingSkeleton($document)
+        if (!$noAnchorsForMe && !$this->isSkeletonChecked($document)
         ) {
             self::assertFalse(false, 'Nothing to test here');
 
@@ -247,7 +239,7 @@ class AnchorsTest extends AbstractContentTest
      */
     public function Original_ids_do_not_have_links_to_self(): void
     {
-        $document = $this->getRulesHtmlDocument();
+        $document = $this->getHtmlDocument();
         $originalIds = $document->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS);
         self::assertNotEmpty($originalIds);
         foreach ($originalIds as $originalId) {
@@ -260,9 +252,9 @@ class AnchorsTest extends AbstractContentTest
      */
     public function Only_allowed_elements_are_moved_into_injected_link(): void
     {
-        $document = $this->getRulesHtmlDocument();
+        $document = $this->getHtmlDocument();
         $withAllowedElementsOnly = $document->getElementById(self::ID_WITH_ALLOWED_ELEMENTS_ONLY);
-        if (!$withAllowedElementsOnly && !$this->checkingSkeleton($document)) {
+        if (!$withAllowedElementsOnly && !$this->isSkeletonChecked($document)) {
             self::assertFalse(false, 'Nothing to test here');
 
             return;
@@ -283,9 +275,9 @@ class AnchorsTest extends AbstractContentTest
      */
     public function I_can_navigate_to_every_calculation_as_it_has_its_id_with_anchor(): void
     {
-        $document = $this->getRulesHtmlDocument();
+        $document = $this->getHtmlDocument();
         $calculations = $document->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
-        if (!$this->checkingSkeleton($document) && \count($calculations) === 0) {
+        if (!$this->isSkeletonChecked($document) && \count($calculations) === 0) {
             self::assertFalse(false, 'No calculations in current document');
 
             return;
@@ -331,102 +323,5 @@ class AnchorsTest extends AbstractContentTest
                 self::assertStringStartsWith('https', $linkToVukogvazd, "Every link to vukogvazd should be via https: '$linkToVukogvazd'");
             }
         }
-    }
-
-    /**
-     * @test
-     */
-    public function Character_sheet_comes_from_drdplus_info(): void
-    {
-        $linksToCharacterSheet = [];
-        foreach ($this->getExternalAnchors() as $anchor) {
-            $link = $anchor->getAttribute('href');
-            $link = $this->turnToLocalLink($link);
-            if (\strpos($link, 'charakternik.pdf')) {
-                $linksToCharacterSheet[] = $link;
-            }
-        }
-        if (((\defined('JUST_TEXT_TESTING') && JUST_TEXT_TESTING)
-                || (\defined('NOT_FOR_PLAYERS') && NOT_FOR_PLAYERS)
-            )
-            && \count($linksToCharacterSheet) === 0
-        ) {
-            self::assertFalse(false, 'No links to PDF character sheet have been found');
-
-            return;
-        }
-        self::assertGreaterThan(0, \count($linksToCharacterSheet), 'PDF character sheet is missing');
-        $expectedOriginalLink = 'https://www.drdplus.info/pdf/charakternik.pdf';
-        $expectedLink = $this->turnToLocalLink($expectedOriginalLink);
-        foreach ($linksToCharacterSheet as $linkToCharacterSheet) {
-            self::assertSame(
-                $expectedLink,
-                $linkToCharacterSheet,
-                "Every link to PDF character sheet should lead to $expectedOriginalLink"
-            );
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function Journal_comes_from_drdplus_info(): void
-    {
-        $linksToJournal = [];
-        foreach ($this->getExternalAnchors() as $anchor) {
-            $link = $anchor->getAttribute('href');
-            $link = $this->turnToLocalLink($link);
-            if (\preg_match('~/denik_\w+\.pdf$~', $link)) {
-                $linksToJournal[] = $link;
-            }
-        }
-        if (((\defined('JUST_TEXT_TESTING') && JUST_TEXT_TESTING)
-                || (\defined('NOT_FOR_PLAYERS') && NOT_FOR_PLAYERS)
-            )
-            || \count($linksToJournal) === 0
-        ) {
-            self::assertFalse(false, 'No links to PDF journal have been found');
-
-            return;
-        }
-        self::assertGreaterThan(0, \count($linksToJournal), 'PDF journals are missing');
-        if (\defined('WITHOUT_SPECIFIC_JOURNAL') && WITHOUT_SPECIFIC_JOURNAL) {
-            foreach ($linksToJournal as $linkToJournal) {
-                self::assertRegExp(
-                    '~^http://www.drdplus[.]loc/pdf/deniky/denik_\w+[.]pdf$~',
-                    $linkToJournal,
-                    'Every link to PDF journal should lead to https://www.drdplus.info/pdf/deniky/denik_foo.pdf'
-                );
-            }
-
-            return;
-        }
-        $expectedOriginalLink = $this->getExpectedLinkToJournal();
-        $expectedLink = $this->turnToLocalLink($expectedOriginalLink);
-        foreach ($linksToJournal as $linkToJournal) {
-            self::assertSame(
-                $expectedLink,
-                $linkToJournal,
-                "Every link to PDF journal should lead to $expectedOriginalLink"
-            );
-        }
-    }
-
-    private function getExpectedLinkToJournal(): string
-    {
-        return 'https://www.drdplus.info/pdf/deniky/denik_' . StringTools::toConstant($this->getProfessionName()) . '.pdf';
-    }
-
-    private function getProfessionName(): string
-    {
-        $pageTitle = $this->getPageTitle();
-        self::assertSame(
-            1,
-            \preg_match('~\s(?<lastWord>\w+)$~u', $pageTitle, $matches),
-            "No last word found in '$pageTitle'"
-        );
-        $lastWord = $matches['lastWord'];
-
-        return \rtrim($lastWord, 'aeiouy');
     }
 }

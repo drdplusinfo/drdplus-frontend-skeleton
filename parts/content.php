@@ -1,6 +1,6 @@
 <?php
 // switch to version has to be BEFORE cache
-$pageCache = new \DrdPlus\FrontendSkeleton\PageCache($documentRoot, $rulesVersions);
+$pageCache = new \DrdPlus\FrontendSkeleton\PageCache($documentRoot, $versions);
 
 if ($pageCache->cacheIsValid()) {
     return $pageCache->getCachedContent();

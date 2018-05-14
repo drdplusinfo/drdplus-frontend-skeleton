@@ -14,17 +14,17 @@ abstract class Cache extends StrictObject
     /** @var string */
     private $cacheRoot;
     /** @var Versions */
-    private $rulesVersions;
+    private $versions;
 
     /**
      * @param string $documentRoot
-     * @param Versions $rulesVersions
+     * @param Versions $versions
      * @throws \RuntimeException
      */
-    public function __construct(string $documentRoot, Versions $rulesVersions)
+    public function __construct(string $documentRoot, Versions $versions)
     {
         $this->documentRoot = $documentRoot;
-        $this->cacheRoot = "{$this->getDocumentRoot()}/cache/" . (PHP_SAPI === 'cli' ? 'cli' : 'web') . "/{$rulesVersions->getCurrentVersion()}";
+        $this->cacheRoot = "{$this->getDocumentRoot()}/cache/" . (PHP_SAPI === 'cli' ? 'cli' : 'web') . "/{$versions->getCurrentVersion()}";
         if (!\file_exists($this->cacheRoot)) {
             if (!@\mkdir($this->cacheRoot, 0775, true /* recursive */) && !\is_dir($this->cacheRoot)) {
                 throw new \RuntimeException('Can not create directory for page cache ' . $this->cacheRoot);
@@ -34,7 +34,7 @@ abstract class Cache extends StrictObject
             }
             \chmod($this->cacheRoot, 0775); // because umask could suppress it
         }
-        $this->rulesVersions = $rulesVersions;
+        $this->versions = $versions;
     }
 
     public function inProduction(): bool
@@ -78,7 +78,7 @@ abstract class Cache extends StrictObject
         foreach ((array)$changedFiles as $changedFile) {
             \preg_match('~^\s*(?<change>\S+)\s+(?<relativeFileName>.+)$~', $changedFile, $matches);
             ['change' => $change, 'relativeFileName' => $changedRelativeFileName] = $matches;
-            if ($change === 'RM') { // file has been moved / renamed
+            if (\strpos($change, 'RM') !== false) { // file has been moved / renamed
                 // something like 'parts/contacts.php -> parts/menu.php'
                 \preg_match('~(?<oldName>(?:.(?!->))+)\s*->\s*(?<newName>(?:(?<!->).)+)~', $changedRelativeFileName, $movedFileMatches);
                 $changedRelativeFileName = \trim($movedFileMatches['newName']);
@@ -86,7 +86,7 @@ abstract class Cache extends StrictObject
             $changedRelativeFileName = StringTools::octalToUtf8($changedRelativeFileName);
             // double quotes trimmed as files with spaces in name are "double quoted" by GIT status
             $changedFileName = $this->getDocumentRoot() . '/' . \trim($changedRelativeFileName, '"');
-            if ($change === 'D') { // file was deleted, so we can not get MD5 of its content
+            if (\strpos($change, 'D') !== false) { // file was deleted, so we can not get MD5 of its content
                 $allStamp .= '0';
             } else {
                 $allStamp .= \md5_file($changedFileName);
@@ -124,7 +124,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileBaseNamePartWithoutGet(): string
     {
-        return "{$this->rulesVersions->getCurrentVersion()}_{$this->getCachePrefix()}_{$this->rulesVersions->getCurrentCommitHash()}_{$this->getGitStamp()}";
+        return "{$this->versions->getCurrentVersion()}_{$this->getCachePrefix()}_{$this->versions->getCurrentCommitHash()}_{$this->getGitStamp()}";
     }
 
     abstract protected function getCachePrefix(): string;
@@ -185,8 +185,8 @@ abstract class Cache extends StrictObject
     private function clearOldCache(): void
     {
         $foldersToSkip = ['.', '..', '.gitignore'];
-        $currentCacheStamp = $this->rulesVersions->getCurrentCommitHash();
-        $currentVersion = $this->rulesVersions->getCurrentVersion();
+        $currentCacheStamp = $this->versions->getCurrentCommitHash();
+        $currentVersion = $this->versions->getCurrentVersion();
         foreach (\scandir($this->cacheRoot, SCANDIR_SORT_NONE) as $folder) {
             if (\in_array($folder, $foldersToSkip, true)) {
                 continue;

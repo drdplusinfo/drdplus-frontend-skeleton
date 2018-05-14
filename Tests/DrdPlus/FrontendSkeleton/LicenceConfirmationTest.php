@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\RulesSkeleton;
+namespace Tests\DrdPlus\FrontendSkeleton;
 
 use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
@@ -68,7 +68,7 @@ class LicenceConfirmationTest extends AbstractContentTest
      */
     public function I_can_confirm_ownership(): void
     {
-        $html = new HTMLDocument($this->getRulesContent()); // includes confirmation via cookie
+        $html = new HTMLDocument($this->getContent()); // includes confirmation via cookie
         $forms = $html->getElementsByTagName('form');
         self::assertCount(0, $forms, 'No forms expected in confirmed content');
     }
@@ -83,7 +83,7 @@ class LicenceConfirmationTest extends AbstractContentTest
             $_SERVER['HTTP_USER_AGENT'] = $crawlerUserAgent;
             self::assertSame(
                 $this->getOwnershipConfirmationContent(true /* not cached */),
-                $this->getRulesContent(),
+                $this->getContent(),
                 'Expected rules content for a crawler, skipping ownership confirmation page'
             );
         }
