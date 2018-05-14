@@ -2,7 +2,7 @@
 namespace Tests\DrdPlus\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Exceptions\CanNotLockVersionMutex;
-use DrdPlus\FrontendSkeleton\VersionSwitchMutex;
+use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
 use PHPUnit\Framework\TestCase;
 
 class VersionSwitchMutexTest extends TestCase
@@ -12,7 +12,7 @@ class VersionSwitchMutexTest extends TestCase
      */
     public function I_can_get_and_release_lock(): void
     {
-        $mutex = new VersionSwitchMutex();
+        $mutex = new WebVersionSwitchMutex();
         self::assertFalse($mutex->isLockedForId('foo'), 'Should not be locked yet');
         self::assertFalse($mutex->isLockedForId('bar'), 'Should not be locked yet');
         self::assertTrue($mutex->lock('foo'), 'Can not get lock via mutex');
@@ -24,7 +24,7 @@ class VersionSwitchMutexTest extends TestCase
         self::assertFalse($mutex->unlock(), 'Second unlock in a row should NOT be successful');
         self::assertTrue($mutex->lock('foo'), 'Can not get lock via mutex');
         self::assertTrue($mutex->isLockedForId('foo'), 'Should be locked for "foo" version');
-        $anotherMutex = new VersionSwitchMutex();
+        $anotherMutex = new WebVersionSwitchMutex();
         self::assertTrue($anotherMutex->isLockedForId('foo'), 'Should be locked for "foo" version using any mutex instance');
         $mutex->__destruct();
         unset($mutex);
@@ -36,9 +36,9 @@ class VersionSwitchMutexTest extends TestCase
      */
     public function I_can_not_lock_twice(): void
     {
-        $mutex = new VersionSwitchMutex();
+        $mutex = new WebVersionSwitchMutex();
         $mutex->lock('foo');
-        $mutexClass = VersionSwitchMutex::class;
+        $mutexClass = WebVersionSwitchMutex::class;
         $canNotLockClass = CanNotLockVersionMutex::class;
         $message = \exec(<<<PHP
 php -r 'require "vendor/autoload.php";
@@ -65,7 +65,7 @@ PHP
      */
     public function I_can_not_get_lock_with_invalid_lock_dir(): void
     {
-        $mutex = new VersionSwitchMutex('/just/a/small/flash/memory/in/another/universe');
+        $mutex = new WebVersionSwitchMutex('/just/a/small/flash/memory/in/another/universe');
         $mutex->lock('foo');
     }
 }

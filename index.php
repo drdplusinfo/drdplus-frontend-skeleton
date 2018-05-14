@@ -12,12 +12,12 @@ require_once $documentRoot . '/vendor/autoload.php';
 
 \DrdPlus\FrontendSkeleton\TracyDebugger::enable();
 
-$versions = new \DrdPlus\FrontendSkeleton\Versions($documentRoot);
-$versionSwitchMutex = new \DrdPlus\FrontendSkeleton\VersionSwitchMutex();
-$versionSwitcher = new \DrdPlus\FrontendSkeleton\VersionSwitcher($versions, $versionSwitchMutex);
+$webVersions = new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot);
+$versionSwitchMutex = new \DrdPlus\FrontendSkeleton\WebVersionSwitchMutex();
+$versionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher($webVersions, $versionSwitchMutex);
 $request = new \DrdPlus\FrontendSkeleton\Request();
 try {
-    $versionSwitcher->switchToVersion($_GET['version'] ?? $_COOKIE['version'] ?? $versions->getLastVersion());
+    $versionSwitcher->switchToVersion($_GET['version'] ?? $_COOKIE['version'] ?? $webVersions->getLastVersion());
 } catch (\DrdPlus\FrontendSkeleton\Exceptions\Exception $exception) {
     \trigger_error($exception->getMessage() . '; ' . $exception->getTraceAsString(), E_USER_WARNING);
 }

@@ -6,18 +6,18 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class VersionSwitcher extends StrictObject
+class WebVersionSwitcher extends StrictObject
 {
 
-    /** @var Versions */
-    private $versions;
-    /** @var VersionSwitchMutex */
-    private $versionSwitchMutex;
+    /** @var WebVersions */
+    private $webVersions;
+    /** @var WebVersionSwitchMutex */
+    private $webVersionSwitchMutex;
 
-    public function __construct(Versions $versions, VersionSwitchMutex $versionSwitchMutex)
+    public function __construct(WebVersions $webVersions, WebVersionSwitchMutex $webVersionSwitchMutex)
     {
-        $this->versions = $versions;
-        $this->versionSwitchMutex = $versionSwitchMutex;
+        $this->webVersions = $webVersions;
+        $this->webVersionSwitchMutex = $webVersionSwitchMutex;
     }
 
     /**
@@ -32,15 +32,15 @@ class VersionSwitcher extends StrictObject
     public function switchToVersion(string $version): bool
     {
         // do NOT unlock it as we need the version to be locked until we fill or use the cache (lock will be unlocked automatically on script end)
-        if ($version === $this->versions->getCurrentVersion()) {
-            if (!$this->versionSwitchMutex->isLockedForId($version)) {
-                $this->versionSwitchMutex->lock($version);
+        if ($version === $this->webVersions->getCurrentVersion()) {
+            if (!$this->webVersionSwitchMutex->isLockedForId($version)) {
+                $this->webVersionSwitchMutex->lock($version);
             }
 
             return false;
         }
-        $this->versionSwitchMutex->lock($version);
-        if (!$this->versions->hasVersion($version)) {
+        $this->webVersionSwitchMutex->lock($version);
+        if (!$this->webVersions->hasVersion($version)) {
             throw new Exceptions\InvalidVersionToSwitchInto("Required version {$version} does not exist");
         }
         $command = 'git checkout ' . \escapeshellarg($version) . ' 2>&1';

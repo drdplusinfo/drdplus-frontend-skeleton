@@ -6,7 +6,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class Versions extends StrictObject
+class WebVersions extends StrictObject
 {
 
     public const LATEST_VERSION = 'master';
@@ -26,7 +26,7 @@ class Versions extends StrictObject
      * @return array|string[]
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    public function getAllVersions(): array
+    public function getAllWebVersions(): array
     {
         $branches = $this->executeArray(
             'cd ' . \escapeshellarg($this->documentRoot) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
@@ -57,7 +57,7 @@ class Versions extends StrictObject
      */
     public function getLastVersion(): string
     {
-        $versions = $this->getAllVersions();
+        $versions = $this->getAllWebVersions();
 
         return \reset($versions);
     }
@@ -88,7 +88,7 @@ class Versions extends StrictObject
      */
     public function hasVersion(string $version): bool
     {
-        return \in_array($version, $this->getAllVersions(), true);
+        return \in_array($version, $this->getAllWebVersions(), true);
     }
 
     /**

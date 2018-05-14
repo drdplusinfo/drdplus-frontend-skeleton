@@ -12,18 +12,18 @@ abstract class Cache extends StrictObject
     private $documentRoot;
     /** @var string */
     private $cacheRoot;
-    /** @var Versions */
-    private $versions;
+    /** @var WebVersions */
+    private $webVersions;
 
     /**
      * @param string $documentRoot
-     * @param Versions $versions
+     * @param WebVersions $webVersions
      * @throws \RuntimeException
      */
-    public function __construct(string $documentRoot, Versions $versions)
+    public function __construct(string $documentRoot, WebVersions $webVersions)
     {
         $this->documentRoot = $documentRoot;
-        $this->cacheRoot = "{$this->getDocumentRoot()}/cache/" . (PHP_SAPI === 'cli' ? 'cli' : 'web') . "/{$versions->getCurrentVersion()}";
+        $this->cacheRoot = "{$this->getDocumentRoot()}/cache/" . (PHP_SAPI === 'cli' ? 'cli' : 'web') . "/{$webVersions->getCurrentVersion()}";
         if (!\file_exists($this->cacheRoot)) {
             if (!@\mkdir($this->cacheRoot, 0775, true /* recursive */) && !\is_dir($this->cacheRoot)) {
                 throw new \RuntimeException('Can not create directory for page cache ' . $this->cacheRoot);
@@ -33,7 +33,7 @@ abstract class Cache extends StrictObject
             }
             \chmod($this->cacheRoot, 0775); // because umask could suppress it
         }
-        $this->versions = $versions;
+        $this->webVersions = $webVersions;
     }
 
     public function isInProduction(): bool
@@ -82,7 +82,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileBaseNamePartWithoutGet(): string
     {
-        return "{$this->versions->getCurrentVersion()}_{$this->getCachePrefix()}_{$this->versions->getCurrentCommitHash()}_{$this->getGitStamp()}";
+        return "{$this->webVersions->getCurrentVersion()}_{$this->getCachePrefix()}_{$this->webVersions->getCurrentCommitHash()}_{$this->getGitStamp()}";
     }
 
     abstract protected function getCachePrefix(): string;
@@ -166,8 +166,8 @@ abstract class Cache extends StrictObject
     private function clearOldCache(): void
     {
         $foldersToSkip = ['.', '..', '.gitignore'];
-        $currentCacheStamp = $this->versions->getCurrentCommitHash();
-        $currentVersion = $this->versions->getCurrentVersion();
+        $currentCacheStamp = $this->webVersions->getCurrentCommitHash();
+        $currentVersion = $this->webVersions->getCurrentVersion();
         foreach (\scandir($this->cacheRoot, SCANDIR_SORT_NONE) as $folder) {
             if (\in_array($folder, $foldersToSkip, true)) {
                 continue;

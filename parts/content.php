@@ -1,6 +1,6 @@
 <?php
 // switch to version has to be BEFORE cache
-$pageCache = new \DrdPlus\FrontendSkeleton\PageCache($documentRoot, $versions);
+$pageCache = new \DrdPlus\FrontendSkeleton\PageCache($documentRoot, $webVersions);
 
 if ($pageCache->isCacheValid()) {
     return $pageCache->getCachedContent();

@@ -6,7 +6,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class VersionSwitchMutex extends StrictObject
+class WebVersionSwitchMutex extends StrictObject
 {
 
     /**

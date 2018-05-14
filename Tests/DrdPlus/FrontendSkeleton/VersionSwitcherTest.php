@@ -1,30 +1,30 @@
 <?php
 namespace DrdPlus\Tests\RulesSkeleton;
 
-use DrdPlus\FrontendSkeleton\Versions;
-use DrdPlus\FrontendSkeleton\VersionSwitcher;
-use DrdPlus\FrontendSkeleton\VersionSwitchMutex;
+use DrdPlus\FrontendSkeleton\WebVersions;
+use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
+use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
 use PHPUnit\Framework\TestCase;
 
 class VersionSwitcherTest extends TestCase
 {
-    private $currentVersion;
+    private $currentWebVersion;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->currentVersion = (new Versions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
+        $this->currentWebVersion = (new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
     }
 
     protected function tearDown()
     {
-        $versionSwitchMutex = new VersionSwitchMutex();
-        $rulesVersionSwitcher = new VersionSwitcher(
-            new Versions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)),
-            $versionSwitchMutex
+        $webVersionSwitchMutex = new WebVersionSwitchMutex();
+        $webVersionSwitcher = new WebVersionSwitcher(
+            new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)),
+            $webVersionSwitchMutex
         );
-        $rulesVersionSwitcher->switchToVersion($this->currentVersion);
-        $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
+        $webVersionSwitcher->switchToVersion($this->currentWebVersion);
+        $webVersionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
         parent::tearDown();
     }
 
@@ -33,8 +33,8 @@ class VersionSwitcherTest extends TestCase
      */
     public function I_can_switch_to_another_version(): void
     {
-        $rulesVersions = new Versions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
-        $versions = $rulesVersions->getAllVersions();
+        $webVersions = new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
+        $versions = $webVersions->getAllWebVersions();
         if (\defined('SINGLE_VERSION_ONLY') && SINGLE_VERSION_ONLY) {
             self::assertCount(1, 'Only a single version expected due to a config');
         }
@@ -43,14 +43,14 @@ class VersionSwitcherTest extends TestCase
             \count($versions),
             'Expected at least two versions to test, got only ' . \implode($versions)
         );
-        $versionSwitchMutex = new VersionSwitchMutex();
-        $rulesVersionSwitcher = new VersionSwitcher($rulesVersions, $versionSwitchMutex);
+        $versionSwitchMutex = new WebVersionSwitchMutex();
+        $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, $versionSwitchMutex);
         self::assertFalse(
-            $rulesVersionSwitcher->switchToVersion($this->currentVersion),
+            $rulesVersionSwitcher->switchToVersion($this->currentWebVersion),
             'Changing version to the same should result into false as nothing changed'
         );
         $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
-        $otherVersions = \array_diff($versions, [$this->currentVersion]);
+        $otherVersions = \array_diff($versions, [$this->currentWebVersion]);
         foreach ($otherVersions as $otherVersion) {
             self::assertTrue(
                 $rulesVersionSwitcher->switchToVersion($otherVersion),
