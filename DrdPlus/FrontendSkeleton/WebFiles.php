@@ -6,16 +6,14 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class HtmlFiles extends StrictObject implements \IteratorAggregate
+class WebFiles extends StrictObject implements \IteratorAggregate
 {
-    /**
-     * @var string
-     */
-    private $htmlFilesDir;
+    /** @var string */
+    private $webFilesDir;
 
-    public function __construct(string $htmlFilesDir)
+    public function __construct(string $webFilesDir)
     {
-        $this->htmlFilesDir = \rtrim($htmlFilesDir, '\/');
+        $this->webFilesDir = \rtrim($webFilesDir, '\/');
     }
 
     /**
@@ -23,14 +21,14 @@ class HtmlFiles extends StrictObject implements \IteratorAggregate
      */
     public function getIterator(): \Iterator
     {
-        return new \ArrayIterator($this->getSortedHtmlFileNames());
+        return new \ArrayIterator($this->getSortedWebFileNames());
     }
 
-    private function getSortedHtmlFileNames(): array
+    private function getSortedWebFileNames(): array
     {
-        $htmlFileNames = $this->getUnsortedHtmlFileNames();
+        $htmlFileNames = $this->getUnsortedWebFileNames();
 
-        $sorted = $this->sortHtmlFiles($htmlFileNames);
+        $sorted = $this->sortFiles($htmlFileNames);
 
         return $this->extendRelativeToFullPath($sorted);
     }
@@ -38,24 +36,24 @@ class HtmlFiles extends StrictObject implements \IteratorAggregate
     /**
      * @return array|string[]
      */
-    private function getUnsortedHtmlFileNames(): array
+    private function getUnsortedWebFileNames(): array
     {
-        if (!\is_dir($this->htmlFilesDir)) {
+        if (!\is_dir($this->webFilesDir)) {
             return [];
         }
 
-        return \array_filter(\scandir($this->htmlFilesDir, SCANDIR_SORT_NONE), function ($file) {
-            return $file !== '.' && $file !== '..' && \preg_match('~\.html$~', $file);
+        return \array_filter(\scandir($this->webFilesDir, SCANDIR_SORT_NONE), function ($file) {
+            return $file !== '.' && $file !== '..' && \preg_match('~\.(html|php)$~', $file);
         });
     }
 
     /**
-     * @param array|string[] $htmlFileNames
+     * @param array|string[] $fileNames
      * @return array
      */
-    private function sortHtmlFiles(array $htmlFileNames): array
+    private function sortFiles(array $fileNames): array
     {
-        \usort($htmlFileNames, function ($firstName, $secondName) {
+        \usort($fileNames, function ($firstName, $secondName) {
             $firstNameParts = $this->parseNameParts($firstName);
             $secondNameParts = $this->parseNameParts($secondName);
             if (isset($firstNameParts['page'], $secondNameParts['page'])) {
@@ -91,7 +89,7 @@ class HtmlFiles extends StrictObject implements \IteratorAggregate
             return 0;
         });
 
-        return $htmlFileNames;
+        return $fileNames;
     }
 
     /**
@@ -113,7 +111,7 @@ class HtmlFiles extends StrictObject implements \IteratorAggregate
     {
         return \array_map(
             function ($htmlFile) {
-                return $this->htmlFilesDir . '/' . $htmlFile;
+                return $this->webFilesDir . '/' . $htmlFile;
             },
             $relativeFileNames
         );

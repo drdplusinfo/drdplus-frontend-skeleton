@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
-use Granam\String\StringTools;
 
 abstract class Cache extends StrictObject
 {
@@ -37,7 +36,7 @@ abstract class Cache extends StrictObject
         $this->versions = $versions;
     }
 
-    public function inProduction(): bool
+    public function isInProduction(): bool
     {
         return !empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] !== '127.0.0.1';
     }
@@ -56,53 +55,12 @@ abstract class Cache extends StrictObject
     }
 
     /**
-     * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
-     */
-    private function getGitStamp(): string
-    {
-        if ($this->inProduction()) {
-            return 'production';
-        }
-        // GIT status is same for any working dir, if it sub-dir of GIT project root
-        \exec('git status --porcelain', $changedFiles, $return);
-        if ($return !== 0) {
-            throw new Exceptions\CanNotGetGitStatus(
-                'Can not run `git status --porcelain`, got result code ' . $return
-            );
-        }
-        if (\count($changedFiles) === 0) {
-            return 'unchanged';
-        }
-        $allStamp = '';
-        foreach ((array)$changedFiles as $changedFile) {
-            \preg_match('~^\s*(?<change>\S+)\s+(?<relativeFileName>.+)$~', $changedFile, $matches);
-            ['change' => $change, 'relativeFileName' => $changedRelativeFileName] = $matches;
-            if (\strpos($change, 'RM') !== false) { // file has been moved / renamed
-                // something like 'parts/contacts.php -> parts/menu.php'
-                \preg_match('~(?<oldName>(?:.(?!->))+)\s*->\s*(?<newName>(?:(?<!->).)+)~', $changedRelativeFileName, $movedFileMatches);
-                $changedRelativeFileName = \trim($movedFileMatches['newName']);
-            }
-            $changedRelativeFileName = StringTools::octalToUtf8($changedRelativeFileName);
-            // double quotes trimmed as files with spaces in name are "double quoted" by GIT status
-            $changedFileName = $this->getDocumentRoot() . '/' . \trim($changedRelativeFileName, '"');
-            if (\strpos($change, 'D') !== false) { // file was deleted, so we can not get MD5 of its content
-                $allStamp .= '0';
-            } else {
-                $allStamp .= \md5_file($changedFileName);
-            }
-        }
-
-        return \md5($allStamp);
-    }
-
-    /**
      * @return bool
      * @throws \RuntimeException
      */
-    public function cacheIsValid(): bool
+    public function isCacheValid(): bool
     {
-        return \is_readable($this->getCacheFileName());
+        return ($_GET['cache'] ?? '') !== 'disable' && \is_readable($this->getCacheFileName());
     }
 
     /**
@@ -128,6 +86,29 @@ abstract class Cache extends StrictObject
     }
 
     abstract protected function getCachePrefix(): string;
+
+    /**
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
+     */
+    private function getGitStamp(): string
+    {
+        if ($this->isInProduction()) {
+            return 'production';
+        }
+        // GIT status is same for any working dir, if it sub-dir of GIT project root
+        \exec('git diff', $changedRows, $return);
+        if ($return !== 0) {
+            throw new Exceptions\CanNotGetGitStatus(
+                'Can not run `git status --porcelain`, got result code ' . $return
+            );
+        }
+        if (\count($changedRows) === 0) {
+            return 'unchanged';
+        }
+
+        return \md5(\implode($changedRows));
+    }
 
     /**
      * @return string

@@ -12,17 +12,22 @@ class AssetsVersion extends StrictObject
     private $scanDirsForCss;
     /** @var bool */
     private $scanDirsForHtml;
+    /** @var bool */
+    private $scanDirsForPhp;
 
-    public function __construct(bool $scanDirsForCss = null, bool $scanDirsForHtml = null)
+    public function __construct(bool $scanDirsForCss = null, bool $scanDirsForHtml = null, bool $scanDirsForPhp = null)
     {
         $this->scanDirsForCss = false;
         $this->scanDirsForHtml = false;
-        if ($scanDirsForCss === null && $scanDirsForHtml === null) { // default is to can for everything
+        $this->scanDirsForPhp = false;
+        if ($scanDirsForCss === null && $scanDirsForHtml === null && $scanDirsForPhp === null) { // default is to scan for everything
             $this->scanDirsForCss = true;
             $this->scanDirsForHtml = true;
+            $this->scanDirsForPhp = true;
         } else { // only selected file types will be searched
             $this->scanDirsForCss = $scanDirsForCss ?? false;
             $this->scanDirsForHtml = $scanDirsForHtml ?? false;
+            $this->scanDirsForPhp = $scanDirsForPhp ?? false;
         }
     }
 
@@ -82,6 +87,9 @@ class AssetsVersion extends StrictObject
         }
         if ($this->scanDirsForHtml) {
             $wantedFileExtensions[] = 'html';
+        }
+        if ($this->scanDirsForPhp) {
+            $wantedFileExtensions[] = 'php';
         }
         $excludeDirs = $this->unifyFolderNames($excludeDirs);
         $wantedFileExtensionsRegexp = '(' . \implode('|', $wantedFileExtensions) . ')';
