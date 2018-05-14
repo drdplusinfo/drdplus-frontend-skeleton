@@ -6,7 +6,7 @@ namespace Tests\DrdPlus\FrontendSkeleton;
 
 use Granam\Tests\ExceptionsHierarchy\Exceptions\AbstractExceptionsHierarchyTest;
 
-class SkeletonExceptionsHierarchyTest extends AbstractExceptionsHierarchyTest
+class FrontendSkeletonExceptionsHierarchyTest extends AbstractExceptionsHierarchyTest
 {
     protected function getTestedNamespace(): string
     {
