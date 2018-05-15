@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractContentTest extends TestCase
 {
     private static $content = [];
+    private static $htmlDocument = [];
 
     protected function setUp()
     {
@@ -23,7 +24,7 @@ abstract class AbstractContentTest extends TestCase
      */
     protected function getContent(string $show = '', array $get = []): string
     {
-        $key = "$show-" . \serialize($get);
+        $key = $this->createKey($show, $get);
         if ((self::$content[$key] ?? null) === null) {
             if ($show !== '') {
                 $_GET['show'] = $show;
@@ -43,6 +44,11 @@ abstract class AbstractContentTest extends TestCase
         return self::$content[$key];
     }
 
+    protected function createKey(string $show, array $get): string
+    {
+        return "{$this->passIn()}-$show-" . \serialize($get);
+    }
+
     /**
      * Intended for overwrite if protected content is accessed
      */
@@ -53,13 +59,12 @@ abstract class AbstractContentTest extends TestCase
 
     protected function getHtmlDocument(string $show = '', array $get = []): HTMLDocument
     {
-        static $htmlDocument = [];
-        $key = "$show-" . \serialize($get);
-        if (empty($htmlDocument[$key])) {
-            $htmlDocument[$key] = new HTMLDocument($this->getContent($show, $get));
+        $key = $this->createKey($show, $get);
+        if (empty(self::$htmlDocument[$key])) {
+            self::$htmlDocument[$key] = new HTMLDocument($this->getContent($show, $get));
         }
 
-        return $htmlDocument[$key];
+        return self::$htmlDocument[$key];
     }
 
     protected function isSkeletonChecked(HTMLDocument $document): bool
