@@ -26,7 +26,19 @@ class AssetsVersionTest extends AbstractContentTest
             $changedFiles,
             "Expected all CSS files already transpiled to have versioned links to assets, but those are not: \n"
             . implode("\n", $changedFiles)
-            ."\ntranspile them:\n ./vendor/drd-plus/rules-html-skeleton/bin/assets --dir=css"
+            . "\ntranspile them:\n ./vendor/drd-plus/rules-html-skeleton/bin/assets --dir=css"
         );
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_use_helper_script(): void
+    {
+        $binAssets = __DIR__ . '/../../../bin/assets';
+        \exec("php $binAssets", $output, $result);
+        self::assertSame(0, $result, 'Can not call ' . $binAssets);
+        self::assertNotEmpty($output);
+        self::assertStringStartsWith('Options are', $output[0]);
     }
 }
