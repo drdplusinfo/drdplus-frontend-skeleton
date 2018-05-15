@@ -10,7 +10,13 @@ $documentRoot = PHP_SAPI !== 'cli' ? rtrim(dirname($_SERVER['SCRIPT_FILENAME']),
 /** @noinspection PhpIncludeInspection */
 require_once $documentRoot . '/vendor/autoload.php';
 
-\DrdPlus\FrontendSkeleton\TracyDebugger::enable();
+$onLocalhost = PHP_SAPI === 'cli'
+    || ($_SERVER['REMOTE_ADDR'] ?? null) === '127.0.0.1';
+$tracyMode = null;
+if ($onLocalhost) {
+    $tracyMode = false;
+}
+\DrdPlus\FrontendSkeleton\TracyDebugger::enable($tracyMode);
 
 $webVersions = new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot);
 $versionSwitchMutex = new \DrdPlus\FrontendSkeleton\WebVersionSwitchMutex();
