@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton;
 
 use Gt\Dom\Element;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\UsagePolicy;
 use PHPUnit\Framework\TestCase;

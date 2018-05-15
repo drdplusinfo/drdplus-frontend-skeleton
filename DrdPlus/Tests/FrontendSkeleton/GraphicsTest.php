@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton;
 
 class GraphicsTest extends AbstractContentTest
 {

@@ -1,5 +1,5 @@
 <?php
-namespace Tests\DrdPlus\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Exceptions\CanNotLockVersionMutex;
 use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
