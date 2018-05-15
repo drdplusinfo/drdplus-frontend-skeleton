@@ -1,18 +1,12 @@
 <?php
 // switch to version has to be BEFORE cache
-$pageCache = new \DrdPlus\FrontendSkeleton\PageCache($documentRoot, $webVersions);
+$pageCache = new \DrdPlus\FrontendSkeleton\PageCache($documentRoot, $webVersions, $htmlHelper->isInProduction());
 
 if ($pageCache->isCacheValid()) {
     return $pageCache->getCachedContent();
 }
 $previousMemoryLimit = \ini_set('memory_limit', '1G');
-$htmlHelper = new \DrdPlus\FrontendSkeleton\HtmlHelper(
-    $documentRoot,
-    !empty($_GET['mode']) && strpos(trim($_GET['mode']), 'dev') === 0,
-    !empty($_GET['hide']) && strpos(trim($_GET['hide']), 'cover') === 0,
-    !empty($_GET['show']) && strpos(trim($_GET['show']), 'intro') === 0
-);
-ob_start();
+\ob_start();
 ?>
   <!DOCTYPE html>
   <html lang="cs">
@@ -41,28 +35,34 @@ ob_start();
         // $contactsFixed = true; // (default is on top or bottom of the content)
         // $contactsBottom = true; // (default is top)
         // $hideHomeButton = true; // (default is to show)
-        include __DIR__ . '/menu.php';
-        $content = ob_get_contents();
-        ob_clean();
+        if (\file_exists(__DIR__ . '/parts/menu.php')) {
+            /** @noinspection PhpIncludeInspection */
+            include $documentRoot . '/parts/menu.php';
+        } else {
+            include __DIR__ . '/menu.php';
+        }
+        $content = \ob_get_contents();
+        \ob_clean();
 
         if (file_exists($documentRoot . '/custom_body_content.php')) {
             /** @noinspection PhpIncludeInspection */
             include $documentRoot . '/custom_body_content.php';
-            $content .= ob_get_contents();
-            ob_clean();
+            $content .= \ob_get_contents();
+            \ob_clean();
         }
 
         /** @var array|string[] $sortedWebFiles */
         $sortedWebFiles = new \DrdPlus\FrontendSkeleton\WebFiles($documentRoot . '/web');
         foreach ($sortedWebFiles as $webFile) {
             if (\preg_match('~\.php$~', $webFile)) {
+                /** @noinspection PhpIncludeInspection */
                 include $webFile;
-                $content .= ob_get_contents();
-                ob_clean();
+                $content .= \ob_get_contents();
+                \ob_clean();
             } else {
                 readfile($webFile);
-                $content .= ob_get_contents();
-                ob_clean();
+                $content .= \ob_get_contents();
+                \ob_clean();
             }
         } ?>
       <script type="text/javascript">
@@ -74,7 +74,7 @@ ob_start();
     </body>
   </html>
 <?php
-$content .= ob_get_clean();
+$content .= \ob_get_clean();
 $pageCache->saveContentForDebug($content); // for debugging purpose
 $htmlDocument = new \DrdPlus\FrontendSkeleton\HtmlDocument($content);
 $htmlHelper->prepareSourceCodeLinks($htmlDocument);

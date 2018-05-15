@@ -1,22 +1,21 @@
 <?php
-error_reporting(-1);
+\error_reporting(-1);
 if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1') || PHP_SAPI === 'cli') {
-    ini_set('display_errors', '1');
+    \ini_set('display_errors', '1');
 } else {
-    ini_set('display_errors', '0');
+    \ini_set('display_errors', '0');
 }
-$documentRoot = PHP_SAPI !== 'cli' ? rtrim(dirname($_SERVER['SCRIPT_FILENAME']), '\/') : getcwd();
+$documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
 
-/** @noinspection PhpIncludeInspection */
-require_once $documentRoot . '/vendor/autoload.php';
-
-$onLocalhost = PHP_SAPI === 'cli'
-    || ($_SERVER['REMOTE_ADDR'] ?? null) === '127.0.0.1';
-$tracyMode = null;
-if ($onLocalhost) {
-    $tracyMode = false;
+if (\file_exists($documentRoot . '/vendor/autoload.php')) {
+    /** @noinspection PhpIncludeInspection */
+    require_once $documentRoot . '/vendor/autoload.php';
+} else {
+    require_once __DIR__ . '/vendor/autoload.php';
 }
-\DrdPlus\FrontendSkeleton\TracyDebugger::enable($tracyMode);
+
+$htmlHelper = \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
+\DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
 $webVersions = new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot);
 $versionSwitchMutex = new \DrdPlus\FrontendSkeleton\WebVersionSwitchMutex();
@@ -28,6 +27,10 @@ try {
     \trigger_error($exception->getMessage() . '; ' . $exception->getTraceAsString(), E_USER_WARNING);
 }
 
-/** @see vendor/drd-plus/rules-html-skeleton/content.php */
-echo require __DIR__ . '/parts/content.php';
+if (\file_exists($documentRoot . '/parts/content.php')) {
+    /** @noinspection PhpIncludeInspection */
+    echo require $documentRoot . '/parts/content.php';
+} else {
+    echo require __DIR__ . '/parts/content.php';
+}
 $versionSwitchMutex->unlock(); // unlock even if was not locked, just for sure

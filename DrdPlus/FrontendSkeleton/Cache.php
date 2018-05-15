@@ -14,13 +14,20 @@ abstract class Cache extends StrictObject
     private $cacheRoot;
     /** @var WebVersions */
     private $webVersions;
+    /** @var bool */
+    private $isInProduction;
 
     /**
      * @param string $documentRoot
      * @param WebVersions $webVersions
+     * @param bool $isInProduction
      * @throws \RuntimeException
      */
-    public function __construct(string $documentRoot, WebVersions $webVersions)
+    public function __construct(
+        string $documentRoot,
+        WebVersions $webVersions,
+        bool $isInProduction
+    )
     {
         $this->documentRoot = $documentRoot;
         $this->cacheRoot = "{$this->getDocumentRoot()}/cache/" . (PHP_SAPI === 'cli' ? 'cli' : 'web') . "/{$webVersions->getCurrentVersion()}";
@@ -34,11 +41,12 @@ abstract class Cache extends StrictObject
             \chmod($this->cacheRoot, 0775); // because umask could suppress it
         }
         $this->webVersions = $webVersions;
+        $this->isInProduction = $isInProduction;
     }
 
     public function isInProduction(): bool
     {
-        return !empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] !== '127.0.0.1';
+        return $this->isInProduction;
     }
 
     /**

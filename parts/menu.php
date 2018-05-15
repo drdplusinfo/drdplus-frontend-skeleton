@@ -7,7 +7,7 @@ if (!empty($contactsFixed)) {
     $contactsClasses['fixed'] = 'fixed';
 }
 ?>
-    <div class="contacts visible <?= implode(' ', $contactsClasses) ?> permanent" id="contacts">
+    <div class="contacts visible <?= \implode(' ', $contactsClasses) ?> permanent" id="contacts">
         <div class="container">
             <?php if (empty($hideHomeButton)) { ?>
                 <span class="menu">
