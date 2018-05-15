@@ -25,6 +25,16 @@ class HtmlHelper extends StrictObject
     /** @var string */
     private $rootDir;
 
+    public static function createFromGlobals(string $documentRootDir): HtmlHelper
+    {
+        return new static(
+            $documentRootDir,
+            !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'dev') === 0,
+            !empty($_GET['hide']) && \strpos(\trim($_GET['hide']), 'cover') === 0,
+            !empty($_GET['show']) && \strpos(\trim($_GET['show']), 'intro') === 0
+        );
+    }
+
     public function __construct(string $rootDir, bool $inDevMode, bool $shouldHideCovered, bool $showIntroductionOnly)
     {
         $this->rootDir = $this->unifyPath($rootDir);
@@ -484,5 +494,10 @@ class HtmlHelper extends StrictObject
         return ($smiley !== '')
             ? ($smiley . ' ' . $title)
             : $title;
+    }
+
+    public function isInProduction(): bool
+    {
+        return PHP_SAPI !== 'cli' && ($_SERVER['REMOTE_ADDR'] ?? null) !== '127.0.0.1';
     }
 }
