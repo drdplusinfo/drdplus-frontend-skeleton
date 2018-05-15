@@ -52,9 +52,9 @@ abstract class AbstractContentTest extends TestCase
     /**
      * Intended for overwrite if protected content is accessed
      */
-    protected function passIn()
+    protected function passIn(): bool
     {
-        return;
+        return true;
     }
 
     protected function getHtmlDocument(string $show = '', array $get = []): HTMLDocument
