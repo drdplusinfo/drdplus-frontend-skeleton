@@ -159,11 +159,7 @@ class AnchorsTest extends AbstractContentTest
 
     protected function turnToLocalLink(string $link): string
     {
-        if (\strpos($link, 'drdplus.info') === false) {
-            return $link;
-        }
-
-        return \str_replace(['drdplus.info', 'https'], ['drdplus.loc', 'http'], $link); // turn link into local version
+        return \preg_replace('~https?://((?:[[:alnum:]]+\.)*)drdplus\.info~', 'http://$1drdplus.loc', $link); // turn link into local version
     }
 
     /**
