@@ -86,6 +86,7 @@ class AnchorsTest extends AbstractContentTest
 
     /**
      * @test
+     * @runInSeparateProcess
      */
     public function All_external_anchors_can_be_reached(): void
     {
@@ -97,7 +98,7 @@ class AnchorsTest extends AbstractContentTest
             $link = $this->turnToLocalLink($link);
             $curl = \curl_init($link);
             \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+            \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
             \curl_setopt($curl, CURLOPT_HEADER, 1);
             \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
             \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
