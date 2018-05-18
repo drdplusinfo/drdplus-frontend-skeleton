@@ -7,9 +7,10 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
 }
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
 
-if (\file_exists($documentRoot . '/vendor/autoload.php')) {
+$vendorRoot = $vendorRoot ?? $documentRoot;
+if (\file_exists($vendorRoot . '/vendor/autoload.php')) {
     /** @noinspection PhpIncludeInspection */
-    require_once $documentRoot . '/vendor/autoload.php';
+    require_once $vendorRoot . '/vendor/autoload.php';
 } else {
     require_once __DIR__ . '/vendor/autoload.php';
 }
@@ -27,9 +28,10 @@ try {
     \trigger_error($exception->getMessage() . '; ' . $exception->getTraceAsString(), E_USER_WARNING);
 }
 
-if (\file_exists($documentRoot . '/parts/content.php')) {
+$partsRoot = $partsRoot ?? $documentRoot;
+if (\file_exists($partsRoot . '/parts/content.php')) {
     /** @noinspection PhpIncludeInspection */
-    echo require $documentRoot . '/parts/content.php';
+    echo require $partsRoot . '/parts/content.php';
 } else {
     echo require __DIR__ . '/parts/content.php';
 }
