@@ -19,7 +19,7 @@ if (!empty($contactsFixed)) {
             <div class="version">
                 <?php /** @var \DrdPlus\FrontendSkeleton\WebVersions $webVersions */
                 $allVersions = $webVersions->getAllWebVersions();
-                if (count($allVersions) > 1) {
+                if (\count($allVersions) > 1) {
                     $currentVersion = $webVersions->getCurrentVersion(); ?>
                     <span class="current-version"><?= $webVersions->getVersionName($currentVersion) ?></span>
                     <ul class="other-versions">
