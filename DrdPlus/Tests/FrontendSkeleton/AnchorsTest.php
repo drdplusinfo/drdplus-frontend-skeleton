@@ -119,12 +119,14 @@ class AnchorsTest extends AbstractContentTest
      */
     protected function getExternalAnchors(): array
     {
-        $html = $this->getHtmlDocument();
-        $externalAnchors = [];
-        /** @var Element $anchor */
-        foreach ($html->getElementsByTagName('a') as $anchor) {
-            if (\preg_match('~^(http|//)~', $anchor->getAttribute('href'))) {
-                $externalAnchors[] = $anchor;
+        static $externalAnchors = [];
+        if (!$externalAnchors) {
+            $html = $this->getHtmlDocument();
+            /** @var Element $anchor */
+            foreach ($html->getElementsByTagName('a') as $anchor) {
+                if (\preg_match('~^(http|//)~', $anchor->getAttribute('href'))) {
+                    $externalAnchors[] = $anchor;
+                }
             }
         }
 
