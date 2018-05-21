@@ -1,5 +1,5 @@
 <?php
-namespace DrdPlus\Tests\RulesSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
