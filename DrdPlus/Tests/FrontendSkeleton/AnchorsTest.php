@@ -2,7 +2,6 @@
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
-use DrdPlus\FrontendSkeleton\UsagePolicy;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
@@ -184,20 +183,19 @@ class AnchorsTest extends AbstractContentTest
     {
         $link = \substr($href, 0, \strpos($href, '#') ?: null);
         if ((self::$externalHtmlDocuments[$link] ?? null) === null) {
-            $curl = curl_init($link);
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+            $curl = \curl_init($link);
+            \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
             $cookieName = null;
             if (\strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false) {
                 self::assertNotEmpty(
                     \preg_match('~//(?<subDomain>[^.]+([.][^.]+)*)\.drdplus\.~', $link, $matches),
                     "Expected some sub-domain in link $link"
                 );
-                $cookieName = $this->getCookieNameForOwnershipConfirmation($matches['subDomain']);
-                curl_setopt($curl, CURLOPT_COOKIE, $cookieName . '=1');
+                \curl_setopt($curl, CURLOPT_POSTFIELDS, ['trial' => '1']);
             }
-            $content = curl_exec($curl);
-            curl_close($curl);
+            $content = \curl_exec($curl);
+            \curl_close($curl);
             self::assertNotEmpty($content, 'Nothing has been fetched from URL ' . $link);
             self::$externalHtmlDocuments[$link] = @new HTMLDocument($content);
             if (\strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false) {
@@ -211,21 +209,6 @@ class AnchorsTest extends AbstractContentTest
         }
 
         return self::$externalHtmlDocuments[$link];
-    }
-
-    protected function getCookieNameForOwnershipConfirmation(string $rulesDirBasename): string
-    {
-        $usagePolicy = new UsagePolicy($rulesDirBasename);
-        try {
-            $reflectionClass = new \ReflectionClass(UsagePolicy::class);
-        } catch (\ReflectionException $reflectionException) {
-            self::fail($reflectionException->getMessage());
-            exit;
-        }
-        $getCookieName = $reflectionClass->getMethod('getOwnershipCookieName');
-        $getCookieName->setAccessible(true);
-
-        return $getCookieName->invoke($usagePolicy);
     }
 
     /**
