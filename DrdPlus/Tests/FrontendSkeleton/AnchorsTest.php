@@ -296,12 +296,19 @@ class AnchorsTest extends AbstractContentTest
      */
     public function Links_to_altar_uses_https(): void
     {
+        $linksToAltar = [];
         foreach ($this->getExternalAnchors() as $anchor) {
             $link = $anchor->getAttribute('href');
             if (!\strpos($link, 'altar.cz')) {
                 continue;
             }
-            self::assertStringStartsWith('https', $link, "Every link to Altar should be via https: '$link'");
+            $linksToAltar[] = $link;
+        }
+        if (\defined('NO_LINKS_TO_ALTAR') && NO_LINKS_TO_ALTAR) {
+            self::assertCount(0, $linksToAltar, 'No link to Altar expected according to tests config');
+        }
+        foreach ($linksToAltar as $linkToAltar) {
+            self::assertStringStartsWith('https', $linkToAltar, "Every link to Altar should be via https: '$linkToAltar'");
         }
     }
 }
