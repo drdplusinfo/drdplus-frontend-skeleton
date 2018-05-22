@@ -18,12 +18,4 @@ class GraphicsTest extends AbstractContentTest
     {
         self::assertFileExists($this->getDocumentRoot() . '/images/generic/frontend-skeleton/background.png');
     }
-
-    /**
-     * @test
-     */
-    public function Licence_page_has_monochrome_background_image(): void
-    {
-        self::assertFileExists($this->getDocumentRoot() . '/images/licence-background.png');
-    }
 }
