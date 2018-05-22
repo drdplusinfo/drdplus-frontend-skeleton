@@ -50,18 +50,27 @@ class HtmlHelperTest extends AbstractContentTest
 
     /**
      * @test
+     */
+    public function Same_table_ids_are_filtered_on_tables_only_mode(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        $tableIds = $this->getSomeExpectedTableIds();
+        if (\count($tableIds) === 0) {
+            self::assertFalse(false, 'No tables expected');
+        }
+        $tableId = \current($tableIds);
+        $tables = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), [$tableId, $tableId]);
+        self::assertCount(1, $tables);
+    }
+
+    /**
+     * @test
      * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\DuplicatedRequiredTableId
      * @expectedExceptionMessageRegExp ~IAmSoAlone~
      */
     public function I_can_not_request_tables_with_same_ids_if_lower_cased(): void
     {
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
-        try {
-            $tables = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'IAmSoAlone']);
-            self::assertNotEmpty($tables);
-        } catch (\Exception $exception) {
-            self::fail('No exception expected so far (very same table IDs should be filtered): ' . $exception->getMessage());
-        }
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iamsoalone']);
     }
 }
