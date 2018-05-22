@@ -24,17 +24,28 @@ class HtmlHelperTest extends AbstractContentTest
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
 
         $allTables = $htmlHelper->findTablesWithIds($this->getHtmlDocument());
-        self::assertCount(1, $allTables);
-        self::assertArrayHasKey('iamsoalone', $allTables);
-        $iAmSoAlone = $allTables['iamsoalone'];
-        self::assertInstanceOf(Element::class, $iAmSoAlone);
-        self::assertNotEmpty($iAmSoAlone->innerHTML);
+        if (\defined('JUST_TEXT_TESTING') && JUST_TEXT_TESTING) {
+            self::assertCount(0, $allTables);
 
+            return;
+        }
+        self::assertGreaterThan(0, \count($allTables));
         self::assertEmpty($htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['nonExistingTableId']));
+        foreach ($this->getSomeExpectedTableIds() as $someExpectedTableId) {
+            $lowerExpectedTableId = \strtolower($someExpectedTableId);
+            self::assertArrayHasKey($lowerExpectedTableId, $allTables);
+            $expectedTable = $allTables[$lowerExpectedTableId];
+            self::assertInstanceOf(Element::class, $expectedTable);
+            self::assertNotEmpty($expectedTable->innerHTML, "Table of ID $someExpectedTableId is empty");
+            $singleTable = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), [$someExpectedTableId]);
+            self::assertCount(1, $singleTable);
+            self::assertArrayHasKey($lowerExpectedTableId, $allTables, 'ID is expected to be lower-cased');
+        }
+    }
 
-        $singleTable = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone']);
-        self::assertCount(1, $singleTable);
-        self::assertArrayHasKey('iamsoalone', $allTables, 'ID is expected to be lower-cased');
+    protected function getSomeExpectedTableIds(): array
+    {
+        return \defined('SOME_EXPECTED_TABLE_IDS') ? (array)\SOME_EXPECTED_TABLE_IDS : ['IAmSoAlone'];
     }
 
     /**
