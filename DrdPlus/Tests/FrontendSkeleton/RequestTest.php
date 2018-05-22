@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class RequestTest extends TestCase
 {
-    public static function getCrawlerUserAgents()
+    public static function getCrawlerUserAgents(): array
     {
         return [
             'Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)',
@@ -21,7 +21,7 @@ class RequestTest extends TestCase
      * @test
      * @backupGlobals
      */
-    public function I_can_detect_czech_seznam_bot()
+    public function I_can_detect_czech_seznam_bot(): void
     {
         $request = new Request();
         foreach (self::getCrawlerUserAgents() as $crawlerUserAgent) {

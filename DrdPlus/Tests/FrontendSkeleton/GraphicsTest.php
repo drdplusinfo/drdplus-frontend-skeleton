@@ -14,6 +14,14 @@ class GraphicsTest extends AbstractContentTest
     /**
      * @test
      */
+    public function Main_page_uses_generic_image_for_background(): void
+    {
+        self::assertFileExists($this->getDocumentRoot() . '/images/generic/frontend-skeleton/background.png');
+    }
+
+    /**
+     * @test
+     */
     public function Licence_page_has_monochrome_background_image(): void
     {
         self::assertFileExists($this->getDocumentRoot() . '/images/licence-background.png');
