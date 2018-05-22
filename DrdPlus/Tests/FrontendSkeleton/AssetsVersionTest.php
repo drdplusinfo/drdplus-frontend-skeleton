@@ -26,7 +26,7 @@ class AssetsVersionTest extends AbstractContentTest
             $changedFiles,
             "Expected all CSS files already transpiled to have versioned links to assets, but those are not: \n"
             . implode("\n", $changedFiles)
-            . "\ntranspile them:\n php ./vendor/drd-plus/rules-html-skeleton/bin/assets --dir=css"
+            . "\ntranspile them:\n php " . __DIR__ . '/../../../bin/assets --dir=css'
         );
     }
 
