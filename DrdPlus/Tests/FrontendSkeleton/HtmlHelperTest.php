@@ -36,4 +36,21 @@ class HtmlHelperTest extends AbstractContentTest
         self::assertCount(1, $singleTable);
         self::assertArrayHasKey('iamsoalone', $allTables, 'ID is expected to be lower-cased');
     }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\DuplicatedRequiredTableId
+     * @expectedExceptionMessageRegExp ~IAmSoAlone~
+     */
+    public function I_can_not_request_tables_with_same_ids_if_lower_cased(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        try {
+            $tables = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'IAmSoAlone']);
+            self::assertNotEmpty($tables);
+        } catch (\Exception $exception) {
+            self::fail('No exception expected so far (very same table IDs should be filtered): ' . $exception->getMessage());
+        }
+        $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iamsoalone']);
+    }
 }

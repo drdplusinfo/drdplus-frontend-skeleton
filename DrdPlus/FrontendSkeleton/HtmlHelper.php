@@ -325,13 +325,15 @@ class HtmlHelper extends StrictObject
      */
     public function findTablesWithIds(HtmlDocument $html, array $requiredIds = []): array
     {
+        $requiredIds = \array_unique($requiredIds);
         $lowerCasedRequiredIds = [];
         foreach ($requiredIds as $requiredId) {
             $lowerRequiredId = \strtolower($requiredId);
             if (\array_key_exists($lowerRequiredId, $lowerCasedRequiredIds)) {
+                $requiredIdsAsString = \implode(',', $requiredIds);
                 throw new Exceptions\DuplicatedRequiredTableId(
                     'IDs of tables are lower-cased and some required table IDs are same in lowercase: '
-                    . "'{$requiredId}' x '{$lowerCasedRequiredIds[$lowerRequiredId]}' = '{$lowerRequiredId}'"
+                    . "'{$requiredId}' => '{$lowerRequiredId}' ($requiredIdsAsString)"
                 );
             }
             $lowerCasedRequiredIds[$lowerRequiredId] = $lowerRequiredId;
