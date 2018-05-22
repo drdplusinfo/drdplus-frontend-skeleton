@@ -57,11 +57,11 @@ abstract class AbstractContentTest extends TestCase
         return true;
     }
 
-    protected function getHtmlDocument(string $show = '', array $get = []): HTMLDocument
+    protected function getHtmlDocument(string $show = '', array $get = []): \DrdPlus\FrontendSkeleton\HtmlDocument
     {
         $key = $this->createKey($show, $get);
         if (empty(self::$htmlDocument[$key])) {
-            self::$htmlDocument[$key] = new HTMLDocument($this->getContent($show, $get));
+            self::$htmlDocument[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($show, $get));
         }
 
         return self::$htmlDocument[$key];

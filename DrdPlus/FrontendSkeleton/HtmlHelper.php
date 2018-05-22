@@ -321,14 +321,27 @@ class HtmlHelper extends StrictObject
      * @param HtmlDocument $html
      * @param array|string[] $requiredIds filter of required tables by their IDs
      * @return array|Element[]
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\DuplicatedRequiredTableId
      */
     public function findTablesWithIds(HtmlDocument $html, array $requiredIds = []): array
     {
+        $lowerCasedRequiredIds = [];
+        foreach ($requiredIds as $requiredId) {
+            $lowerRequiredId = \strtolower($requiredId);
+            if (\array_key_exists($lowerRequiredId, $lowerCasedRequiredIds)) {
+                throw new Exceptions\DuplicatedRequiredTableId(
+                    'IDs of tables are lower-cased and some required table IDs are same in lowercase: '
+                    . "'{$requiredId}' x '{$lowerCasedRequiredIds[$lowerRequiredId]}' = '{$lowerRequiredId}'"
+                );
+            }
+            $lowerCasedRequiredIds[$lowerRequiredId] = $lowerRequiredId;
+        }
         $tablesWithIds = [];
         /** @var Element $table */
         foreach ($html->getElementsByTagName('table') as $table) {
-            if ($table->getAttribute('id')) {
-                $tablesWithIds[$table->getAttribute('id')] = $table;
+            $lowerId = $table->getAttribute('id');
+            if ($lowerId) {
+                $tablesWithIds[$lowerId] = $table;
                 continue;
             }
             $childId = $this->getChildId($table->children);
@@ -343,7 +356,7 @@ class HtmlHelper extends StrictObject
             return $tablesWithIds;
         }
 
-        return \array_intersect_key($tablesWithIds, \array_fill_keys($requiredIds, true));
+        return \array_intersect_key($tablesWithIds, $lowerCasedRequiredIds);
     }
 
     /**
@@ -498,6 +511,6 @@ class HtmlHelper extends StrictObject
 
     public function isInProduction(): bool
     {
-        return PHP_SAPI !== 'cli' && ($_SERVER['REMOTE_ADDR'] ?? null) !== '127.0.0.1';
+        return \PHP_SAPI !== 'cli' && ($_SERVER['REMOTE_ADDR'] ?? null) !== '127.0.0.1';
     }
 }
