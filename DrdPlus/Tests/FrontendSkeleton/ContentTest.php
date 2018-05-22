@@ -63,6 +63,11 @@ class ContentTest extends AbstractContentTest
     public function Authors_got_heading(): void
     {
         $authorsHeading = $this->getHtmlDocument()->getElementById('autori');
+        if (\defined('NO_AUTHORS') && \NO_AUTHORS) {
+            self::assertEmpty($authorsHeading, 'Authors are not expected');
+
+            return;
+        }
         self::assertNotEmpty($authorsHeading, 'Authors should have heading');
         self::assertSame(
             'h3',
