@@ -31,7 +31,14 @@ class HtmlHelperTest extends AbstractContentTest
         }
         self::assertGreaterThan(0, \count($allTables));
         self::assertEmpty($htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['nonExistingTableId']));
-        foreach ($this->getTestsConfiguration()->getSomeExpectedTableIds() as $someExpectedTableId) {
+        $someExpectedTableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
+        if (!$this->getTestsConfiguration()->hasTables()) {
+            self::assertCount(0, $someExpectedTableIds, 'No tables expected');
+
+            return;
+        }
+        self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected');
+        foreach ($someExpectedTableIds as $someExpectedTableId) {
             $lowerExpectedTableId = \strtolower($someExpectedTableId);
             self::assertArrayHasKey($lowerExpectedTableId, $allTables);
             $expectedTable = $allTables[$lowerExpectedTableId];
@@ -48,12 +55,15 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function Same_table_ids_are_filtered_on_tables_only_mode(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
-        $tableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
-        if (\count($tableIds) === 0) {
-            self::assertFalse(false, 'No tables expected');
+        if (!$this->getTestsConfiguration()->hasTables()) {
+            self::assertCount(0, $this->getTestsConfiguration()->getSomeExpectedTableIds(), 'No tables expected');
+
+            return;
         }
-        $tableId = \current($tableIds);
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        $someExpectedTableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
+        self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected');
+        $tableId = \current($someExpectedTableIds);
         $tables = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), [$tableId, $tableId]);
         self::assertCount(1, $tables);
     }
