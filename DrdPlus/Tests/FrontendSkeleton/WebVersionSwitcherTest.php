@@ -45,7 +45,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
     {
         $webVersions = new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
         $versions = $webVersions->getAllWebVersions();
-        if ($this->getTestsConfiguration()->hasMoreVersions()) {
+        if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');
         }
         self::assertGreaterThan(
