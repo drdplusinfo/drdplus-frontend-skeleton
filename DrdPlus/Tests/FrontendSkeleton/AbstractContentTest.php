@@ -3,12 +3,11 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use Gt\Dom\HTMLDocument;
-use PHPUnit\Framework\TestCase;
 
-abstract class AbstractContentTest extends TestCase
+abstract class AbstractContentTest extends SkeletonTestCase
 {
-    private static $content = [];
-    private static $htmlDocument = [];
+    private static $contents = [];
+    private static $htmlDocuments = [];
 
     protected function setUp()
     {
@@ -25,7 +24,7 @@ abstract class AbstractContentTest extends TestCase
     protected function getContent(string $show = '', array $get = []): string
     {
         $key = $this->createKey($show, $get);
-        if ((self::$content[$key] ?? null) === null) {
+        if ((self::$contents[$key] ?? null) === null) {
             if ($show !== '') {
                 $_GET['show'] = $show;
             }
@@ -36,12 +35,12 @@ abstract class AbstractContentTest extends TestCase
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
-            self::$content[$key] = \ob_get_clean();
-            self::assertNotEmpty(self::$content[$key]);
+            self::$contents[$key] = \ob_get_clean();
+            self::assertNotEmpty(self::$contents[$key]);
             unset($_GET['show']);
         }
 
-        return self::$content[$key];
+        return self::$contents[$key];
     }
 
     protected function createKey(string $show, array $get): string
@@ -60,11 +59,11 @@ abstract class AbstractContentTest extends TestCase
     protected function getHtmlDocument(string $show = '', array $get = []): \DrdPlus\FrontendSkeleton\HtmlDocument
     {
         $key = $this->createKey($show, $get);
-        if (empty(self::$htmlDocument[$key])) {
-            self::$htmlDocument[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($show, $get));
+        if (empty(self::$htmlDocuments[$key])) {
+            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($show, $get));
         }
 
-        return self::$htmlDocument[$key];
+        return self::$htmlDocuments[$key];
     }
 
     protected function isSkeletonChecked(HTMLDocument $document): bool

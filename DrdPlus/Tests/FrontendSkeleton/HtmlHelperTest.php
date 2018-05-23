@@ -24,14 +24,14 @@ class HtmlHelperTest extends AbstractContentTest
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
 
         $allTables = $htmlHelper->findTablesWithIds($this->getHtmlDocument());
-        if (\defined('JUST_TEXT_TESTING') && JUST_TEXT_TESTING) {
+        if (!$this->getTestsConfiguration()->hasTables()) {
             self::assertCount(0, $allTables);
 
             return;
         }
         self::assertGreaterThan(0, \count($allTables));
         self::assertEmpty($htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['nonExistingTableId']));
-        foreach ($this->getSomeExpectedTableIds() as $someExpectedTableId) {
+        foreach ($this->getTestsConfiguration()->getSomeExpectedTableIds() as $someExpectedTableId) {
             $lowerExpectedTableId = \strtolower($someExpectedTableId);
             self::assertArrayHasKey($lowerExpectedTableId, $allTables);
             $expectedTable = $allTables[$lowerExpectedTableId];
@@ -43,18 +43,13 @@ class HtmlHelperTest extends AbstractContentTest
         }
     }
 
-    protected function getSomeExpectedTableIds(): array
-    {
-        return \defined('SOME_EXPECTED_TABLE_IDS') ? (array)\SOME_EXPECTED_TABLE_IDS : ['IAmSoAlone'];
-    }
-
     /**
      * @test
      */
     public function Same_table_ids_are_filtered_on_tables_only_mode(): void
     {
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
-        $tableIds = $this->getSomeExpectedTableIds();
+        $tableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
         if (\count($tableIds) === 0) {
             self::assertFalse(false, 'No tables expected');
         }

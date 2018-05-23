@@ -138,7 +138,7 @@ class AnchorsTest extends AbstractContentTest
     public function External_anchors_with_hashes_point_to_existing_ids(): void
     {
         $externalAnchorsWithHash = $this->getExternalAnchorsWithHash();
-        if (\defined('NO_EXTERNAL_ANCHORS_WITH_HASH_EXPECTED') && NO_EXTERNAL_ANCHORS_WITH_HASH_EXPECTED) {
+        if (!$this->getTestsConfiguration()->hasExternalAnchorsWithHashes()) {
             self::assertCount(0, $externalAnchorsWithHash);
 
             return;

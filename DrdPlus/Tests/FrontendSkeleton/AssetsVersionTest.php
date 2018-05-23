@@ -25,9 +25,22 @@ class AssetsVersionTest extends AbstractContentTest
             0,
             $changedFiles,
             "Expected all CSS files already transpiled to have versioned links to assets, but those are not: \n"
-            . implode("\n", $changedFiles)
-            . "\ntranspile them:\n php " . __DIR__ . '/../../../bin/assets --dir=css'
+            . \implode("\n", $changedFiles)
+            . "\ntranspile them:\n php " . $this->getBinAssetsFile()
         );
+    }
+
+    protected function getBinAssetsFile(): string
+    {
+        $assetsFile = __DIR__ . '/../../../bin/assets';
+        if (\file_exists($assetsFile)) {
+            return $assetsFile;
+        }
+        $assetsFile = __DIR__ . '/../../../vendor/frontend-skeleton/bin/assets';
+        if (\file_exists($assetsFile)) {
+            return $assetsFile;
+        }
+        throw new \LogicException('Can not find bin/assets file');
     }
 
     /**
@@ -35,7 +48,7 @@ class AssetsVersionTest extends AbstractContentTest
      */
     public function I_can_use_helper_script(): void
     {
-        $binAssets = __DIR__ . '/../../../bin/assets';
+        $binAssets = $this->getBinAssetsFile();
         \exec("php $binAssets", $output, $result);
         self::assertSame(0, $result, 'Can not call ' . $binAssets);
         self::assertNotEmpty($output);

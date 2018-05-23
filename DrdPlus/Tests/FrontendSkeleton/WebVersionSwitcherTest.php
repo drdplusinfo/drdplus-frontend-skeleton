@@ -4,9 +4,8 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
-use PHPUnit\Framework\TestCase;
 
-class WebVersionSwitcherTest extends TestCase
+class WebVersionSwitcherTest extends SkeletonTestCase
 {
     private $currentWebVersion;
 
@@ -46,7 +45,7 @@ class WebVersionSwitcherTest extends TestCase
     {
         $webVersions = new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
         $versions = $webVersions->getAllWebVersions();
-        if (\defined('SINGLE_VERSION_ONLY') && SINGLE_VERSION_ONLY) {
+        if ($this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, 'Only a single version expected due to a config');
         }
         self::assertGreaterThan(

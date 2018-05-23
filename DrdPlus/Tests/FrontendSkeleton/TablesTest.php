@@ -14,8 +14,8 @@ class TablesTest extends AbstractContentTest
         $withTables = $this->getHtmlDocument('', ['tables' => '' /* all of them */]);
         $body = $withTables->getElementsByTagName('body')[0];
         $tables = $body->getElementsByTagName('table');
-        if (\defined('JUST_TEXT_TESTING') && JUST_TEXT_TESTING) {
-            self::assertCount(0, $tables, 'Text-only content does not have tables');
+        if (!$this->getTestsConfiguration()->hasTables()) {
+            self::assertCount(0, $tables, 'No tables expected');
         } else {
             self::assertGreaterThan(0, \count($tables), 'Expected some tables');
         }
