@@ -2,6 +2,7 @@
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use Granam\String\StringTools;
 use Gt\Dom\Element;
 
 class HtmlHelperTest extends AbstractContentTest
@@ -39,7 +40,7 @@ class HtmlHelperTest extends AbstractContentTest
         }
         self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected');
         foreach ($someExpectedTableIds as $someExpectedTableId) {
-            $lowerExpectedTableId = \strtolower($someExpectedTableId);
+            $lowerExpectedTableId = StringTools::toConstantLikeValue(StringTools::camelCaseToSnakeCase($someExpectedTableId));
             self::assertArrayHasKey($lowerExpectedTableId, $allTables);
             $expectedTable = $allTables[$lowerExpectedTableId];
             self::assertInstanceOf(Element::class, $expectedTable);
@@ -73,9 +74,9 @@ class HtmlHelperTest extends AbstractContentTest
      * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\DuplicatedRequiredTableId
      * @expectedExceptionMessageRegExp ~IAmSoAlone~
      */
-    public function I_can_not_request_tables_with_same_ids_if_lower_cased(): void
+    public function I_can_not_request_tables_with_ids_with_same_id_like_representation(): void
     {
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
-        $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iamsoalone']);
+        $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
     }
 }

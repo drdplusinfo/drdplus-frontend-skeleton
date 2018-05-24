@@ -116,7 +116,7 @@ class HtmlHelper extends StrictObject
                 continue;
             }
             /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-            $idWithoutDiacritics = StringTools::toConstant($id);
+            $idWithoutDiacritics = $this->unifyId($id);
             if ($idWithoutDiacritics === $id) {
                 continue;
             }
@@ -126,6 +126,11 @@ class HtmlHelper extends StrictObject
             $invisibleId->setAttribute('id', \urlencode($id));
             $invisibleId->className = self::INVISIBLE_ID_CLASS;
         }
+    }
+
+    private function unifyId(string $id): string
+    {
+        return StringTools::toConstantLikeValue(StringTools::camelCaseToSnakeCase($id));
     }
 
     public function replaceDiacriticsFromAnchorHashes(HtmlDocument $html): void
@@ -152,7 +157,7 @@ class HtmlHelper extends StrictObject
                 continue;
             }
             /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-            $hashWithoutDiacritics = StringTools::toConstant($hash);
+            $hashWithoutDiacritics = $this->unifyId($hash);
             if ($hashWithoutDiacritics === $hash) {
                 continue;
             }
@@ -328,15 +333,15 @@ class HtmlHelper extends StrictObject
         $requiredIds = \array_unique($requiredIds);
         $lowerCasedRequiredIds = [];
         foreach ($requiredIds as $requiredId) {
-            $lowerRequiredId = \strtolower($requiredId);
-            if (\array_key_exists($lowerRequiredId, $lowerCasedRequiredIds)) {
+            $unifiedId = $this->unifyId($requiredId);
+            if (\array_key_exists($unifiedId, $lowerCasedRequiredIds)) {
                 $requiredIdsAsString = \implode(',', $requiredIds);
                 throw new Exceptions\DuplicatedRequiredTableId(
                     'IDs of tables are lower-cased and some required table IDs are same in lowercase: '
-                    . "'{$requiredId}' => '{$lowerRequiredId}' ($requiredIdsAsString)"
+                    . "'{$requiredId}' => '{$unifiedId}' ($requiredIdsAsString)"
                 );
             }
-            $lowerCasedRequiredIds[$lowerRequiredId] = $lowerRequiredId;
+            $lowerCasedRequiredIds[$unifiedId] = $unifiedId;
         }
         $tablesWithIds = [];
         /** @var Element $table */
