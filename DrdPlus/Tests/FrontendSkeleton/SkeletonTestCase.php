@@ -6,7 +6,7 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 
 use PHPUnit\Framework\TestCase;
 
-class SkeletonTestCase extends TestCase
+abstract class SkeletonTestCase extends TestCase
 {
     /** @var TestsConfiguration */
     private $testsConfiguration;
