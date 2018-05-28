@@ -51,7 +51,7 @@ h1 + .quote, h2 + .quote, h3 + .quote, h4 + .quote, h5 + .quote, h6 + .quote {
     text-align: right;
 }
 
-.calculation {
+.calculation, .calculation-like {
     margin: 1em 0 1em 0;
     font-weight: bold;
     font-family: monospace;
