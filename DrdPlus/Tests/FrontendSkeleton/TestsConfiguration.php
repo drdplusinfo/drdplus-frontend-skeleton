@@ -14,7 +14,6 @@ class TestsConfiguration extends StrictObject
     public const SOME_EXPECTED_TABLE_IDS = 'some_expected_table_ids';
     public const HAS_EXTERNAL_ANCHORS_WITH_HASHES = 'has_external_anchors_with_hashes';
     public const HAS_MORE_VERSIONS = 'has_more_versions';
-    public const HAS_AUTHORS = 'has_authors';
 
     // every setting SHOULD be strict (expecting instead of ignoring)
 
@@ -26,8 +25,6 @@ class TestsConfiguration extends StrictObject
     private $hasExternalAnchorsWithHashes = true;
     /** @var bool */
     private $hasMoreVersions = true;
-    /** @var bool */
-    private $hasAuthors = true;
 
     public function __construct(array $configuration = [])
     {
@@ -115,25 +112,6 @@ class TestsConfiguration extends StrictObject
     public function setHasMoreVersions(bool $hasMoreVersions): TestsConfiguration
     {
         $this->hasMoreVersions = $hasMoreVersions;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasAuthors(): bool
-    {
-        return $this->hasAuthors;
-    }
-
-    /**
-     * @param bool $hasAuthors
-     * @return TestsConfiguration
-     */
-    public function setHasAuthors(bool $hasAuthors): TestsConfiguration
-    {
-        $this->hasAuthors = $hasAuthors;
 
         return $this;
     }

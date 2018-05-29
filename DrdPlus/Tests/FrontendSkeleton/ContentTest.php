@@ -56,23 +56,4 @@ class ContentTest extends AbstractContentTest
             \var_export($matches, true)
         );
     }
-
-    /**
-     * @test
-     */
-    public function Authors_got_heading(): void
-    {
-        $authorsHeading = $this->getHtmlDocument()->getElementById('autori');
-        if (!$this->getTestsConfiguration()->hasAuthors()) {
-            self::assertEmpty($authorsHeading, 'Authors are not expected');
-
-            return;
-        }
-        self::assertNotEmpty($authorsHeading, 'Authors should have heading');
-        self::assertSame(
-            'h3',
-            $authorsHeading->nodeName,
-            'Authors heading should be h3, but is ' . $authorsHeading->nodeName
-        );
-    }
 }
