@@ -9,18 +9,14 @@ use Granam\Strict\Object\StrictObject;
 class WebVersionSwitchMutex extends StrictObject
 {
 
-    /**
-     * @var string
-     */
-    private $lockDir;
-    /**
-     * @var null|resource
-     */
+    /** @var string */
+    private $lockFile;
+    /** @var null|resource */
     private $lockFileHandle;
 
-    public function __construct(string $lockDir = null)
+    public function __construct(CacheRoot $cacheRoot)
     {
-        $this->lockDir = $lockDir ?? \sys_get_temp_dir();
+        $this->lockFile = $cacheRoot->getCacheRootDir() . \basename(__FILE__, '.php') . '.lock';
     }
 
     /**
@@ -46,7 +42,7 @@ class WebVersionSwitchMutex extends StrictObject
         if (!$locked) {
             $this->unlock(); // closes file handle
             throw new Exceptions\CanNotLockVersionMutex(
-                "Even after {$wait} seconds and {$attempts} attempts the lock has not been obtained on file {$this->getLockFileName()}"
+                "Even after {$wait} seconds and {$attempts} attempts the lock has not been obtained on file {$this->lockFile}"
             );
         }
         \fwrite($handle, $lockId);
@@ -61,10 +57,10 @@ class WebVersionSwitchMutex extends StrictObject
     private function getLockFileHandle()
     {
         if (!$this->lockFileHandle) {
-            $this->lockFileHandle = @\fopen($this->getLockFileName(), 'ab');
+            $this->lockFileHandle = @\fopen($this->lockFile, 'ab');
             if (!$this->lockFileHandle) {
                 throw new Exceptions\CanNotWriteLockOfVersionMutex(
-                    "Can not use {$this->getLockFileName()} as a lock file, can not write to it"
+                    "Can not use {$this->lockFile} as a lock file, can not write to it"
                 );
             }
         }
@@ -72,14 +68,9 @@ class WebVersionSwitchMutex extends StrictObject
         return $this->lockFileHandle;
     }
 
-    private function getLockFileName(): string
-    {
-        return $this->lockDir . '/drdplus_rules_version_switch_mutex';
-    }
-
     public function isLockedForId(string $lockId): bool
     {
-        return \file_exists($this->getLockFileName()) && \file_get_contents($this->getLockFileName()) === $lockId;
+        return \file_exists($this->lockFile) && \file_get_contents($this->lockFile) === $lockId;
     }
 
     public function __destruct()
@@ -95,8 +86,8 @@ class WebVersionSwitchMutex extends StrictObject
         $unlocked = \flock($this->lockFileHandle, LOCK_UN); // it is no harm to unlock it even if it was not locked
         \fclose($this->lockFileHandle);
         $this->lockFileHandle = null;
-        if (\file_exists($this->getLockFileName())) {
-            \unlink($this->getLockFileName());
+        if (\file_exists($this->lockFile)) {
+            \unlink($this->lockFile);
         }
 
         return $unlocked;

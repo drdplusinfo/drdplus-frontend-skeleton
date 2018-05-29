@@ -9,8 +9,6 @@ use Granam\Strict\Object\StrictObject;
 abstract class Cache extends StrictObject
 {
     /** @var string */
-    private $documentRoot;
-    /** @var string */
     private $cacheRoot;
     /** @var WebVersions */
     private $webVersions;
@@ -18,21 +16,20 @@ abstract class Cache extends StrictObject
     private $isInProduction;
 
     /**
-     * @param string $documentRoot
+     * @param CacheRoot $cacheRoot
      * @param WebVersions $webVersions
      * @param bool $isInProduction
      * @throws \RuntimeException
      */
     public function __construct(
-        string $documentRoot,
+        CacheRoot $cacheRoot,
         WebVersions $webVersions,
         bool $isInProduction
     )
     {
-        $this->documentRoot = $documentRoot;
-        $this->cacheRoot = "{$this->getDocumentRoot()}/cache/" . (PHP_SAPI === 'cli' ? 'cli' : 'web') . "/{$webVersions->getCurrentVersion()}";
+        $this->cacheRoot = $cacheRoot->getCacheRootDir() . '/' . $webVersions->getCurrentVersion();
         if (!\file_exists($this->cacheRoot)) {
-            if (!@\mkdir($this->cacheRoot, 0775, true /* recursive */) && !\is_dir($this->cacheRoot)) {
+            if (!@\mkdir($this->cacheRoot, 0775, true /* with parents */) && !\is_dir($this->cacheRoot)) {
                 throw new \RuntimeException('Can not create directory for page cache ' . $this->cacheRoot);
             }
             if (PHP_SAPI === 'cli') {
@@ -44,17 +41,17 @@ abstract class Cache extends StrictObject
         $this->isInProduction = $isInProduction;
     }
 
-    public function isInProduction(): bool
-    {
-        return $this->isInProduction;
-    }
-
     /**
      * @return string
      */
-    private function getDocumentRoot(): string
+    public function getCacheRoot(): string
     {
-        return $this->documentRoot;
+        return $this->cacheRoot;
+    }
+
+    public function isInProduction(): bool
+    {
+        return $this->isInProduction;
     }
 
     private function getCurrentGetHash(): string

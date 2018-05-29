@@ -19,7 +19,8 @@ $htmlHelper = \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentR
 \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
 $webVersions = new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot);
-$versionSwitchMutex = new \DrdPlus\FrontendSkeleton\WebVersionSwitchMutex();
+$cacheRoot = new \DrdPlus\FrontendSkeleton\CacheRoot($documentRoot);
+$versionSwitchMutex = new \DrdPlus\FrontendSkeleton\WebVersionSwitchMutex($cacheRoot);
 $versionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher($webVersions, $versionSwitchMutex);
 $request = new \DrdPlus\FrontendSkeleton\Request();
 try {

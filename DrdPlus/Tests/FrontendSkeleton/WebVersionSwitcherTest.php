@@ -1,6 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\CacheRoot;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
@@ -28,7 +29,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
 
     protected function tearDown()
     {
-        $webVersionSwitchMutex = new WebVersionSwitchMutex();
+        $webVersionSwitchMutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
         $webVersionSwitcher = new WebVersionSwitcher(
             new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)),
             $webVersionSwitchMutex
@@ -53,7 +54,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
             \count($versions),
             'Expected at least two versions to test, got only ' . \implode($versions)
         );
-        $versionSwitchMutex = new WebVersionSwitchMutex();
+        $versionSwitchMutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
         $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, $versionSwitchMutex);
         self::assertFalse(
             $rulesVersionSwitcher->switchToVersion($this->currentWebVersion),
