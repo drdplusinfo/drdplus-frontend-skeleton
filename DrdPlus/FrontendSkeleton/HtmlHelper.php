@@ -17,6 +17,8 @@ class HtmlHelper extends StrictObject
     /** @var bool */
     private $inDevMode;
     /** @var bool */
+    private $inForcedProductionMode;
+    /** @var bool */
     private $shouldHideCovered;
     /** @var bool */
     private $showIntroductionOnly;
@@ -30,15 +32,23 @@ class HtmlHelper extends StrictObject
         return new static(
             $documentRootDir,
             !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'dev') === 0,
+            !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'prod') === 0,
             !empty($_GET['hide']) && \strpos(\trim($_GET['hide']), 'cover') === 0,
             !empty($_GET['show']) && \strpos(\trim($_GET['show']), 'intro') === 0
         );
     }
 
-    public function __construct(string $rootDir, bool $inDevMode, bool $shouldHideCovered, bool $showIntroductionOnly)
+    public function __construct(
+        string $rootDir,
+        bool $inDevMode,
+        bool $inForcedProductionMode,
+        bool $shouldHideCovered,
+        bool $showIntroductionOnly
+    )
     {
         $this->rootDir = $this->unifyPath($rootDir);
         $this->inDevMode = $inDevMode;
+        $this->inForcedProductionMode = $inForcedProductionMode;
         $this->shouldHideCovered = $shouldHideCovered;
         $this->showIntroductionOnly = $showIntroductionOnly;
     }
@@ -463,7 +473,11 @@ class HtmlHelper extends StrictObject
 
     private function makeDrdPlusHostLocal(string $linkWithRemoteDrdPlusHost): string
     {
-        return \preg_replace('~(?:https?:)?//([[:alpha:]]+)\.drdplus\.info/~', 'http://$1.drdplus.loc/', $linkWithRemoteDrdPlusHost);
+        return \preg_replace(
+            '~(?:https?:)?//([[:alpha:]]+)[.]drdplus[.]info~',
+            'http://$1.drdplus.loc',
+            $linkWithRemoteDrdPlusHost
+        );
     }
 
     public function addVersionHashToAssets(HtmlDocument $html): void
@@ -518,6 +532,6 @@ class HtmlHelper extends StrictObject
 
     public function isInProduction(): bool
     {
-        return \PHP_SAPI !== 'cli' && ($_SERVER['REMOTE_ADDR'] ?? null) !== '127.0.0.1';
+        return $this->inForcedProductionMode || (\PHP_SAPI !== 'cli' && ($_SERVER['REMOTE_ADDR'] ?? null) !== '127.0.0.1');
     }
 }

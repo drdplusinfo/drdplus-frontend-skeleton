@@ -311,4 +311,26 @@ class AnchorsTest extends AbstractContentTest
             self::assertStringStartsWith('https', $linkToAltar, "Every link to Altar should be via https: '$linkToAltar'");
         }
     }
+
+    /**
+     * @test
+     */
+    public function No_links_point_to_local_hosts(): void
+    {
+        $urlsWithLocalHosts = [];
+        /** @var Element $anchor */
+        foreach ($this->getHtmlDocument('', ['mode' => 'prod' /* do not turn links to local */])->getElementsByTagName('a') as $anchor) {
+            $href = $anchor->getAttribute('href');
+            self::assertNotEmpty($href);
+            $parsedUrl = \parse_url($href);
+            $hostname = $parsedUrl['host'] ?? null;
+            if ($hostname === null) { // local link with anchor or query only
+                continue;
+            }
+            if (\preg_match('~[.]loc#~', $hostname) || \gethostbyname($hostname) === '127.0.0.1') {
+                $urlsWithLocalHosts[] = $anchor->outerHTML;
+            }
+        }
+        self::assertCount(0, $urlsWithLocalHosts, "There are forgotten local URLs \n" . \implode(",\n", $urlsWithLocalHosts));
+    }
 }

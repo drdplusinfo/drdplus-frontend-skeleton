@@ -78,7 +78,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getPageTitle(): string
     {
-        return (new HtmlHelper($this->getDocumentRoot(), false, false, false))->getPageTitle();
+        return (new HtmlHelper($this->getDocumentRoot(), false, false,  false, false))->getPageTitle();
     }
 
 }
