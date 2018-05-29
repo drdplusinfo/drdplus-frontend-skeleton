@@ -40,11 +40,12 @@ class WebVersionSwitchMutexTest extends TestCase
         $mutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
         $mutex->lock('foo');
         $mutexClass = WebVersionSwitchMutex::class;
+        $cacheRootClass = CacheRoot::class;
         $canNotLockClass = CanNotLockVersionMutex::class;
         $message = \exec(<<<PHP
 php -r 'require "vendor/autoload.php";
 try {
-    (new $mutexClass)->lock("bar", 0 /* no wait */);
+    (new $mutexClass(new $cacheRootClass(".")))->lock("bar" /* locking for different version */, 0 /* no wait */);
 } catch($canNotLockClass \$exception) {
     echo \$exception->getMessage();
     exit(0);
