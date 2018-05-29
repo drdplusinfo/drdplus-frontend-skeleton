@@ -57,13 +57,17 @@ class HtmlHelperTest extends AbstractContentTest
     public function Same_table_ids_are_filtered_on_tables_only_mode(): void
     {
         if (!$this->getTestsConfiguration()->hasTables()) {
-            self::assertCount(0, $this->getTestsConfiguration()->getSomeExpectedTableIds(), 'No tables expected');
+            self::assertCount(
+                0,
+                $this->getHtmlDocument()->getElementsByTagName('table'),
+                'No tables with IDs expected according to tests config'
+            );
 
             return;
         }
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
         $someExpectedTableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
-        self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected');
+        self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected according to tests config');
         $tableId = \current($someExpectedTableIds);
         $tables = $htmlHelper->findTablesWithIds($this->getHtmlDocument(), [$tableId, $tableId]);
         self::assertCount(1, $tables);
