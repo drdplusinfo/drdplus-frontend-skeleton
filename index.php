@@ -30,10 +30,11 @@ try {
 }
 
 $partsRoot = $partsRoot ?? ($documentRoot . '/parts');
-if (\file_exists($partsRoot . '/content.php')) {
+$genericPartsRoot = $genericPartsRoot ?? ($partsRoot . '/frontend-skeleton');
+if (\file_exists($genericPartsRoot . '/content.php')) {
     /** @noinspection PhpIncludeInspection */
-    echo require $partsRoot . '/content.php';
+    echo require $genericPartsRoot . '/content.php';
 } else {
-    echo require __DIR__ . '/parts/content.php';
+    echo require __DIR__ . '/parts/frontend-skeleton/content.php';
 }
 $versionSwitchMutex->unlock(); // unlock even if was not locked, just for sure

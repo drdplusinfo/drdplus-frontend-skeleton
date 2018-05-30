@@ -63,7 +63,7 @@ class ContentTest extends AbstractContentTest
      */
     public function I_get_pages_with_custom_body_content(): void
     {
-        $customBodyContentFile = $this->getDocumentRoot() . '/parts/custom_body_content.php';
+        $customBodyContentFile = $this->getGenericPartsRoot() . '/custom_body_content.php';
         if (!$this->getTestsConfiguration()->hasCustomBodyContent()) {
             self::assertFileNotExists($customBodyContentFile, "Does not expected {$customBodyContentFile} to exists according to tests config");
 
@@ -76,5 +76,10 @@ class ContentTest extends AbstractContentTest
         self::assertInstanceOf(Element::class, $customBodyContent);
         /** @var Element $customBodyContent */
         self::assertNotEmpty($customBodyContent->innerHTML, "Content of '$customBodyContentId' is empty");
+    }
+
+    protected function getGenericPartsRoot(): string
+    {
+        return $this->getDocumentRoot() . '/parts/frontend-skeleton';
     }
 }
