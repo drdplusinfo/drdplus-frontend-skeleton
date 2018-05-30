@@ -1,6 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use Granam\String\StringTools;
 use Gt\Dom\Element;
 
 class ContentTest extends AbstractContentTest
@@ -55,5 +56,25 @@ class ContentTest extends AbstractContentTest
             ),
             \var_export($matches, true)
         );
+    }
+
+    /**
+     * @test
+     */
+    public function I_get_pages_with_custom_body_content(): void
+    {
+        $customBodyContentFile = $this->getDocumentRoot() . '/parts/custom_body_content.php';
+        if (!$this->getTestsConfiguration()->hasCustomBodyContent()) {
+            self::assertFileNotExists($customBodyContentFile, "Does not expected {$customBodyContentFile} to exists according to tests config");
+
+            return;
+        }
+        $customBodyContentId = StringTools::camelCaseToSnakeCase('customBodyContent');
+        self::assertFileExists($customBodyContentFile, "Expected {$customBodyContentFile} to exists according to tests config");
+        $customBodyContent = $this->getHtmlDocument()->getElementById($customBodyContentId);
+        self::assertNotEmpty($customBodyContent, "Custom body content element has not been found by ID '$customBodyContentId'");
+        self::assertInstanceOf(Element::class, $customBodyContent);
+        /** @var Element $customBodyContent */
+        self::assertNotEmpty($customBodyContent->innerHTML, "Content of '$customBodyContentId' is empty");
     }
 }

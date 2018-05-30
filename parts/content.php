@@ -47,11 +47,13 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         $content = \ob_get_contents();
         \ob_clean();
 
-        if (file_exists($documentRoot . '/custom_body_content.php')) {
+        if (\file_exists($documentRoot . '/parts/custom_body_content.php')) {
+            $content .= '<div id="customBodyContent">';
             /** @noinspection PhpIncludeInspection */
-            include $documentRoot . '/custom_body_content.php';
+            include $documentRoot . '/parts/custom_body_content.php';
             $content .= \ob_get_contents();
             \ob_clean();
+            $content .= '</div>';
         }
 
         /** @var array|string[] $sortedWebFiles */
@@ -63,16 +65,18 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
                 $content .= \ob_get_contents();
                 \ob_clean();
             } else {
-                readfile($webFile);
+                \readfile($webFile);
                 $content .= \ob_get_contents();
                 \ob_clean();
             }
         } ?>
       <script type="text/javascript">
-          $(document).on('click', '.lightbox', function (event) {
-              event.preventDefault();
-              $(this).ekkoLightbox();
-          });
+          (function ($) {
+              $(document).on('click', '.lightbox', function (event) {
+                  event.preventDefault();
+                  $(this).ekkoLightbox();
+              });
+          })(jQuery);
       </script>
     </body>
   </html>
