@@ -6,15 +6,9 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 
 use Granam\Scalar\Tools\ToString;
 use Granam\Strict\Object\StrictObject;
-use Granam\String\StringTools;
 
 class TestsConfiguration extends StrictObject
 {
-    public const HAS_TABLES = 'has_tables';
-    public const SOME_EXPECTED_TABLE_IDS = 'some_expected_table_ids';
-    public const HAS_EXTERNAL_ANCHORS_WITH_HASHES = 'has_external_anchors_with_hashes';
-    public const HAS_MORE_VERSIONS = 'has_more_versions';
-
     // every setting SHOULD be strict (expecting instead of ignoring)
 
     /** @var bool */
@@ -25,17 +19,8 @@ class TestsConfiguration extends StrictObject
     private $hasExternalAnchorsWithHashes = true;
     /** @var bool */
     private $hasMoreVersions = true;
-
-    public function __construct(array $configuration = [])
-    {
-        foreach ($configuration as $settingName => $value) {
-            $setterForName = StringTools::assembleSetterForName($settingName);
-            if (!\method_exists($this, $setterForName)) {
-                throw new \LogicException("Unknown configuration '{$settingName}' with value " . \var_export($value, true));
-            }
-            $this->$setterForName($value);
-        }
-    }
+    /** @var bool */
+    private $hasCustomBodyContent = true;
 
     /**
      * @return bool
@@ -46,12 +31,11 @@ class TestsConfiguration extends StrictObject
     }
 
     /**
-     * @param bool $hasTables
      * @return TestsConfiguration
      */
-    public function setHasTables(bool $hasTables): TestsConfiguration
+    public function disableHasTables(): TestsConfiguration
     {
-        $this->hasTables = $hasTables;
+        $this->hasTables = false;
 
         return $this;
     }
@@ -87,12 +71,11 @@ class TestsConfiguration extends StrictObject
     }
 
     /**
-     * @param bool $hasExternalAnchorsWithHashes
      * @return TestsConfiguration
      */
-    public function setHasExternalAnchorsWithHashes(bool $hasExternalAnchorsWithHashes): TestsConfiguration
+    public function disableHasExternalAnchorsWithHashes(): TestsConfiguration
     {
-        $this->hasExternalAnchorsWithHashes = $hasExternalAnchorsWithHashes;
+        $this->hasExternalAnchorsWithHashes = false;
 
         return $this;
     }
@@ -106,13 +89,31 @@ class TestsConfiguration extends StrictObject
     }
 
     /**
-     * @param bool $hasMoreVersions
      * @return TestsConfiguration
      */
-    public function setHasMoreVersions(bool $hasMoreVersions): TestsConfiguration
+    public function disableHasMoreVersions(): TestsConfiguration
     {
-        $this->hasMoreVersions = $hasMoreVersions;
+        $this->hasMoreVersions = false;
 
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function hasCustomBodyContent(): bool
+    {
+        return $this->hasCustomBodyContent;
+    }
+
+    /**
+     * @return TestsConfiguration
+     */
+    public function disableHasCustomBodyContent(): TestsConfiguration
+    {
+        $this->hasCustomBodyContent = false;
+
+        return $this;
+    }
+
 }
