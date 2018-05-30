@@ -21,6 +21,8 @@ class TestsConfiguration extends StrictObject
     private $hasMoreVersions = true;
     /** @var bool */
     private $hasCustomBodyContent = true;
+    /** @var bool */
+    private $hasNotes = true;
 
     /**
      * @return bool
@@ -116,4 +118,21 @@ class TestsConfiguration extends StrictObject
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasNotes(): bool
+    {
+        return $this->hasNotes;
+    }
+
+    /**
+     * @return TestsConfiguration
+     */
+    public function disableHasNotes(): TestsConfiguration
+    {
+        $this->hasNotes = false;
+
+        return $this;
+    }
 }

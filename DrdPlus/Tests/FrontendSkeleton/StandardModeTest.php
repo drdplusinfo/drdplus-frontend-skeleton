@@ -1,8 +1,6 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use Gt\Dom\HTMLDocument;
-
 class StandardModeTest extends AbstractContentTest
 {
     /**
@@ -10,9 +8,11 @@ class StandardModeTest extends AbstractContentTest
      */
     public function I_get_notes_styled(): void
     {
-        $content = $this->getContent();
-        $html = new HTMLDocument($content);
-        self::assertNotEmpty($html->getElementsByClassName('note'));
+        if (!$this->getTestsConfiguration()->hasNotes()) {
+            self::assertEmpty($this->getHtmlDocument()->getElementsByClassName('note'));
+        } else {
+            self::assertNotEmpty($this->getHtmlDocument()->getElementsByClassName('note'));
+        }
     }
 
     /**
@@ -20,10 +20,9 @@ class StandardModeTest extends AbstractContentTest
      */
     public function I_am_not_distracted_by_development_classes(): void
     {
-        $content = $this->getContent();
-        $html = new HTMLDocument($content);
-        self::assertCount(0, $html->getElementsByClassName('covered-by-code'));
-        self::assertCount(0, $html->getElementsByClassName('generic'));
-        self::assertCount(0, $html->getElementsByClassName('excluded'));
+        $htmlDocument = $this->getHtmlDocument();
+        self::assertCount(0, $htmlDocument->getElementsByClassName('covered-by-code'));
+        self::assertCount(0, $htmlDocument->getElementsByClassName('generic'));
+        self::assertCount(0, $htmlDocument->getElementsByClassName('excluded'));
     }
 }
