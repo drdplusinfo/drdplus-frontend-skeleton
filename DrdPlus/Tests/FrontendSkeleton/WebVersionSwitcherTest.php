@@ -41,7 +41,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
         if ($countOfChanges === 0) {
             throw new \LogicException('No changes');
         }
-        if (\count($changes) > 1) { // we consider only changes of composer.lock only to be safe to stash
+        if ($countOfChanges > 1) { // we consider only changes of composer.lock only to be safe to stash
             return false;
         }
         $change = \trim(\reset($changes));
