@@ -45,9 +45,13 @@ class WebVersionSwitchMutex extends StrictObject
                 "Even after {$wait} seconds and {$attempts} attempts the lock has not been obtained on file {$this->lockFile}"
             );
         }
-        \fwrite($handle, $lockId);
+        $written = \fwrite($handle, $lockId) > 0;
+        \system('sync', $syncReturn); // flushes any non-yet-written data from memory to disk
+        if ($syncReturn !== 0) {
+            throw new Exceptions\CanNotWriteBuffersToDisk("'sync' command failed with return value {$syncReturn}");
+        }
 
-        return true;
+        return $written;
     }
 
     /**
