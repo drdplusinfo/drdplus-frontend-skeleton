@@ -9,14 +9,44 @@ use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
 class WebVersionSwitcherTest extends SkeletonTestCase
 {
     private $currentWebVersion;
+    private $changesStashed = false;
 
     protected function setUp()
     {
         parent::setUp();
-        if ($this->areThereUncommittedChanges()) {
+        if ($this->areThereUncommittedChanges() && !$this->trySafeStashOfChanges()) {
             self::markTestSkipped('There are uncommitted changes, so can not test version switching');
         }
         $this->currentWebVersion = (new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
+    }
+
+    private function trySafeStashOfChanges(): bool
+    {
+        if (!$this->isOnlyComposerLockChanged()) {
+            return false;
+        }
+        \exec('git stash', $output, $return);
+        $this->changesStashed = $return === 0;
+
+        return $this->changesStashed;
+    }
+
+    private function isOnlyComposerLockChanged(): bool
+    {
+        \exec('git status --porcelain', $changes, $return);
+        if ($return !== 0) {
+            return false;
+        }
+        $countOfChanges = \count($changes);
+        if ($countOfChanges === 0) {
+            throw new \LogicException('No changes');
+        }
+        if (\count($changes) > 1) { // we consider only changes of composer.lock only to be safe to stash
+            return false;
+        }
+        $change = \trim(\reset($changes));
+
+        return $change !== 'M composer.lock';
     }
 
     protected function areThereUncommittedChanges(): bool
@@ -36,7 +66,18 @@ class WebVersionSwitcherTest extends SkeletonTestCase
         );
         $webVersionSwitcher->switchToVersion($this->currentWebVersion);
         $webVersionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
+        $this->unStashChangesIfAny();
         parent::tearDown();
+    }
+
+    private function unStashChangesIfAny(): void
+    {
+        if (!$this->changesStashed) {
+            return;
+        }
+        \exec('git stash pop', $output, $return);
+        self::assertSame(0, $output, "Can not pop GIT stash, got return code {$return} and output " . \print_r($output, true));
+        self::assertTrue($this->isOnlyComposerLockChanged(), 'composer.lock is not changed after un-stashing of changes by GIT');
     }
 
     /**
