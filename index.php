@@ -8,12 +8,8 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
 
 $vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
-if (\file_exists($vendorRoot . '/autoload.php')) {
-    /** @noinspection PhpIncludeInspection */
-    require_once $vendorRoot . '/autoload.php';
-} else {
-    require_once __DIR__ . '/vendor/autoload.php';
-}
+/** @noinspection PhpIncludeInspection */
+require_once $vendorRoot . '/autoload.php';
 
 $htmlHelper = \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
 \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
@@ -31,6 +27,7 @@ try {
 
 $partsRoot = $partsRoot ?? ($documentRoot . '/parts');
 $genericPartsRoot = $genericPartsRoot ?? (__DIR__ . '/parts/frontend-skeleton');
+/** @noinspection PhpIncludeInspection */
 echo require $genericPartsRoot . '/content.php';
 
 $versionSwitchMutex->unlock(); // unlock even if was not locked, just for sure

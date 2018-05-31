@@ -47,10 +47,10 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         $content = \ob_get_contents();
         \ob_clean();
 
-        if (\file_exists($genericPartsRoot . '/custom_body_content.php')) {
+        if (\file_exists($partsRoot . '/custom_body_content.php')) {
             $content .= '<div id="customBodyContent">';
             /** @noinspection PhpIncludeInspection */
-            include $genericPartsRoot . '/custom_body_content.php';
+            include $partsRoot . '/custom_body_content.php';
             $content .= \ob_get_contents();
             \ob_clean();
             $content .= '</div>';
