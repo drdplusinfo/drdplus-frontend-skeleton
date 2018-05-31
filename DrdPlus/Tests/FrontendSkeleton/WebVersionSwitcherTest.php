@@ -46,7 +46,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
         }
         $change = \trim(\reset($changes));
 
-        return $change !== 'M composer.lock';
+        return $change === 'M composer.lock';
     }
 
     protected function areThereUncommittedChanges(): bool
