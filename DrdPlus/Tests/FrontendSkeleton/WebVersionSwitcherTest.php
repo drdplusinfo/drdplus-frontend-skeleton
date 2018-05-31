@@ -76,7 +76,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
             return;
         }
         \exec('git stash pop', $output, $return);
-        self::assertSame(0, $output, "Can not pop GIT stash, got return code {$return} and output " . \print_r($output, true));
+        self::assertSame(0, $return, "Can not pop GIT stash, got return code {$return} and output " . \print_r($output, true));
         self::assertTrue($this->isOnlyComposerLockChanged(), 'composer.lock is not changed after un-stashing of changes by GIT');
     }
 
