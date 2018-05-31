@@ -85,31 +85,48 @@ class AnchorsTest extends AbstractContentTest
 
     /**
      * @test
-     * @runInSeparateProcess
      */
     public function All_external_anchors_can_be_reached(): void
     {
+        $skippedExternalUrls = [];
         foreach ($this->getExternalAnchors() as $anchor) {
-            $link = $anchor->getAttribute('href');
+            $originalLink = $anchor->getAttribute('href');
+            $link = $this->turnToLocalLink($originalLink);
             if (\in_array($link, self::$checkedExternalAnchors, true)) {
                 continue;
             }
-            $link = $this->turnToLocalLink($link);
-            $curl = \curl_init($link);
-            \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
-            \curl_setopt($curl, CURLOPT_HEADER, 1);
-            \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
-            \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
-            \curl_exec($curl);
-            $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
-            \curl_close($curl);
-            self::assertTrue(
-                $responseHttpCode >= 200 && $responseHttpCode < 300,
-                "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl'"
+            $weAreOffline = false;
+            if ($originalLink === $link) { // nothing changed so it is not an drdplus.info link and is still external
+                $host = \parse_url($link, \PHP_URL_HOST);
+                $weAreOffline = $host !== false
+                    && !\filter_var($host, \FILTER_VALIDATE_IP)
+                    && \gethostbyname($host) === $host; // instead of IP address we got again the site name
+            }
+            if ($weAreOffline) {
+                $skippedExternalUrls[] = $link;
+            } else {
+                $curl = \curl_init($link);
+                \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+                \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
+                \curl_setopt($curl, CURLOPT_HEADER, 1);
+                \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
+                \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
+                \curl_exec($curl);
+                $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+                \curl_close($curl);
+                self::assertTrue(
+                    $responseHttpCode >= 200 && $responseHttpCode < 300,
+                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl'"
+                );
+            }
+            self::$checkedExternalAnchors[] = $link;
+        }
+        if ($skippedExternalUrls) {
+            self::markTestSkipped(
+                'Some external URLs have been skipped as we are probably offline: ' .
+                \print_r($skippedExternalUrls, true)
             );
-            $checkedExternalAnchors[] = $link;
         }
     }
 
@@ -217,7 +234,7 @@ class AnchorsTest extends AbstractContentTest
     public function Anchor_to_ID_self_is_not_created_if_contains_anchor_element(): void
     {
         $document = $this->getHtmlDocument();
-        $noAnchorsForMe = $document->getElementById(StringTools::toConstant('no-anchor-for-me'));
+        $noAnchorsForMe = $document->getElementById(StringTools::toConstantLikeValue('no-anchor-for-me'));
         if (!$noAnchorsForMe && !$this->isSkeletonChecked($document)
         ) {
             self::assertFalse(false, 'Nothing to test here');
