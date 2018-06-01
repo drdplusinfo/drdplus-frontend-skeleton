@@ -95,11 +95,11 @@ $htmlHelper->addVersionHashToAssets($htmlDocument);
 if (!$htmlHelper->isInProduction()) {
     $htmlHelper->makeExternalLinksLocal($htmlDocument);
 }
-$updated = $htmlDocument->saveHTML();
-$pageCache->cacheContent($updated);
+$updatedContent = $htmlDocument->saveHTML();
+$pageCache->cacheContent($updatedContent);
 
 if ($previousMemoryLimit !== false) {
     \ini_set('memory_limit', $previousMemoryLimit);
 }
 
-return $updated;
+return $updatedContent;
