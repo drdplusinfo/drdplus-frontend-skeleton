@@ -117,11 +117,17 @@ abstract class Cache extends StrictObject
 
     /**
      * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadCachedContent
      * @throws \RuntimeException
      */
     public function getCachedContent(): string
     {
-        return \file_get_contents($this->getCacheFileName());
+        $cachedContent = \file_get_contents($this->getCacheFileName());
+        if ($cachedContent === false) {
+            throw new Exceptions\CanNotReadCachedContent("Can not read cached content from '{$this->getCacheFileName()}'");
+        }
+
+        return $cachedContent;
     }
 
     /**
