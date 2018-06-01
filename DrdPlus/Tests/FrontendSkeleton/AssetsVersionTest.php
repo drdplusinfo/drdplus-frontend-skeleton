@@ -26,7 +26,7 @@ class AssetsVersionTest extends AbstractContentTest
             $changedFiles,
             "Expected all CSS files already transpiled to have versioned links to assets, but those are not: \n"
             . \implode("\n", $changedFiles)
-            . "\ntranspile them:\n php " . $this->getBinAssetsFile()
+            . "\ntranspile them:\nphp {$this->getBinAssetsFile()} --css --dir=css"
         );
     }
 
