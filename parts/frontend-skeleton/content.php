@@ -41,15 +41,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         // $contactsFixed = true; // (default is on top or bottom of the content)
         // $contactsBottom = true; // (default is top)
         // $hideHomeButton = true; // (default is to show)
-        if (\file_exists($documentRoot . '/parts/menu.php')) {
-            /** @noinspection PhpIncludeInspection */
-            include $documentRoot . '/parts/menu.php';
-        } elseif (\file_exists($vendorRoot . '/drd-plus/frontend-skeleton/parts/menu.php')) {
-            /** @noinspection PhpIncludeInspection */
-            include $vendorRoot . '/drd-plus/frontend-skeleton/parts/menu.php';
-        } else {
-            include __DIR__ . '/menu.php';
-        }
+        include $genericPartsRoot . '/menu.php';
         $content = \ob_get_contents();
         \ob_clean();
 
