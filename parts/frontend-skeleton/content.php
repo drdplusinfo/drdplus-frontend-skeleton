@@ -25,9 +25,15 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         /** @var array|string[] $cssFiles */
         $cssRoot = $documentRoot . '/css';
         $cssFiles = new \DrdPlus\FrontendSkeleton\CssFiles($cssRoot);
-        foreach ($cssFiles as $cssFile) { ?>
-          <link rel="stylesheet" type="text/css" href="css/<?= $cssFile ?>">
-        <?php } ?>
+        foreach ($cssFiles as $cssFile) {
+            if (\strpos($cssFile, 'no-script.css') !== false) { ?>
+              <noscript>
+                <link rel="stylesheet" type="text/css" href="css/<?= $cssFile ?>">
+              </noscript>
+            <?php } else { ?>
+              <link rel="stylesheet" type="text/css" href="css/<?= $cssFile ?>">
+            <?php }
+        } ?>
     </head>
     <body class="container">
       <div class="background-image"></div>
@@ -70,14 +76,6 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
                 \ob_clean();
             }
         } ?>
-      <script type="text/javascript">
-          (function ($) {
-              $(document).on('click', '.lightbox', function (event) {
-                  event.preventDefault();
-                  $(this).ekkoLightbox();
-              });
-          })(jQuery);
-      </script>
     </body>
   </html>
 <?php
