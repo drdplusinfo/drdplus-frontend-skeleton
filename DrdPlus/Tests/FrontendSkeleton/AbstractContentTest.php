@@ -68,7 +68,15 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function isSkeletonChecked(HTMLDocument $document): bool
     {
-        return \strpos($document->head->getElementsByTagName('title')->item(0)->nodeValue, 'skeleton') !== false;
+
+        $head = $document->head;
+        self::assertNotEmpty($head, 'Document lacks of head');
+        $titles = $head->getElementsByTagName('title');
+        self::assertGreaterThan(0, \count($titles), 'Head lacks of title');
+        $titles->rewind();
+        $title = $titles->current();
+
+        return \strpos($title->nodeValue, 'skeleton') !== false;
     }
 
     protected function getDocumentRoot(): string
@@ -78,7 +86,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getPageTitle(): string
     {
-        return (new HtmlHelper($this->getDocumentRoot(), false, false,  false, false))->getPageTitle();
+        return (new HtmlHelper($this->getDocumentRoot(), false, false, false, false))->getPageTitle();
     }
 
 }
