@@ -68,15 +68,22 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function isSkeletonChecked(HTMLDocument $document): bool
     {
+        return \strpos($this->getCurrentPageTitle($document), 'skeleton') !== false;
+    }
 
-        $head = $document->head;
-        self::assertNotEmpty($head, 'Document lacks of head');
+    protected function getCurrentPageTitle(HTMLDocument $document = null): string
+    {
+        $head = ($document ?? $this->getHtmlDocument())->head;
+        if (!$head) {
+            return '';
+        }
         $titles = $head->getElementsByTagName('title');
-        self::assertGreaterThan(0, \count($titles), 'Head lacks of title');
+        if ($titles->count() === 0) {
+            return '';
+        }
         $titles->rewind();
-        $title = $titles->current();
 
-        return \strpos($title->nodeValue, 'skeleton') !== false;
+        return $titles->current()->nodeValue;
     }
 
     protected function getDocumentRoot(): string
@@ -84,7 +91,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return \dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
     }
 
-    protected function getPageTitle(): string
+    protected function getDefinedPageTitle(): string
     {
         return (new HtmlHelper($this->getDocumentRoot(), false, false, false, false))->getPageTitle();
     }

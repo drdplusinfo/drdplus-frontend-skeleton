@@ -6,6 +6,19 @@ use Gt\Dom\Element;
 
 class ContentTest extends AbstractContentTest
 {
+
+    /**
+     * @test
+     */
+    public function Page_has_title(): void
+    {
+        $definedPageTitle = $this->getDefinedPageTitle();
+        $currentPageTitle = $this->getCurrentPageTitle();
+        self::assertNotEmpty($definedPageTitle, 'Page title is not defined');
+        self::assertNotEmpty($currentPageTitle, 'Page title is missing on page');
+        self::assertSame($definedPageTitle, $currentPageTitle, 'Defined and current page titles should be the same');
+    }
+
     /**
      * @test
      */
