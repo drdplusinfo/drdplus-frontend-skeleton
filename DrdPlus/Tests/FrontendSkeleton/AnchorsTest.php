@@ -44,6 +44,12 @@ class AnchorsTest extends AbstractContentTest
     public function Local_anchors_with_hashes_point_to_existing_ids(): void
     {
         $html = $this->getHtmlDocument();
+        $localAnchors = $this->getLocalAnchors();
+        if (!$this->getTestsConfiguration()->hasIds()) { // no IDs no local anchors
+            self::assertCount(0, $localAnchors, 'No local anchors expected as there are no IDs to make anchors from');
+
+            return;
+        }
         foreach ($this->getLocalAnchors() as $localAnchor) {
             $expectedId = \substr($localAnchor->getAttribute('href'), 1); // just remove leading #
             /** @var Element $target */
@@ -325,7 +331,7 @@ class AnchorsTest extends AbstractContentTest
             }
             $linksToAltar[] = $link;
         }
-        if (\defined('NO_LINKS_TO_ALTAR') && NO_LINKS_TO_ALTAR) {
+        if (!$this->getTestsConfiguration()->hasLinksToAltar()) {
             self::assertCount(0, $linksToAltar, 'No link to Altar expected according to tests config');
         }
         foreach ($linksToAltar as $linkToAltar) {
