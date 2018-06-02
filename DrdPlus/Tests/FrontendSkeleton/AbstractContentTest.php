@@ -91,7 +91,17 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getDocumentRoot(): string
     {
-        return \dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
+        static $documentRoot;
+        if ($documentRoot === null) {
+            $documentRoot = \dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
+        }
+
+        return $documentRoot;
+    }
+
+    protected function getVendorRoot(): string
+    {
+        return $this->getDocumentRoot() . '/vendor';
     }
 
     protected function getDefinedPageTitle(): string

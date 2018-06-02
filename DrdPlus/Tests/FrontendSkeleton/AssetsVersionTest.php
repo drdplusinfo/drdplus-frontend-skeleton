@@ -32,15 +32,15 @@ class AssetsVersionTest extends AbstractContentTest
 
     protected function getBinAssetsFile(): string
     {
-        $assetsFile = __DIR__ . '/../../../bin/assets';
-        if (\file_exists($assetsFile)) {
-            return $assetsFile;
+        $assetsFile = $this->getVendorRoot() . '/bin/assets';
+        if (!\file_exists($assetsFile)) {
+            $assetsFile = $this->getDocumentRoot() . '/bin/assets';
         }
-        $assetsFile = __DIR__ . '/../../../vendor/frontend-skeleton/bin/assets';
-        if (\file_exists($assetsFile)) {
-            return $assetsFile;
+        if (!\file_exists($assetsFile)) {
+            throw new \LogicException('Can not find bin/assets file');
         }
-        throw new \LogicException('Can not find bin/assets file');
+
+        return $assetsFile;
     }
 
     /**

@@ -17,6 +17,9 @@
       "Tests\\": "Tests/"
     }
   },
+  "bin": [
+    "bin/assets"
+  ],
   "require": {
     "php": ">=7.1",
     "ext-mbstring": "*",
