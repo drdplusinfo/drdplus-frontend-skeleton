@@ -518,16 +518,19 @@ class HtmlHelper extends StrictObject
 
     public function getPageTitle(): string
     {
-        $title = \is_readable($this->rootDir . '/name.txt')
-            ? \file_get_contents($this->rootDir . '/name.txt')
-            : ('DrD+ ' . \basename(\preg_replace('~([\\/][.]{2})*$~', '', $this->rootDir)));
-        $smiley = \is_readable($this->rootDir . '/title_smiley.txt')
-            ? \file_get_contents($this->rootDir . '/title_smiley.txt')
-            : '';
+        static $title;
+        if ($title === null) {
+            $name = \trim(\file_get_contents($this->rootDir . '/name.txt'));
+            $smiley = \file_exists($this->rootDir . '/title_smiley.txt')
+                ? \trim(\file_get_contents($this->rootDir . '/title_smiley.txt'))
+                : '';
 
-        return ($smiley !== '')
-            ? ($smiley . ' ' . $title)
-            : $title;
+            $title = ($smiley !== '')
+                ? ($smiley . ' ' . $name)
+                : $name;
+        }
+
+        return $title;
     }
 
     public function isInProduction(): bool
