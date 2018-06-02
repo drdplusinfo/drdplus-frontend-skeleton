@@ -286,7 +286,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $array = [];
         foreach ($collection as $item) {
-            $array = $item;
+            $array[] = $item;
         }
 
         return $array;
