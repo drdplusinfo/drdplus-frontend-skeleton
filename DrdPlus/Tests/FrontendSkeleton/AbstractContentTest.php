@@ -66,9 +66,12 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return self::$htmlDocuments[$key];
     }
 
-    protected function isSkeletonChecked(HTMLDocument $document): bool
+    protected function isSkeletonChecked(): bool
     {
-        return \strpos($this->getCurrentPageTitle($document), 'skeleton') !== false;
+        $documentRootRealPath = \realpath($this->getDocumentRoot());
+        $frontendSkeletonRealPath = \realpath(__DIR__ . '/../../..');
+
+        return $documentRootRealPath === $frontendSkeletonRealPath;
     }
 
     protected function getCurrentPageTitle(HTMLDocument $document = null): string

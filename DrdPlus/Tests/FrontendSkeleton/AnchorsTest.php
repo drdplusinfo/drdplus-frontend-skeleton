@@ -235,8 +235,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $noAnchorsForMe = $document->getElementById(StringTools::toConstantLikeValue('no-anchor-for-me'));
-        if (!$noAnchorsForMe && !$this->isSkeletonChecked($document)
-        ) {
+        if (!$noAnchorsForMe && !$this->isSkeletonChecked()) {
             self::assertFalse(false, 'Nothing to test here');
 
             return;
@@ -272,7 +271,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $withAllowedElementsOnly = $document->getElementById(self::ID_WITH_ALLOWED_ELEMENTS_ONLY);
-        if (!$withAllowedElementsOnly && !$this->isSkeletonChecked($document)) {
+        if (!$withAllowedElementsOnly && !$this->isSkeletonChecked()) {
             self::assertFalse(false, 'Nothing to test here');
 
             return;
@@ -295,7 +294,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $calculations = $document->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
-        if (!$this->isSkeletonChecked($document) && \count($calculations) === 0) {
+        if (!$this->isSkeletonChecked() && \count($calculations) === 0) {
             self::assertFalse(false, 'No calculations in current document');
 
             return;
