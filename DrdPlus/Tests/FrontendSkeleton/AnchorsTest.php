@@ -258,6 +258,11 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $originalIds = $document->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS);
+        if (!$this->getTestsConfiguration()->hasIds()) {
+            self::assertCount(0, $originalIds);
+
+            return;
+        }
         self::assertNotEmpty($originalIds);
         foreach ($originalIds as $originalId) {
             self::assertSame('', $originalId->innerHTML);

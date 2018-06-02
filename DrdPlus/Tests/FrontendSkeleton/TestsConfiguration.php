@@ -23,6 +23,8 @@ class TestsConfiguration extends StrictObject
     private $hasCustomBodyContent = true;
     /** @var bool */
     private $hasNotes = true;
+    /** @var bool */
+    private $hasIds = true;
 
     /**
      * @return bool
@@ -132,6 +134,24 @@ class TestsConfiguration extends StrictObject
     public function disableHasNotes(): TestsConfiguration
     {
         $this->hasNotes = false;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasIds(): bool
+    {
+        return $this->hasIds;
+    }
+
+    /**
+     * @return TestsConfiguration
+     */
+    public function disableHasIds(): TestsConfiguration
+    {
+        $this->hasIds = false;
 
         return $this;
     }
