@@ -520,7 +520,7 @@ class HtmlHelper extends StrictObject
     {
         $title = \is_readable($this->rootDir . '/name.txt')
             ? \file_get_contents($this->rootDir . '/name.txt')
-            : ('Drd+ ' . \basename($this->rootDir));
+            : ('DrD+ ' . \basename(\preg_replace('~([\\/][.]{2})*$~', '', $this->rootDir)));
         $smiley = \is_readable($this->rootDir . '/title_smiley.txt')
             ? \file_get_contents($this->rootDir . '/title_smiley.txt')
             : '';

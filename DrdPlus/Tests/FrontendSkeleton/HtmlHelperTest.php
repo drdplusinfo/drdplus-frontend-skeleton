@@ -83,4 +83,13 @@ class HtmlHelperTest extends AbstractContentTest
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
     }
+
+    /**
+     * @test
+     */
+    public function I_will_get_meaningful_title_even_if_document_root_ends_by_two_dots(): void
+    {
+        $htmlHelper = new HtmlHelper(__DIR__ . '/..', false, false, false, false);
+        self::assertSame('DrD+ ' . \basename(__DIR__), $htmlHelper->getPageTitle());
+    }
 }
