@@ -265,7 +265,14 @@ class AnchorsTest extends AbstractContentTest
         $document = $this->getHtmlDocument();
         $originalIds = $document->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS);
         if (!$this->getTestsConfiguration()->hasIds()) {
-            self::assertCount(0, $originalIds);
+            self::assertCount(
+                0,
+                $originalIds,
+                'No original IDs, identified by CSS class ' . HtmlHelper::INVISIBLE_ID_CLASS . ' expected, got '
+                . \implode("\n", \array_map(function (Element $element) {
+                    return $element->outerHTML;
+                }, $this->collectionToArray($originalIds)))
+            );
 
             return;
         }
@@ -273,6 +280,16 @@ class AnchorsTest extends AbstractContentTest
         foreach ($originalIds as $originalId) {
             self::assertSame('', $originalId->innerHTML);
         }
+    }
+
+    protected function collectionToArray(\Iterator $collection): array
+    {
+        $array = [];
+        foreach ($collection as $item) {
+            $array = $item;
+        }
+
+        return $array;
     }
 
     /**
