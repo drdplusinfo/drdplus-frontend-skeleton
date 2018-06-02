@@ -240,7 +240,7 @@ class AnchorsTest extends AbstractContentTest
 
             return;
         }
-        self::assertNotEmpty($noAnchorsForMe);
+        self::assertNotEmpty($noAnchorsForMe, "Missing testing element with ID 'no-anchor-for-me'");
         $links = $noAnchorsForMe->getElementsByTagName('a');
         self::assertNotEmpty($links);
         /** @var \DOMElement $noAnchorsForMe */
@@ -335,6 +335,7 @@ class AnchorsTest extends AbstractContentTest
 
     /**
      * @test
+     * @backupGlobals enabled
      */
     public function No_links_point_to_local_hosts(): void
     {
