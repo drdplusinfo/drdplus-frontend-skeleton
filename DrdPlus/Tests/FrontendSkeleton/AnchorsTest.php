@@ -322,7 +322,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $calculations = $document->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
-        if (!$this->isSkeletonChecked() && \count($calculations) === 0) {
+        if (\count($calculations) === 0 && !$this->isSkeletonChecked()) {
             self::assertFalse(false, 'No calculations in current document');
 
             return;
