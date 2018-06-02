@@ -304,7 +304,10 @@ class AnchorsTest extends AbstractContentTest
 
             return;
         }
-        self::assertNotEmpty($withAllowedElementsOnly);
+        self::assertNotEmpty(
+            $withAllowedElementsOnly,
+            'Missing testing HTML element with ID ' . self::ID_WITH_ALLOWED_ELEMENTS_ONLY
+        );
         $anchors = $withAllowedElementsOnly->getElementsByTagName('a');
         self::assertCount(1, $anchors);
         $anchor = $anchors->item(0);
