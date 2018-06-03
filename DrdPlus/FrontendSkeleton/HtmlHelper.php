@@ -520,7 +520,10 @@ class HtmlHelper extends StrictObject
     {
         static $title;
         if ($title === null) {
-            $name = \trim(\file_get_contents($this->rootDir . '/name.txt'));
+            if (!\file_exists($this->rootDir . '/name.txt')) {
+                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->rootDir}/name.txt}'");
+            }
+            $name = \trim((string)\file_get_contents($this->rootDir . '/name.txt'));
             $smiley = \file_exists($this->rootDir . '/title_smiley.txt')
                 ? \trim(\file_get_contents($this->rootDir . '/title_smiley.txt'))
                 : '';
