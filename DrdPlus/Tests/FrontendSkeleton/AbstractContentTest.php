@@ -1,7 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\HtmlHelper;
+use DrdPlus\FrontendSkeleton\Controller;
 use Gt\Dom\HTMLDocument;
 
 abstract class AbstractContentTest extends SkeletonTestCase
@@ -106,7 +106,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getDefinedPageTitle(): string
     {
-        return (new HtmlHelper($this->getDocumentRoot(), false, false, false, false))->getPageTitle();
+        return (new Controller($this->getDocumentRoot()))->getPageTitle();
     }
 
 }

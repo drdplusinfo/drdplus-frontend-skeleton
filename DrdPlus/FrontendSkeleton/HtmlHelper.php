@@ -516,26 +516,6 @@ class HtmlHelper extends StrictObject
         return \md5_file($fileName) ?: (string)\time(); // time is fallback
     }
 
-    public function getPageTitle(): string
-    {
-        static $title;
-        if ($title === null) {
-            if (!\file_exists($this->rootDir . '/name.txt')) {
-                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->rootDir}/name.txt'");
-            }
-            $name = \trim((string)\file_get_contents($this->rootDir . '/name.txt'));
-            $smiley = \file_exists($this->rootDir . '/title_smiley.txt')
-                ? \trim(\file_get_contents($this->rootDir . '/title_smiley.txt'))
-                : '';
-
-            $title = ($smiley !== '')
-                ? ($smiley . ' ' . $name)
-                : $name;
-        }
-
-        return $title;
-    }
-
     public function isInProduction(): bool
     {
         return $this->inForcedProductionMode || (\PHP_SAPI !== 'cli' && ($_SERVER['REMOTE_ADDR'] ?? null) !== '127.0.0.1');
