@@ -54,4 +54,18 @@ class AssetsVersionTest extends AbstractContentTest
         self::assertNotEmpty($output);
         self::assertStringStartsWith('Options are', $output[0]);
     }
+
+    /**
+     * @test
+     */
+    public function I_can_run_script_for_cli_assets_control(): void
+    {
+        $filePermissions = \fileperms($this->getBinAssetsFile());
+        $inOctal = \decoct($filePermissions & 0777);
+        self::assertSame(
+            '775',
+            $inOctal,
+            "Expected {$this->getBinAssetsFile()} to has executable permissions 0775 as Composer will do that anyway later on this library installation"
+        );
+    }
 }
