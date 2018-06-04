@@ -71,7 +71,7 @@ class TestsConfigurationTest extends TestCase
             self::assertSame(
                 $testsConfiguration,
                 $testsConfiguration->$disablingMethod(),
-                "$disablingMethod should return the " . TestsConfiguration::class . 'to get fluent interface'
+                "$disablingMethod should return the " . TestsConfiguration::class . ' to get fluent interface'
             );
         }
     }
@@ -127,7 +127,7 @@ class TestsConfigurationTest extends TestCase
             self::assertSame(
                 $testsConfiguration,
                 $setterReflection->invokeArgs($testsConfiguration, $parameters),
-                "$setterReflection should return the " . TestsConfiguration::class . 'to get fluent interface'
+                "$setterReflection should return the " . TestsConfiguration::class . ' to get fluent interface'
             );
         }
     }

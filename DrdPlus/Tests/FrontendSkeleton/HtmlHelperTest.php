@@ -83,4 +83,25 @@ class HtmlHelperTest extends AbstractContentTest
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
     }
+
+    /**
+     * @test
+     */
+    public function I_can_get_page_title(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        self::assertSame($this->getTestsConfiguration()->getExpectedPageTitle(), $htmlHelper->getPageTitle());
+    }
+
+    /**
+     * @test
+     * @runInSeparateProcess to get empty static variables
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\MissingFileWithPageName
+     * @expectedExceptionMessageRegExp ~'Not from this world/name[.]txt'~
+     */
+    public function I_can_not_get_page_title_if_text_file_with_its_name_does_not_exist(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals('Not from this world');
+        $htmlHelper->getPageTitle();
+    }
 }

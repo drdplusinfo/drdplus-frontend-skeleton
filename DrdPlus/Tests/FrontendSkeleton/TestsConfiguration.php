@@ -27,6 +27,8 @@ class TestsConfiguration extends StrictObject
     private $hasIds = true;
     /** @var bool */
     private $hasLinksToAltar = true;
+    /** @var string */
+    private $expectedPageTitle = 'HTML kostra pro DrD+ webový obsah';
 
     /**
      * @return bool
@@ -172,6 +174,25 @@ class TestsConfiguration extends StrictObject
     public function disableHasLinksToAltar(): TestsConfiguration
     {
         $this->hasLinksToAltar = false;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpectedPageTitle(): string
+    {
+        return $this->expectedPageTitle;
+    }
+
+    /**
+     * @param string $expectedPageTitle
+     * @return TestsConfiguration
+     */
+    public function setExpectedPageTitle(string $expectedPageTitle): TestsConfiguration
+    {
+        $this->expectedPageTitle = $expectedPageTitle;
 
         return $this;
     }
