@@ -9,9 +9,15 @@ class StandardModeTest extends AbstractContentTest
     public function I_get_notes_styled(): void
     {
         if (!$this->getTestsConfiguration()->hasNotes()) {
-            self::assertEmpty($this->getHtmlDocument()->getElementsByClassName('note'));
+            self::assertEmpty(
+                $this->getHtmlDocument()->getElementsByClassName('note'),
+                "No elements with 'note' class expected according to tests config"
+            );
         } else {
-            self::assertNotEmpty($this->getHtmlDocument()->getElementsByClassName('note'));
+            self::assertNotEmpty(
+                $this->getHtmlDocument()->getElementsByClassName('note'),
+                "Expected at least a single element with 'note' class according to tests config"
+            );
         }
     }
 
