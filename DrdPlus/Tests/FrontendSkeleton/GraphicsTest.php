@@ -16,6 +16,6 @@ class GraphicsTest extends AbstractContentTest
      */
     public function Main_page_uses_generic_image_for_background(): void
     {
-        self::assertFileExists($this->getDocumentRoot() . '/images/generic/frontend-skeleton/background.png');
+        self::assertFileExists($this->getDocumentRoot() . '/images/generic/skeleton/background.png');
     }
 }

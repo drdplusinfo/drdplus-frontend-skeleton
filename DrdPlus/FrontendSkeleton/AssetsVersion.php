@@ -154,7 +154,7 @@ class AssetsVersion extends StrictObject
             if (!$md5) {
                 continue;
             }
-            $versionedLink = $this->appendVersionHashToLink($link, $md5, $sourceFile);
+            $versionedLink = $this->appendVersionHashToLink($link, $md5);
             if ($versionedLink === $link) {
                 continue; // nothing changed for current link
             }
@@ -166,7 +166,7 @@ class AssetsVersion extends StrictObject
         return $replacedContent;
     }
 
-    private function getFileMd5(string $link, string $documentRootDir): ?string
+    private function getFileMd5(string $link, string $documentRootDir, string $sourceFile): ?string
     {
         $parts = \parse_url($link);
         $localPath = $parts['path'] ?? '';
@@ -177,7 +177,10 @@ class AssetsVersion extends StrictObject
         }
         $file = $documentRootDir . '/' . \ltrim($localPath, '/');
         if (!\is_readable($file)) {
-            \trigger_error("Can not read asset file {$file} figured from link '{$parts['path']}", E_USER_WARNING);
+            \trigger_error(
+                "Can not read asset file {$file} figured from link '{$parts['path']} in file {$sourceFile}",
+                E_USER_WARNING
+            );
 
             return null;
         }
