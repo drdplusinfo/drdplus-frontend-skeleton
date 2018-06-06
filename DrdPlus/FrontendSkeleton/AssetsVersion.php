@@ -60,7 +60,7 @@ class AssetsVersion extends StrictObject
                 \trigger_error("File {$confirmedFileToEdit} is empty", E_USER_WARNING);
                 continue;
             }
-            $replacedContent = $this->addVersionsToAssetLinksInContent($content, $documentRootDir);
+            $replacedContent = $this->addVersionsToAssetLinksInContent($content, $documentRootDir, $confirmedFileToEdit);
             if ($replacedContent === $content) {
                 continue;
             }
@@ -138,7 +138,7 @@ class AssetsVersion extends StrictObject
         }, $folders);
     }
 
-    private function addVersionsToAssetLinksInContent(string $content, string $documentRootDir): string
+    private function addVersionsToAssetLinksInContent(string $content, string $documentRootDir, string $sourceFile): string
     {
         $srcFound = \preg_match_all('~(?<sources>(?:src="[^"]+"|src=\'[^\']+\'))~', $content, $sourceMatches);
         $urlFound = \preg_match_all('~(?<urls>(?:url\((?:(?<!data:)[^)])+\)|url\("(?:(?<!data:)[^)])+"\)|url\(\'(?:(?!data:)[^)])+\'\)))~', $content, $urlMatches);
@@ -150,11 +150,11 @@ class AssetsVersion extends StrictObject
         foreach ($stringsWithLinks as $stringWithLink) {
             $maybeQuotedLink = \preg_replace('~src|url\(([^)]+)\)~', '$1', $stringWithLink);
             $link = \trim($maybeQuotedLink, '"\'');
-            $md5 = $this->getFileMd5($link, $documentRootDir);
+            $md5 = $this->getFileMd5($link, $documentRootDir, $sourceFile);
             if (!$md5) {
                 continue;
             }
-            $versionedLink = $this->appendVersionHashToLink($link, $md5);
+            $versionedLink = $this->appendVersionHashToLink($link, $md5, $sourceFile);
             if ($versionedLink === $link) {
                 continue; // nothing changed for current link
             }

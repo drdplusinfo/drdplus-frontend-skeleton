@@ -154,10 +154,8 @@ var getTableByHrefForPreview = function (hrefToTable) {
     return table;
 };
 
-window.addEventListener(
-    'load',
-    function () {
-        // var just second level domain to be the document domain to allow access to iframes from other subdomains
+document.addEventListener('DOMContentLoaded', function () {
+        // var just second level domain to be the document domain to allow access to iframes from other sub-domains
         document.domain = document.domain.replace(/^(?:[^.]+\.)*([^.]+\.[^.]+).*/, '$1');
         addPreviewToTableLinks(isAnchorToTable, getTableByHrefForPreview);
     }
