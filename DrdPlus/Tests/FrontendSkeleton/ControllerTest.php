@@ -36,7 +36,7 @@ class ControllerTest extends AbstractContentTest
     public function I_can_get_web_versions(): void
     {
         $controller = new Controller($this->getDocumentRoot());
-        self::assertEquals(new WebVersions($this->getWebFilesRoot()), $controller->getRequest());
+        self::assertEquals(new WebVersions($this->getDocumentRoot()), $controller->getWebVersions());
     }
 
     /**
@@ -45,7 +45,7 @@ class ControllerTest extends AbstractContentTest
     public function I_can_get_web_files(): void
     {
         $controller = new Controller($this->getDocumentRoot());
-        self::assertEquals(new WebFiles($this->getDocumentRoot()), $controller->getRequest());
+        self::assertEquals(new WebFiles($this->getWebFilesRoot()), $controller->getWebFiles());
     }
 
     /**
@@ -54,6 +54,6 @@ class ControllerTest extends AbstractContentTest
     public function I_can_get_request(): void
     {
         $controller = new Controller($this->getDocumentRoot());
-        self::assertEquals(new Request(new Bot()), $controller->getWebVersions());
+        self::assertEquals(new Request(new Bot()), $controller->getRequest());
     }
 }
