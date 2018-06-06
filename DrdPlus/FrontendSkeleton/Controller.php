@@ -1,6 +1,7 @@
 <?php
 namespace DrdPlus\FrontendSkeleton;
 
+use DeviceDetector\Parser\Bot;
 use Granam\Strict\Object\StrictObject;
 
 class Controller extends StrictObject
@@ -19,6 +20,12 @@ class Controller extends StrictObject
     private $cssRoot;
     /** @var */
     private $title;
+    /** @var WebFiles */
+    private $webFiles;
+    /** @var WebVersions */
+    private $webVersions;
+    /** @var Request */
+    private $request;
 
     public function __construct(
         string $documentRoot,
@@ -161,16 +168,28 @@ class Controller extends StrictObject
 
     public function getWebFiles(): WebFiles
     {
-        return new WebFiles($this->getDocumentRoot() . '/web');
+        if ($this->webFiles === null) {
+            $this->webFiles = new WebFiles($this->getDocumentRoot() . '/web');
+        }
+
+        return $this->webFiles;
     }
 
     public function getWebVersions(): WebVersions
     {
-        return new WebVersions($this->getDocumentRoot());
+        if ($this->webVersions === null) {
+            $this->webVersions = new WebVersions($this->getDocumentRoot());
+        }
+
+        return $this->webVersions;
     }
 
     public function getRequest(): Request
     {
-        return new Request();
+        if ($this->request === null) {
+            $this->request = new Request(new Bot());
+        }
+
+        return $this->request;
     }
 }

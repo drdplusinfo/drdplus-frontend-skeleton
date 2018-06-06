@@ -5,10 +5,20 @@ declare(strict_types=1);
 namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
-use DeviceDetector\Parser\Bot AS BotParser;
+use DeviceDetector\Parser\Bot;
 
 class Request extends StrictObject
 {
+    /**
+     * @var Bot
+     */
+    private $botParser;
+
+    public function __construct(Bot $botParser)
+    {
+        $this->botParser = $botParser;
+    }
+
     public function getServerUrl(): string
     {
         $protocol = 'http';
@@ -40,11 +50,10 @@ class Request extends StrictObject
 
     public function isVisitorBot(string $userAgent = null): bool
     {
-        $botParser = new BotParser();
-        $botParser->setUserAgent($userAgent ?? $_SERVER['HTTP_USER_AGENT'] ?? '');
-        $botParser->discardDetails();
+        $this->botParser->setUserAgent($userAgent ?? $_SERVER['HTTP_USER_AGENT'] ?? '');
+        $this->botParser->discardDetails();
 
-        return (bool)$botParser->parse();
+        return (bool)$this->botParser->parse();
     }
 
     public function getCurrentUrl(array $parameters = []): string

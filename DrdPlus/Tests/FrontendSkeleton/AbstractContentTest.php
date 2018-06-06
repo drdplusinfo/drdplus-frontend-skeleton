@@ -104,6 +104,11 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $this->getDocumentRoot() . '/vendor';
     }
 
+    protected function getWebFilesRoot(): string
+    {
+        return $this->getDocumentRoot() . '/web';
+    }
+
     protected function getDefinedPageTitle(): string
     {
         return (new Controller($this->getDocumentRoot()))->getPageTitle();
