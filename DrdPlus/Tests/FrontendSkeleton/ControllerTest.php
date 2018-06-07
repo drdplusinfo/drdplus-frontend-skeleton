@@ -95,4 +95,16 @@ class ControllerTest extends AbstractContentTest
         $controller->setWebRoot('another web root');
         self::assertSame('another web root', $controller->getWebRoot());
     }
+
+    /**
+     * @test
+     */
+    public function I_can_add_body_class(): void
+    {
+        $controller = new Controller($this->getDocumentRoot());
+        self::assertSame([], $controller->getBodyClasses());
+        $controller->addBodyClass('rumbling');
+        $controller->addBodyClass('cracking');
+        self::assertSame(['rumbling', 'cracking'], $controller->getBodyClasses());
+    }
 }

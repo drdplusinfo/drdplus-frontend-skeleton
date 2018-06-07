@@ -29,7 +29,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
             <?php }
         } ?>
     </head>
-    <body class="container">
+    <body class="container <?= \implode(' ', $controller->getBodyClasses()) ?>">
       <div class="background-image"></div>
         <?php
         // $contactsFixed = true; // (default is on top or bottom of the content)

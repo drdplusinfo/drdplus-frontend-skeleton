@@ -30,13 +30,16 @@ class Controller extends StrictObject
     private $webVersions;
     /** @var Request */
     private $request;
+    /** @var array */
+    private $bodyClasses;
 
     public function __construct(
         string $documentRoot,
         string $webRoot = null,
         string $vendorRoot = null,
         string $partsRoot = null,
-        string $genericPartsRoot = null
+        string $genericPartsRoot = null,
+        array $bodyClasses = []
     )
     {
         $this->documentRoot = $documentRoot;
@@ -46,6 +49,7 @@ class Controller extends StrictObject
         $this->genericPartsRoot = $genericPartsRoot ?? (__DIR__ . '/../../parts/frontend-skeleton');
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
+        $this->bodyClasses = $bodyClasses;
     }
 
     /**
@@ -226,5 +230,15 @@ class Controller extends StrictObject
         }
 
         return $this->request;
+    }
+
+    public function getBodyClasses(): array
+    {
+        return $this->bodyClasses;
+    }
+
+    public function addBodyClass(string $class): void
+    {
+        $this->bodyClasses[] = $class;
     }
 }
