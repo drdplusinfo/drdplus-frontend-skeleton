@@ -84,4 +84,15 @@ class ControllerTest extends AbstractContentTest
         $controller = new Controller($this->getDocumentRoot());
         self::assertEquals(new Request(new Bot()), $controller->getRequest());
     }
+
+    /**
+     * @test
+     */
+    public function I_can_change_web_root(): void
+    {
+        $controller = new Controller($this->getDocumentRoot());
+        self::assertSame($this->getDocumentRoot() . '/web', $controller->getWebRoot());
+        $controller->setWebRoot('another web root');
+        self::assertSame('another web root', $controller->getWebRoot());
+    }
 }

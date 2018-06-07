@@ -65,6 +65,14 @@ class Controller extends StrictObject
     }
 
     /**
+     * @param string $webRoot
+     */
+    public function setWebRoot(string $webRoot): void
+    {
+        $this->webRoot = $webRoot;
+    }
+
+    /**
      * @return string
      */
     public function getVendorRoot(): string
