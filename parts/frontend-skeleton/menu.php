@@ -12,7 +12,7 @@ if (!empty($contactsFixed)) {
         <?php if (empty($hideHomeButton)) { ?>
           <span class="menu">
                     <a class="internal" href="https://www.drdplus.info">
-                        <img class="home" src="/images/generic/skeleton/drd-plus-dragon-menu-2x22.png">
+                        <img class="home" src="/images/generic/skeleton/frontend-drd-plus-dragon-menu-2x22.png">
                     </a>
                 </span>
         <?php } ?>
