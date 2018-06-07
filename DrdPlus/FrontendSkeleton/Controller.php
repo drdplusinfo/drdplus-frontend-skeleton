@@ -21,6 +21,8 @@ class Controller extends StrictObject
     /** @var string */
     private $cssRoot;
     /** @var string */
+    private $webName;
+    /** @var string */
     private $pageTitle;
     /** @var WebFiles */
     private $webFiles;
@@ -112,13 +114,26 @@ class Controller extends StrictObject
         return new JsFiles($this->getJsRoot());
     }
 
-    public function getPageTitle(): string
+    public function getWebName(): string
     {
-        if ($this->pageTitle === null) {
+        if ($this->webName === null) {
             if (!\file_exists($this->getDocumentRoot() . '/name.txt')) {
                 throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->getDocumentRoot()}/name.txt'");
             }
-            $name = \trim((string)\file_get_contents($this->getDocumentRoot() . '/name.txt'));
+            $webName = \trim((string)\file_get_contents($this->getDocumentRoot() . '/name.txt'));
+            if ($webName === '') {
+                throw new Exceptions\FileWithPageNameIsEmpty("File '{$this->getDocumentRoot()}/name.txt' is empty");
+            }
+            $this->webName = $webName;
+        }
+
+        return $this->webName;
+    }
+
+    public function getPageTitle(): string
+    {
+        if ($this->pageTitle === null) {
+            $name = $this->getWebName();
             $smiley = \file_exists($this->getDocumentRoot() . '/title_smiley.txt')
                 ? \trim(\file_get_contents($this->getDocumentRoot() . '/title_smiley.txt'))
                 : '';

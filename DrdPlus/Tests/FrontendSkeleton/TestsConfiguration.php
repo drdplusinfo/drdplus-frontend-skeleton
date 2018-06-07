@@ -28,6 +28,8 @@ class TestsConfiguration extends StrictObject
     /** @var bool */
     private $hasLinksToAltar = true;
     /** @var string */
+    private $expectedWebName = 'HTML kostra pro DrD+ webový obsah';
+    /** @var string */
     private $expectedPageTitle = 'HTML kostra pro DrD+ webový obsah';
 
     /**
@@ -176,6 +178,14 @@ class TestsConfiguration extends StrictObject
         $this->hasLinksToAltar = false;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpectedWebName(): string
+    {
+        return $this->expectedWebName;
     }
 
     /**

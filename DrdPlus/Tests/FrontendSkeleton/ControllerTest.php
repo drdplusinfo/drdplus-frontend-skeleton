@@ -32,6 +32,15 @@ class ControllerTest extends AbstractContentTest
     /**
      * @test
      */
+    public function I_can_get_web_name(): void
+    {
+        $controller = new Controller($this->getDocumentRoot());
+        self::assertSame($this->getTestsConfiguration()->getExpectedWebName(), $controller->getWebName());
+    }
+
+    /**
+     * @test
+     */
     public function I_can_get_page_title(): void
     {
         $controller = new Controller($this->getDocumentRoot());
