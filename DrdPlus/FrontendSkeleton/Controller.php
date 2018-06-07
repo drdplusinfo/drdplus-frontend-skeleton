@@ -9,6 +9,8 @@ class Controller extends StrictObject
     /** @var string */
     private $documentRoot;
     /** @var string */
+    private $webRoot;
+    /** @var string */
     private $vendorRoot;
     /** @var string */
     private $partsRoot;
@@ -18,8 +20,8 @@ class Controller extends StrictObject
     private $jsRoot;
     /** @var string */
     private $cssRoot;
-    /** @var */
-    private $title;
+    /** @var string */
+    private $pageTitle;
     /** @var WebFiles */
     private $webFiles;
     /** @var WebVersions */
@@ -29,12 +31,14 @@ class Controller extends StrictObject
 
     public function __construct(
         string $documentRoot,
+        string $webRoot = null,
         string $vendorRoot = null,
         string $partsRoot = null,
         string $genericPartsRoot = null
     )
     {
         $this->documentRoot = $documentRoot;
+        $this->webRoot = $webRoot ?? ($documentRoot . '/web');
         $this->vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
         $this->partsRoot = $partsRoot ?? ($documentRoot . '/parts');
         $this->genericPartsRoot = $genericPartsRoot ?? (__DIR__ . '/../../parts/frontend-skeleton');
@@ -48,6 +52,14 @@ class Controller extends StrictObject
     public function getDocumentRoot(): string
     {
         return $this->documentRoot;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWebRoot(): string
+    {
+        return $this->webRoot;
     }
 
     /**
@@ -102,7 +114,7 @@ class Controller extends StrictObject
 
     public function getPageTitle(): string
     {
-        if ($this->title === null) {
+        if ($this->pageTitle === null) {
             if (!\file_exists($this->getDocumentRoot() . '/name.txt')) {
                 throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->getDocumentRoot()}/name.txt'");
             }
@@ -111,12 +123,12 @@ class Controller extends StrictObject
                 ? \trim(\file_get_contents($this->getDocumentRoot() . '/title_smiley.txt'))
                 : '';
 
-            $this->title = ($smiley !== '')
+            $this->pageTitle = ($smiley !== '')
                 ? ($smiley . ' ' . $name)
                 : $name;
         }
 
-        return $this->title;
+        return $this->pageTitle;
     }
 
     public function getMenu(): string
@@ -169,7 +181,7 @@ class Controller extends StrictObject
     public function getWebFiles(): WebFiles
     {
         if ($this->webFiles === null) {
-            $this->webFiles = new WebFiles($this->getDocumentRoot() . '/web');
+            $this->webFiles = new WebFiles($this->getWebRoot());
         }
 
         return $this->webFiles;

@@ -13,6 +13,25 @@ class ControllerTest extends AbstractContentTest
     /**
      * @test
      */
+    public function I_can_pass_every_sub_root(): void
+    {
+        $controller = new Controller(
+            $this->getDocumentRoot(),
+            'some web root',
+            'some vendor root',
+            'some parts root',
+            'some generic parts root'
+        );
+        self::assertSame($this->getDocumentRoot(), $controller->getDocumentRoot());
+        self::assertSame('some web root', $controller->getWebRoot());
+        self::assertSame('some vendor root', $controller->getVendorRoot());
+        self::assertSame('some parts root', $controller->getPartsRoot());
+        self::assertSame('some generic parts root', $controller->getGenericPartsRoot());
+    }
+
+    /**
+     * @test
+     */
     public function I_can_get_page_title(): void
     {
         $controller = new Controller($this->getDocumentRoot());

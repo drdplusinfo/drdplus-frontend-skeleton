@@ -13,6 +13,7 @@ require_once $vendorRoot . '/autoload.php';
 
 $controller = $controller ?? new \DrdPlus\FrontendSkeleton\Controller(
         $documentRoot,
+        null, // automatic web root
         $vendorRoot,
         $partsRoot ?? null,
         $genericPartsRoot ?? null
