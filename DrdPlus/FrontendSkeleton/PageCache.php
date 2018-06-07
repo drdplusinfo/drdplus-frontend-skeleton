@@ -6,9 +6,9 @@ namespace DrdPlus\FrontendSkeleton;
 
 class PageCache extends Cache
 {
-    protected function getCachePrefix(): string
+    public function __construct(CacheRoot $cacheRoot, WebVersions $webVersions, bool $isInProduction, string $webRoot)
     {
-        return 'page';
+        parent::__construct($cacheRoot, $webVersions, $isInProduction, 'page-' . \md5($webRoot));
     }
 
 }

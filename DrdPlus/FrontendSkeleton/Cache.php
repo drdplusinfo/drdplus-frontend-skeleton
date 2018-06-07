@@ -12,6 +12,8 @@ abstract class Cache extends StrictObject
     private $cacheRoot;
     /** @var WebVersions */
     private $webVersions;
+    /** @var string */
+    private $cachePrefix;
     /** @var bool */
     private $isInProduction;
 
@@ -19,12 +21,14 @@ abstract class Cache extends StrictObject
      * @param CacheRoot $cacheRoot
      * @param WebVersions $webVersions
      * @param bool $isInProduction
+     * @param string $cachePrefix
      * @throws \RuntimeException
      */
     public function __construct(
         CacheRoot $cacheRoot,
         WebVersions $webVersions,
-        bool $isInProduction
+        bool $isInProduction,
+        string $cachePrefix
     )
     {
         $this->cacheRoot = $cacheRoot->getCacheRootDir() . '/' . $webVersions->getCurrentVersion();
@@ -39,6 +43,7 @@ abstract class Cache extends StrictObject
         }
         $this->webVersions = $webVersions;
         $this->isInProduction = $isInProduction;
+        $this->cachePrefix = $cachePrefix;
     }
 
     /**
@@ -87,10 +92,15 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileBaseNamePartWithoutGet(): string
     {
-        return "{$this->webVersions->getCurrentVersion()}_{$this->getCachePrefix()}_{$this->webVersions->getCurrentCommitHash()}_{$this->getGitStamp()}";
+        $prefix = \md5($this->getCachePrefix() . $this->getGitStamp());
+
+        return "{$this->webVersions->getCurrentVersion()}_{$prefix}_{$this->webVersions->getCurrentCommitHash()}";
     }
 
-    abstract protected function getCachePrefix(): string;
+    protected function getCachePrefix(): string
+    {
+        return $this->cachePrefix;
+    }
 
     /**
      * @return string
