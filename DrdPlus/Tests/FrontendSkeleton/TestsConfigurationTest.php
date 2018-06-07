@@ -15,22 +15,28 @@ class TestsConfigurationTest extends TestCase
         $methods = $reflectionClass->getMethods(
             \ReflectionMethod::IS_PUBLIC ^ \ReflectionMethod::IS_STATIC ^ \ReflectionMethod::IS_ABSTRACT
         );
+        $getters = [];
+        $setters = [];
         $hasGetters = [];
         $disablingMethods = [];
         $setterReflections = [];
         foreach ($methods as $method) {
             $methodName = $method->getName();
-            if (\strpos($methodName, 'has') === 0) {
+            if (\strpos($methodName, 'get') === 0) {
+                $getters[] = $methodName;
+            } elseif (\strpos($methodName, 'has') === 0) {
                 $hasGetters[] = $methodName;
             } elseif (\strpos($methodName, 'disable') === 0) {
                 $disablingMethods[] = $methodName;
             } elseif (\strpos($methodName, 'set') === 0) {
                 $setterReflections[] = $method;
+                $setters[] = $methodName;
             }
         }
         $this->Every_boolean_setting_is_enabled_by_default($hasGetters);
         $this->Every_boolean_setting_can_be_disabled_by_specific_method($disablingMethods, $hasGetters);
         $this->I_can_call_disabling_methods_in_chain($disablingMethods);
+        $this->I_can_set_what_i_can_get($getters, $setters);
         $this->I_can_call_setters_in_chain($setterReflections);
     }
 
@@ -74,6 +80,22 @@ class TestsConfigurationTest extends TestCase
                 "$disablingMethod should return the " . TestsConfiguration::class . ' to get fluent interface'
             );
         }
+    }
+
+    private function I_can_set_what_i_can_get(array $getters, array $setters): void
+    {
+        $expectedGetters = [];
+        foreach ($setters as $setter) {
+            $expectedGetters[] = 'get' . \substr($setter, 3);
+        }
+        $missingGetters = \array_diff($expectedGetters, $getters);
+        self::assertSame([], $missingGetters, 'Some getters are missing');
+        $expectedSetters = [];
+        foreach ($getters as $getter) {
+            $expectedSetters[] = 'set' . \substr($getter, 3);
+        }
+        $missingSetters = \array_diff($expectedSetters, $setters);
+        self::assertSame([], $missingSetters, 'Some setters are missing');
     }
 
     /**

@@ -189,6 +189,17 @@ class TestsConfiguration extends StrictObject
     }
 
     /**
+     * @param string $expectedWebName
+     * @return TestsConfiguration
+     */
+    public function setExpectedWebName(string $expectedWebName): TestsConfiguration
+    {
+        $this->expectedWebName = $expectedWebName;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getExpectedPageTitle(): string
