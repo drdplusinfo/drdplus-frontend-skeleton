@@ -175,7 +175,7 @@ h1 + .quote, h2 + .quote, h3 + .quote, h4 + .quote, h5 + .quote, h6 + .quote {
 .rpgforum-ico:before {
     content: '';
     display: inline-block;
-    background: url(/images/generic/skeleton/frontend-rpgforum-ico.png) left no-repeat;
+    background: url(/images/generic/skeleton/frontend-rpgforum-ico.png?version=a5f512b5198945e44017bacfaf63b1ef) left no-repeat;
     background-size: contain;
     width: 1em;
     height: 1em;

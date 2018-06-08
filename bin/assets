@@ -28,7 +28,7 @@ if (empty($options['dir']) && empty($options['d']) && empty($options['file']) &&
     echo <<<TEXT
 Options are (at least one of dir or file are required):
 --dir=foo (-d=foo) directory to scan for files (all supported types if not limited) recursively
---exclude-dir=foo/vendor (-x=foo/vendor) directory to skip for scan (use relative or absolute path annotation as used for --dir)
+--exclude-dir=foo/bar (-x=foo/bar) directory to skip for scan (use relative or absolute path annotation as used for --dir)
 --css (-c) for CSS files "only" (can be combined with other types), identified by *.css name
 --html (-w) for HTML files "only" (can be combined with other types), identified by *.html and *.htm name
 --file=bar (-f=bar) file to transpile to scan for files (all supported types if not limited) recursively, ignores file-type filters and accepts any file, regardless on file suffix

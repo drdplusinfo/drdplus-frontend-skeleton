@@ -36,5 +36,10 @@
     "roave/security-advisories": "dev-master"
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "pre-autoload-dump": [
+      "rm -f ./vendor/bin/assets && ln -s ../../bin/assets ./vendor/bin/"
+    ]
+  }
 }

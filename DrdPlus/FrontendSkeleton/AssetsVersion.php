@@ -106,9 +106,12 @@ class AssetsVersion extends StrictObject
             foreach (new \RecursiveIteratorIterator($directoryIterator) as $folderName => $folder) {
                 $pathName = $folder->getPathname();
                 $dirPath = \dirname($pathName);
+                if (\preg_match('~/vendor($|/.+)~', $dirPath)) {
+                    continue;
+                }
                 foreach ($excludeDirs as $excludeDir) {
                     if ($dirPath === $excludeDir || \strpos($dirPath, $excludeDir . '/') === 0) {
-                        continue;
+                        continue 2; // next folder
                     }
                 }
                 if (\preg_match('~[.]' . $wantedFileExtensionsRegexp . '$~', $folderName)) {
