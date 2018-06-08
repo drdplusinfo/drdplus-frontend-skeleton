@@ -184,4 +184,5 @@
 
 .contacts .fa-dice-six {
     transform: rotate(45deg);
+    font-size: smaller;
 }
