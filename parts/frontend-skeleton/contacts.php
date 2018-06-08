@@ -30,18 +30,33 @@ if (!empty($contactsFixed)) {
                     if ($webVersion === $currentVersion) {
                         continue;
                     } ?>
-                  <li><a href="<?= $request->getCurrentUrl(['version' => $webVersion]) ?>">
-                          <?= $webVersions->getVersionName($webVersion) ?>
-                    </a></li>
+                  <li>
+                    <a href="<?= $request->getCurrentUrl(['version' => $webVersion]) ?>">
+                        <?= $webVersions->getVersionName($webVersion) ?>
+                    </a>
+                  </li>
                 <?php } ?>
             </ul>
           <?php } ?>
       </div>
-      <span class="contact"><a href="mailto:info@drdplus.info">info@drdplus.info</a></span>
-      <span class="contact"><a target="_blank" class="rpgforum-contact"
-                               href="https://rpgforum.cz/forum/viewtopic.php?f=238&t=14870">RPG fórum</a></span>
-      <span class="contact"><a target="_blank" class="facebook-contact"
-                               href="https://www.facebook.com/drdplus.info">Facebook</a></span>
+      <span class="contact">
+        <a href="mailto:info@drdplus.info">
+          <span class="narrow">@</span>
+          <span class="wide">info@drdplus.info</span>
+        </a>
+      </span>
+      <span class="contact">
+        <a target="_blank" class="rpgforum-contact" href="https://rpgforum.cz/forum/viewtopic.php?f=238&t=14870">
+          <span class="narrow">RPG</span>
+          <span class="wide">RPG fórum</span>
+        </a>
+      </span>
+      <span class="contact">
+        <a target="_blank" class="facebook-contact" href="https://www.facebook.com/drdplus.info">
+          <span class="narrow">FB</span>
+          <span class="wide">Facebook</span>
+        </a>
+      </span>
     </div>
   </div>
 <?php if (empty($contactsBottom) /* contacts are top */) { ?>

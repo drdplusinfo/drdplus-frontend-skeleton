@@ -42,7 +42,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         // $hideHomeButton = true; // (default is to show)
         $content = \ob_get_contents();
         \ob_clean();
-        $content .= $controller->getMenu();
+        $content .= $controller->getContacts();
         $content .= $controller->getCustomBodyContent();
         $content .= $controller->getWebContent(); ?>
     </body>

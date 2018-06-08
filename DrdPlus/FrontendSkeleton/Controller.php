@@ -158,13 +158,13 @@ class Controller extends StrictObject
         return $this->pageTitle;
     }
 
-    public function getMenu(): string
+    public function getContacts(): string
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
         $controller = $this;
         \ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $this->getGenericPartsRoot() . '/menu.php';
+        include $this->getGenericPartsRoot() . '/contacts.php';
 
         return \ob_get_clean();
     }

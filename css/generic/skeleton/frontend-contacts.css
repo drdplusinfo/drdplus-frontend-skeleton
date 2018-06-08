@@ -6,6 +6,24 @@
     z-index: 1030;
 }
 
+.contacts .wide {
+    display: inherit;
+}
+
+.contacts .narrow {
+    display: none;
+}
+
+@media (max-width: 576px) {
+    .contacts .wide {
+        display: none;
+    }
+
+    .contacts .narrow {
+        display: inherit;
+    }
+}
+
 .contacts.fixed {
     position: fixed;
 }
