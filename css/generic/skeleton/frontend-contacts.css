@@ -6,20 +6,42 @@
     z-index: 1030;
 }
 
-.contacts .wide {
+.contacts .desktop {
     display: inherit;
 }
 
-.contacts .narrow {
+.contacts .tablet {
     display: none;
 }
 
-@media (max-width: 576px) {
-    .contacts .wide {
+.contacts .mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .contacts .desktop {
         display: none;
     }
 
-    .contacts .narrow {
+    .contacts .tablet {
+        display: inherit;
+    }
+
+    .contacts .mobile {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .contacts .desktop {
+        display: none;
+    }
+
+    .contacts .tablet {
+        display: none;
+    }
+
+    .contacts .mobile {
         display: inherit;
     }
 }
@@ -158,4 +180,8 @@
     text-decoration: none;
     text-shadow: 0 1px 1px #c5c5c5, 2px 2px 7px #dddddd;
     color: navajowhite;
+}
+
+.contacts .fa-dice-six {
+    transform: rotate(45deg);
 }

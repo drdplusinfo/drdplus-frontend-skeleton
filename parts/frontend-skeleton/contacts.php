@@ -41,20 +41,23 @@ if (!empty($contactsFixed)) {
       </div>
       <span class="contact">
         <a href="mailto:info@drdplus.info">
-          <span class="narrow">@</span>
-          <span class="wide">info@drdplus.info</span>
+          <span class="mobile"><i class="fas fa-envelope"></i></span>
+          <span class="tablet">info@drdplus.info</span>
+          <span class="desktop"><i class="fas fa-envelope"></i> info@drdplus.info</span>
         </a>
       </span>
       <span class="contact">
         <a target="_blank" class="rpgforum-contact" href="https://rpgforum.cz/forum/viewtopic.php?f=238&t=14870">
-          <span class="narrow">RPG</span>
-          <span class="wide">RPG fórum</span>
+          <span class="mobile"><i class="fas fa-dice-six"></i></span>
+          <span class="tablet">RPG fórum</span>
+          <span class="desktop"><i class="fas fa-dice-six"></i> RPG fórum</span>
         </a>
       </span>
       <span class="contact">
         <a target="_blank" class="facebook-contact" href="https://www.facebook.com/drdplus.info">
-          <span class="narrow">FB</span>
-          <span class="wide">Facebook</span>
+          <span class="mobile"><i class="fab fa-facebook-square"></i></span>
+          <span class="tablet">Facebook</span>
+          <span class="desktop"><i class="fab fa-facebook-square"></i> Facebook</span>
         </a>
       </span>
     </div>

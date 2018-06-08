@@ -171,3 +171,13 @@ h1 + .quote, h2 + .quote, h3 + .quote, h4 + .quote, h5 + .quote, h6 + .quote {
     margin: 0;
     padding: 0;
 }
+
+.rpgforum-ico:before {
+    content: '';
+    display: inline-block;
+    background: url(/images/generic/skeleton/frontend-rpgforum-ico.png) left no-repeat;
+    background-size: contain;
+    width: 1em;
+    height: 1em;
+    vertical-align: text-top;
+}
