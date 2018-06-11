@@ -32,6 +32,8 @@ class Controller extends StrictObject
     private $request;
     /** @var array */
     private $bodyClasses;
+    /** @var bool */
+    private $contactsFixed = false;
 
     public function __construct(
         string $documentRoot,
@@ -240,5 +242,20 @@ class Controller extends StrictObject
     public function addBodyClass(string $class): void
     {
         $this->bodyClasses[] = $class;
+    }
+
+    public function setContactsFixed(): Controller
+    {
+        $this->contactsFixed = true;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isContactsFixed(): bool
+    {
+        return $this->contactsFixed;
     }
 }
