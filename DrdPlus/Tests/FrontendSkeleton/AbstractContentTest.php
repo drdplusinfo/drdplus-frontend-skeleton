@@ -115,8 +115,10 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return (new FrontendController($this->getDocumentRoot()))->getPageTitle();
     }
 
-    protected function fetchNonCachedContent(): string
+    protected function fetchNonCachedContent(FrontendController $controller = null): string
     {
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $controller = $controller ?? null;
         $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
         $_GET[Cache::CACHE] = Cache::DISABLE;
         \ob_start();
