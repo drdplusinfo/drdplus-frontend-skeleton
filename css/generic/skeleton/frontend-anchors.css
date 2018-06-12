@@ -12,6 +12,10 @@ a:hover {
     text-shadow: 0 0 1px #7f7f7f;
 }
 
+a:hover .preview {
+    text-shadow: initial;
+}
+
 a.external-url {
     color: #0f293a;
     text-decoration: none;
