@@ -137,4 +137,32 @@ class ControllerTest extends AbstractContentTest
             self::assertTrue($contacts->classList->contains('fixed'), 'Contacts should be fixed as controller says so');
         }
     }
+    /**
+     * @test
+     */
+    public function I_can_hide_home_button(): void
+    {
+        // TODO
+        $controller = new Controller($this->getDocumentRoot());
+        self::assertFalse($controller->isContactsFixed(), 'Contacts are expected to be simply on top by default');
+        if ($this->isSkeletonChecked()) {
+            /** @var Element $contacts */
+            $contacts = $this->getHtmlDocument()->getElementById('contacts');
+            self::assertNotEmpty($contacts, 'Contacts are missing');
+            self::assertTrue($contacts->classList->contains('top'), 'Contacts should be positioned on top');
+            self::assertFalse($contacts->classList->contains('fixed'), 'Contacts should not be fixed as controller does not say so');
+        }
+        $controller->setContactsFixed();
+        self::assertTrue($controller->isContactsFixed(), 'Failed to set contacts as fixed');
+        if ($this->isSkeletonChecked()) {
+            \ob_start();
+            include $this->getDocumentRoot() . '/index.php';
+            $content = \ob_get_clean();
+            $htmlDocument = new HtmlDocument($content);
+            $contacts = $htmlDocument->getElementById('contacts');
+            self::assertNotEmpty($contacts, 'Contacts are missing');
+            self::assertTrue($contacts->classList->contains('top'), 'Contacts should be positioned on top');
+            self::assertTrue($contacts->classList->contains('fixed'), 'Contacts should be fixed as controller says so');
+        }
+    }
 }

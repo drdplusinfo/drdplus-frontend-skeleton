@@ -34,6 +34,8 @@ class Controller extends StrictObject
     private $bodyClasses;
     /** @var bool */
     private $contactsFixed = false;
+    /** @var bool */
+    private $showHomeButton = true;
 
     public function __construct(
         string $documentRoot,
@@ -257,5 +259,17 @@ class Controller extends StrictObject
     public function isContactsFixed(): bool
     {
         return $this->contactsFixed;
+    }
+
+    public function hideHomeButton(): Controller
+    {
+        $this->showHomeButton = false;
+
+        return $this;
+    }
+
+    public function isShownHomeButton(): bool
+    {
+        return $this->showHomeButton;
     }
 }

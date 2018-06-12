@@ -1,6 +1,6 @@
 <div class="contacts visible top <?php if ($controller->isContactsFixed()) { ?>fixed<?php } ?> permanent" id="contacts">
   <div class="container">
-      <?php if (empty($hideHomeButton)) { ?>
+      <?php if ($controller->showHomeButton()) { ?>
         <span class="menu">
                     <a class="internal" href="https://www.drdplus.info">
                         <img class="home" src="/images/generic/skeleton/frontend-drd-plus-dragon-menu-2x22.png">
