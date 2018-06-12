@@ -8,6 +8,9 @@ use Granam\Strict\Object\StrictObject;
 
 abstract class Cache extends StrictObject
 {
+    public const CACHE = 'cache';
+    public const DISABLE = 'disable';
+
     /** @var string */
     private $cacheRoot;
     /** @var WebVersions */
@@ -70,7 +73,7 @@ abstract class Cache extends StrictObject
      */
     public function isCacheValid(): bool
     {
-        return ($_GET['cache'] ?? '') !== 'disable' && \is_readable($this->getCacheFileName());
+        return ($_GET[static::CACHE] ?? '') !== static::DISABLE && \is_readable($this->getCacheFileName());
     }
 
     /**

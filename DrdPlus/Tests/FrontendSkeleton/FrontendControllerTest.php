@@ -128,10 +128,7 @@ class FrontendControllerTest extends AbstractContentTest
         $controller->setContactsFixed();
         self::assertTrue($controller->isContactsFixed(), 'Failed to set contacts as fixed');
         if ($this->isSkeletonChecked()) {
-            \ob_start();
-            /** @noinspection PhpIncludeInspection */
-            include $this->getDocumentRoot() . '/index.php';
-            $content = \ob_get_clean();
+            $content = $this->fetchNonCachedContent();
             $htmlDocument = new HtmlDocument($content);
             $contacts = $htmlDocument->getElementById('contacts');
             self::assertNotEmpty($contacts, 'Contacts are missing');
@@ -170,10 +167,7 @@ class FrontendControllerTest extends AbstractContentTest
         $controller->hideHomeButton();
         self::assertFalse($controller->isShownHomeButton(), 'Failed to hide home button');
         if ($this->isSkeletonChecked()) {
-            \ob_start();
-            /** @noinspection PhpIncludeInspection */
-            include $this->getDocumentRoot() . '/index.php';
-            $content = \ob_get_clean();
+            $content = $this->fetchNonCachedContent();
             $htmlDocument = new HtmlDocument($content);
             $homeButton = $htmlDocument->getElementById('home_button');
             self::assertEmpty($homeButton, 'Home button should be already hidden');

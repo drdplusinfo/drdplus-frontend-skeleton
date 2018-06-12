@@ -1,6 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\Cache;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use Gt\Dom\HTMLDocument;
 
@@ -114,4 +115,16 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return (new FrontendController($this->getDocumentRoot()))->getPageTitle();
     }
 
+    protected function fetchNonCachedContent(): string
+    {
+        $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
+        $_GET[Cache::CACHE] = Cache::DISABLE;
+        \ob_start();
+        /** @noinspection PhpIncludeInspection */
+        include $this->getDocumentRoot() . '/index.php';
+        $content = \ob_get_clean();
+        $_GET[Cache::CACHE] = $cacheOriginalValue;
+
+        return $content;
+    }
 }
