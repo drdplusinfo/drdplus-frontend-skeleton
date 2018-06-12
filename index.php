@@ -11,7 +11,7 @@ $vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
 /** @noinspection PhpIncludeInspection */
 require_once $vendorRoot . '/autoload.php';
 
-$controller = $controller ?? new \DrdPlus\FrontendSkeleton\Controller(
+$controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController(
         $documentRoot,
         null, // automatic web root
         $vendorRoot,

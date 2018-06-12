@@ -4,7 +4,7 @@ namespace DrdPlus\FrontendSkeleton;
 use DeviceDetector\Parser\Bot;
 use Granam\Strict\Object\StrictObject;
 
-class Controller extends StrictObject
+class FrontendController extends StrictObject
 {
     /** @var string */
     private $documentRoot;
@@ -246,7 +246,7 @@ class Controller extends StrictObject
         $this->bodyClasses[] = $class;
     }
 
-    public function setContactsFixed(): Controller
+    public function setContactsFixed(): FrontendController
     {
         $this->contactsFixed = true;
 
@@ -261,7 +261,7 @@ class Controller extends StrictObject
         return $this->contactsFixed;
     }
 
-    public function hideHomeButton(): Controller
+    public function hideHomeButton(): FrontendController
     {
         $this->showHomeButton = false;
 
