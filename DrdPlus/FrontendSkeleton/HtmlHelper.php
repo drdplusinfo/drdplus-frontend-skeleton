@@ -177,21 +177,24 @@ class HtmlHelper extends StrictObject
     }
 
     /**
-     * @param HtmlDocument $html
+     * @param HtmlDocument $htmlDocument
+     * @return HtmlDocument
      */
-    public function addAnchorsToIds(HtmlDocument $html): void
+    public function addAnchorsToIds(HtmlDocument $htmlDocument): HtmlDocument
     {
-        $this->addAnchorsToChildrenWithIds($html->body->children);
+        $this->addAnchorsToChildrenWithIds($htmlDocument->body->children);
+
+        return $htmlDocument;
     }
 
     private function addAnchorsToChildrenWithIds(HTMLCollection $children): void
     {
         /** @var Element $child */
         foreach ($children as $child) {
-            if ($child->getAttribute('id') && !$child->prop_get_classList()->contains(self::INVISIBLE_ID_CLASS)
+            if ($child->nodeName !== 'a' && $child->getAttribute('id')
+                && !$child->prop_get_classList()->contains(self::INVISIBLE_ID_CLASS)
                 && $child->getElementsByTagName('a')->length === 0
             ) {
-                $anchorToSelf = new Element('a');
                 $toMove = [];
                 /** @var \DOMElement $grandChildNode */
                 foreach ($child->childNodes as $grandChildNode) {
@@ -201,6 +204,7 @@ class HtmlHelper extends StrictObject
                     $toMove[] = $grandChildNode;
                 }
                 if (\count($toMove) > 0) {
+                    $anchorToSelf = new Element('a');
                     $child->replaceChild($anchorToSelf, $toMove[0]); // pairs anchor with parent element
                     $anchorToSelf->setAttribute('href', '#' . $child->getAttribute('id'));
                     foreach ($toMove as $index => $item) {

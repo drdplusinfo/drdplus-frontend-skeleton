@@ -1,6 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
@@ -82,5 +83,18 @@ class HtmlHelperTest extends AbstractContentTest
     {
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
+    }
+
+    /**
+     * @test
+     */
+    public function It_will_not_add_anchor_into_anchor_with_id(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        $content = '<!DOCTYPE html>
+<html><body><a href="" id="someId">Foo</a></body></html>';
+        $htmlDocument = new HtmlDocument($content);
+        $htmlHelper->addAnchorsToIds($htmlDocument);
+        self::assertSame($content, \trim($htmlDocument->saveHTML()));
     }
 }
