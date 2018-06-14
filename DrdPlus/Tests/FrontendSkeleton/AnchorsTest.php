@@ -45,8 +45,15 @@ class AnchorsTest extends AbstractContentTest
     {
         $html = $this->getHtmlDocument();
         $localAnchors = $this->getLocalAnchors();
-        if (!$this->getTestsConfiguration()->hasIds()) { // no IDs no local anchors
-            self::assertCount(0, $localAnchors, 'No local anchors expected as there are no IDs to make anchors from');
+        if (!$this->getTestsConfiguration()->hasIds()) { // no IDs, no local anchors
+            self::assertCount(
+                0,
+                $localAnchors,
+                'No local anchors expected as tests config says there are no IDs to make anchors from: '
+                . "\n" . \implode("\n", \array_map(function (Element $anchor) {
+                    return $anchor->getAttribute('href');
+                }, $localAnchors))
+            );
 
             return;
         }
