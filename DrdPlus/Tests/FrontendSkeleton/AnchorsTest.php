@@ -169,7 +169,11 @@ class AnchorsTest extends AbstractContentTest
     {
         $externalAnchorsWithHash = $this->getExternalAnchorsWithHash();
         if (!$this->getTestsConfiguration()->hasExternalAnchorsWithHashes()) {
-            self::assertCount(0, $externalAnchorsWithHash);
+            self::assertCount(
+                0,
+                $externalAnchorsWithHash,
+                'No external anchors expected according to tests config'
+            );
 
             return;
         }
