@@ -57,6 +57,7 @@ class AnchorsTest extends AbstractContentTest
 
             return;
         }
+        self::assertNotEmpty($localAnchors, 'Some local anchors expected');
         foreach ($this->getLocalAnchors() as $localAnchor) {
             $expectedId = \substr($localAnchor->getAttribute('href'), 1); // just remove leading #
             /** @var Element $target */
@@ -177,6 +178,7 @@ class AnchorsTest extends AbstractContentTest
 
             return;
         }
+        self::assertNotEmpty($externalAnchorsWithHash, 'Some external anchors expected');
         foreach ($externalAnchorsWithHash as $anchor) {
             $link = $anchor->getAttribute('href');
             $link = $this->turnToLocalLink($link);
