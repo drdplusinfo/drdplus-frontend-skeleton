@@ -119,19 +119,33 @@ class AnchorsTest extends AbstractContentTest
             if ($weAreOffline) {
                 $skippedExternalUrls[] = $link;
             } else {
-                $curl = \curl_init($link);
-                \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-                \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
-                \curl_setopt($curl, CURLOPT_HEADER, 1);
-                \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
-                \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
-                \curl_exec($curl);
-                $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
-                \curl_close($curl);
+                $responseHttpCode = false;
+                $redirectUrl = '';
+                $isDrdPlus = \strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false;
+                $linkHash = \md5($link);
+                $tempFileName = 'external_anchor_' . $linkHash . '.tmp';
+                if (!$isDrdPlus) {
+                    $responseHttpCode = (int)$this->getFromCache($tempFileName);
+                }
+                if (!$responseHttpCode) {
+                    $curl = \curl_init($link);
+                    \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+                    \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
+                    \curl_setopt($curl, CURLOPT_HEADER, 1);
+                    \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
+                    \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
+                    \curl_exec($curl);
+                    $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                    $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+                    $curlError = \curl_error($curl);
+                    \curl_close($curl);
+                    if (!$isDrdPlus && $responseHttpCode >= 200 && $responseHttpCode < 300) {
+                        $this->cacheContent((string)$responseHttpCode, $tempFileName);
+                    }
+                }
                 self::assertTrue(
                     $responseHttpCode >= 200 && $responseHttpCode < 300,
-                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl'"
+                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($curlError)"
                 );
             }
             self::$checkedExternalAnchors[] = $link;
@@ -142,6 +156,26 @@ class AnchorsTest extends AbstractContentTest
                 \print_r($skippedExternalUrls, true)
             );
         }
+    }
+
+    private function getFromCache(string $cacheFileBaseName): string
+    {
+        $tempFile = \sys_get_temp_dir() . '/' . $cacheFileBaseName;
+        if (!\file_exists($tempFile)) {
+            return '';
+        }
+        if (\filemtime($tempFile) > (\time() - 3600)) {
+            return \file_get_contents($tempFile);
+        }
+        \unlink($tempFile);
+
+        return '';
+    }
+
+    private function cacheContent(string $content, string $cacheFileBaseName): void
+    {
+        $tempFile = \sys_get_temp_dir() . '/' . $cacheFileBaseName;
+        self::assertNotEmpty(\file_put_contents($tempFile, $content));
     }
 
     /**
@@ -219,27 +253,39 @@ class AnchorsTest extends AbstractContentTest
     {
         $link = \substr($href, 0, \strpos($href, '#') ?: null);
         if ((self::$externalHtmlDocuments[$link] ?? null) === null) {
-            $curl = \curl_init($link);
-            \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-            \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-            $cookieName = null;
+            $isDrdPlus = false;
             if (\strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false) {
                 self::assertNotEmpty(
-                    \preg_match('~//(?<subDomain>[^.]+([.][^.]+)*)\.drdplus\.~', $link, $matches),
+                    \preg_match('~//(?<subDomain>[^.]+([.][^.]+)*)\.drdplus\.~', $link),
                     "Expected some sub-domain in link $link"
                 );
-                \curl_setopt($curl, CURLOPT_POSTFIELDS, ['trial' => '1']);
+                $isDrdPlus = true;
             }
-            $content = \curl_exec($curl);
-            \curl_close($curl);
+            $content = '';
+            $tempFileName = 'external_anchor_' . \md5($link) . '.tmp';
+            if (!$isDrdPlus) {
+                $content = $this->getFromCache($tempFileName);
+            }
+            if (!$content) {
+                $curl = \curl_init($link);
+                \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+                \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+                if ($isDrdPlus) {
+                    \curl_setopt($curl, CURLOPT_POSTFIELDS, ['trial' => '1']);
+                }
+                $content = \curl_exec($curl);
+                \curl_close($curl);
+                if (!$isDrdPlus) {
+                    $this->cacheContent($content, $tempFileName);
+                }
+            }
             self::assertNotEmpty($content, 'Nothing has been fetched from URL ' . $link);
             self::$externalHtmlDocuments[$link] = @new HTMLDocument($content);
-            if (\strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false) {
+            if ($isDrdPlus) {
                 self::assertCount(
                     0,
                     self::$externalHtmlDocuments[$link]->getElementsByTagName('form'),
-                    'Seems we have not passed ownership check for ' . $href . ' by using cookie of name '
-                    . \var_export($cookieName, true)
+                    'Seems we have not passed ownership check for ' . $href . ' by using trial=1'
                 );
             }
         }
