@@ -1,15 +1,16 @@
 <?php
 // switch to version has to be BEFORE cache usage
-$pageCache = new \DrdPlus\FrontendSkeleton\PageCache(
-    $cacheRoot,
-    $webVersions,
-    $htmlHelper->isInProduction(),
-    $controller->getWebRoot()
-);
-
-if ($pageCache->isCacheValid()) {
-    return $pageCache->getCachedContent();
+try {
+    $controller->switchToWantedVersion();
+} catch (\DrdPlus\FrontendSkeleton\Exceptions\Exception $exception) {
+    \trigger_error($exception->getMessage() . '; ' . $exception->getTraceAsString(), E_USER_WARNING);
 }
+
+$cachedContent = $controller->getCachedContent();
+if ($cachedContent !== '') {
+    return $cachedContent;
+}
+
 $previousMemoryLimit = \ini_set('memory_limit', '1G');
 \ob_start();
 ?>
@@ -49,7 +50,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
   </html>
 <?php
 $content .= \ob_get_clean();
-$pageCache->saveContentForDebug($content); // for debugging purpose
+$controller->getPageCache()->saveContentForDebug($content); // for debugging purpose
 $htmlDocument = new \DrdPlus\FrontendSkeleton\HtmlDocument($content);
 $htmlHelper->prepareSourceCodeLinks($htmlDocument);
 $htmlHelper->addIdsToTablesAndHeadings($htmlDocument);
@@ -65,7 +66,7 @@ if (!$htmlHelper->isInProduction()) {
     $htmlHelper->makeExternalLinksLocal($htmlDocument);
 }
 $updatedContent = $htmlDocument->saveHTML();
-$pageCache->cacheContent($updatedContent);
+$controller->getPageCache()->cacheContent($updatedContent);
 
 if ($previousMemoryLimit !== false) {
     \ini_set('memory_limit', $previousMemoryLimit);

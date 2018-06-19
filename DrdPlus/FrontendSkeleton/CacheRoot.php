@@ -23,4 +23,9 @@ class CacheRoot extends StrictObject
     {
         return $this->cacheRootDir;
     }
+
+    public function __toString()
+    {
+        return $this->getCacheRootDir();
+    }
 }

@@ -11,7 +11,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
     private $currentWebVersion;
     private $changesStashed = false;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         if ($this->areThereUncommittedChanges() && !$this->trySafeStashOfChanges()) {
@@ -57,7 +57,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
         return \count($changedRows) > 0;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $webVersionSwitchMutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
         $webVersionSwitcher = new WebVersionSwitcher(

@@ -7,8 +7,10 @@ use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\FrontendSkeleton\WebFiles;
 use DrdPlus\FrontendSkeleton\WebVersions;
+use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
+use Mockery\MockInterface;
 
 class FrontendControllerTest extends AbstractContentTest
 {
@@ -19,6 +21,7 @@ class FrontendControllerTest extends AbstractContentTest
     public function I_can_pass_every_sub_root(): void
     {
         $controller = new FrontendController(
+            $this->createHtmlHelper(),
             $this->getDocumentRoot(),
             'some web root',
             'some vendor root',
@@ -37,7 +40,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_web_name(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertSame($this->getTestsConfiguration()->getExpectedWebName(), $controller->getWebName());
     }
 
@@ -46,7 +49,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_page_title(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertSame($this->getTestsConfiguration()->getExpectedPageTitle(), $controller->getPageTitle());
     }
 
@@ -57,7 +60,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_not_get_page_title_if_text_file_with_its_name_does_not_exist(): void
     {
-        $controller = new FrontendController('Not from this world');
+        $controller = new FrontendController($this->createHtmlHelper(), 'Not from this world');
         $controller->getPageTitle();
     }
 
@@ -66,7 +69,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_web_versions(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertEquals(new WebVersions($this->getDocumentRoot()), $controller->getWebVersions());
     }
 
@@ -75,7 +78,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_web_files(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertEquals(new WebFiles($this->getWebFilesRoot()), $controller->getWebFiles());
     }
 
@@ -84,7 +87,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_request(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertEquals(new Request(new Bot()), $controller->getRequest());
     }
 
@@ -93,7 +96,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_change_web_root(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertSame($this->getDocumentRoot() . '/web', $controller->getWebRoot());
         $controller->setWebRoot('another web root');
         self::assertSame('another web root', $controller->getWebRoot());
@@ -104,7 +107,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_add_body_class(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
         self::assertSame([], $controller->getBodyClasses());
         $controller->addBodyClass('rumbling');
         $controller->addBodyClass('cracking');
@@ -116,7 +119,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_set_contacts_fixed(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(false /* not in production */), $this->getDocumentRoot());
         self::assertFalse($controller->isContactsFixed(), 'Contacts are expected to be simply on top by default');
         if ($this->isSkeletonChecked()) {
             /** @var Element $contacts */
@@ -156,7 +159,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_hide_home_button(): void
     {
-        $controller = new FrontendController($this->getDocumentRoot());
+        $controller = new FrontendController($this->createHtmlHelper(false /* not in production */), $this->getDocumentRoot());
         self::assertTrue($controller->isShownHomeButton(), 'Home button should be shown by default');
         if ($this->isSkeletonChecked()) {
             /** @var Element $homeButton */
@@ -172,5 +175,112 @@ class FrontendControllerTest extends AbstractContentTest
             $homeButton = $htmlDocument->getElementById('home_button');
             self::assertEmpty($homeButton, 'Home button should not be used at all');
         }
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_get_page_cache_with_properly_set_production_mode(): void
+    {
+        $controller = new FrontendController($this->createHtmlHelper(true /* in production */), $this->getDocumentRoot());
+        self::assertTrue($controller->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
+        $controller = new FrontendController($this->createHtmlHelper(false /* not in production */), $this->getDocumentRoot());
+        self::assertFalse($controller->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     */
+    public function I_can_get_wanted_version(): void
+    {
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
+        $this->I_will_get_master_as_default_wanted_version($controller);
+        $this->I_will_get_version_from_cookie($controller);
+        $this->I_will_get_version_from_get($controller);
+    }
+
+    private function I_will_get_master_as_default_wanted_version(FrontendController $controller): void
+    {
+        self::assertSame('master', $controller->getWantedVersion());
+    }
+
+    private function I_will_get_version_from_cookie(FrontendController $controller): void
+    {
+        unset($_GET['version']);
+        $_COOKIE['version'] = 'foo_from_cookie';
+        self::assertSame('foo_from_cookie', $controller->getWantedVersion(), 'Wanted version should be taken from cookie');
+        unset($_COOKIE['version']);
+        $this->I_will_get_master_as_default_wanted_version($controller);
+    }
+
+    private function I_will_get_version_from_get(FrontendController $controller): void
+    {
+        $_GET['version'] = 'bar_from_get';
+        self::assertSame('bar_from_get', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
+        $_COOKIE['version'] = 'some_version_from_cookie';
+        self::assertSame('bar_from_get', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
+        unset($_GET['version']);
+        self::assertSame('some_version_from_cookie', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     * @throws \ReflectionException
+     */
+    public function I_can_switch_to_wanted_version(): void
+    {
+        $controller = new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot());
+        $controllerReflection = new \ReflectionClass($controller);
+        $versionSwitcherProperty = $controllerReflection->getProperty('webVersionSwitcher');
+        $versionSwitcherProperty->setAccessible(true);
+        $this->I_will_be_switched_to_master_as_default_wanted_version($controller, $versionSwitcherProperty);
+        $this->I_will_be_switched_to_version_from_cookie($controller, $versionSwitcherProperty);
+        $this->I_will_be_switched_to_version_from_get($controller, $versionSwitcherProperty);
+    }
+
+    /**
+     * @param string $expectedVersionToSwitchTo
+     * @return WebVersionSwitcher|MockInterface
+     */
+    private function createWebVersionSwitcher(string $expectedVersionToSwitchTo): WebVersionSwitcher
+    {
+        $webVersionSwitcher = $this->mockery(WebVersionSwitcher::class);
+        $webVersionSwitcher->expects('switchToVersion')
+            ->with($expectedVersionToSwitchTo)
+            ->andReturn(true);
+
+        return $webVersionSwitcher;
+    }
+
+    private function I_will_be_switched_to_master_as_default_wanted_version(
+        FrontendController $controller,
+        \ReflectionProperty $versionSwitcherProperty
+    ): void
+    {
+        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher('master'));
+        self::assertTrue($controller->switchToWantedVersion());
+        self::assertSame('master', $controller->getWantedVersion());
+    }
+
+    private function I_will_be_switched_to_version_from_cookie(
+        FrontendController $controller,
+        \ReflectionProperty $versionSwitcherProperty
+    ): void
+    {
+        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher('foo_from_cookie'));
+        $_COOKIE['version'] = 'foo_from_cookie';
+        self::assertTrue($controller->switchToWantedVersion());
+    }
+
+    private function I_will_be_switched_to_version_from_get(
+        FrontendController $controller,
+        \ReflectionProperty $versionSwitcherProperty
+    ): void
+    {
+        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher('bar_from_get'));
+        $_GET['version'] = 'bar_from_get';
+        self::assertTrue($controller->switchToWantedVersion());
     }
 }

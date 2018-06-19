@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use PHPUnit\Framework\TestCase;
+use Granam\Tests\Tools\TestWithMockery;
 
-abstract class SkeletonTestCase extends TestCase
+abstract class SkeletonTestCase extends TestWithMockery
 {
     /** @var TestsConfiguration */
     private $testsConfiguration;

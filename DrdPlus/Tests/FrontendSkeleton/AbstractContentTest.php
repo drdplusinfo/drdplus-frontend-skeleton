@@ -3,6 +3,7 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Cache;
 use DrdPlus\FrontendSkeleton\FrontendController;
+use DrdPlus\FrontendSkeleton\HtmlHelper;
 use Gt\Dom\HTMLDocument;
 
 abstract class AbstractContentTest extends SkeletonTestCase
@@ -10,7 +11,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
     private static $contents = [];
     private static $htmlDocuments = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\defined('DRD_PLUS_INDEX_FILE_NAME_TO_TEST')) {
             self::markTestSkipped('Missing constant \'DRD_PLUS_INDEX_FILE_NAME_TO_TEST\'');
@@ -112,7 +113,22 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getDefinedPageTitle(): string
     {
-        return (new FrontendController($this->getDocumentRoot()))->getPageTitle();
+        return (new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot()))->getPageTitle();
+    }
+
+    /**
+     * @param bool|null $inProductionMode
+     * @return HtmlHelper|\Mockery\MockInterface
+     */
+    protected function createHtmlHelper(bool $inProductionMode = null): HtmlHelper
+    {
+        $htmlHelper = $this->mockery(HtmlHelper::class);
+        if ($inProductionMode !== null) {
+            $htmlHelper->shouldReceive('isInProduction')
+                ->andReturn($inProductionMode);
+        }
+
+        return $htmlHelper;
     }
 
     protected function fetchNonCachedContent(FrontendController $controller = null): string

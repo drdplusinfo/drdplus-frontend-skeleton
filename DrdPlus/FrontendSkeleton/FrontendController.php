@@ -6,6 +6,8 @@ use Granam\Strict\Object\StrictObject;
 
 class FrontendController extends StrictObject
 {
+    /** @var HtmlHelper */
+    private $htmlHelper;
     /** @var string */
     private $documentRoot;
     /** @var string */
@@ -36,8 +38,17 @@ class FrontendController extends StrictObject
     private $contactsFixed = false;
     /** @var bool */
     private $showHomeButton = true;
+    /** @var CacheRoot */
+    private $cacheRoot;
+    /** @var WebVersionSwitchMutex */
+    private $versionSwitchMutex;
+    /** @var WebVersionSwitcher */
+    private $webVersionSwitcher;
+    /** @var PageCache */
+    private $pageCache;
 
     public function __construct(
+        HtmlHelper $htmlHelper,
         string $documentRoot,
         string $webRoot = null,
         string $vendorRoot = null,
@@ -54,6 +65,7 @@ class FrontendController extends StrictObject
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
         $this->bodyClasses = $bodyClasses;
+        $this->htmlHelper = $htmlHelper;
     }
 
     /**
@@ -271,5 +283,77 @@ class FrontendController extends StrictObject
     public function isShownHomeButton(): bool
     {
         return $this->showHomeButton;
+    }
+
+    public function getCacheRoot(): CacheRoot
+    {
+        if ($this->cacheRoot === null) {
+            $this->cacheRoot = new CacheRoot($this->getDocumentRoot());
+        }
+
+        return $this->cacheRoot;
+    }
+
+    public function getVersionSwitchMutex(): WebVersionSwitchMutex
+    {
+        if ($this->versionSwitchMutex === null) {
+            $this->versionSwitchMutex = new WebVersionSwitchMutex($this->getCacheRoot());
+        }
+
+        return $this->versionSwitchMutex;
+    }
+
+    public function getWebVersionSwitcher(): WebVersionSwitcher
+    {
+        if ($this->webVersionSwitcher === null) {
+            $this->webVersionSwitcher = new WebVersionSwitcher($this->getWebVersions(), $this->getVersionSwitchMutex());
+        }
+
+        return $this->webVersionSwitcher;
+    }
+
+    public function getPageCache(): PageCache
+    {
+        if ($this->pageCache === null) {
+            $this->pageCache = new PageCache(
+                $this->getCacheRoot(),
+                $this->getWebVersions(),
+                $this->htmlHelper->isInProduction(),
+                $this->getWebRoot()
+            );
+        }
+
+        return $this->pageCache;
+    }
+
+    /**
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     */
+    public function getWantedVersion(): string
+    {
+        return $_GET['version'] ?? $_COOKIE['version'] ?? $this->getWebVersions()->getLastVersion();
+    }
+
+    /**
+     * @return bool
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidVersionToSwitchInto
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotSwitchGitVersion
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotWriteLockOfVersionMutex
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLockVersionMutex
+     */
+    public function switchToWantedVersion(): bool
+    {
+        return $this->getWebVersionSwitcher()->switchToVersion($this->getWantedVersion());
+    }
+
+    public function getCachedContent(): string
+    {
+        if ($this->getPageCache()->isCacheValid()) {
+            return $this->getPageCache()->getCachedContent();
+        }
+
+        return '';
     }
 }
