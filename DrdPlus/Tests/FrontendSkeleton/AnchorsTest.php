@@ -418,6 +418,7 @@ class AnchorsTest extends AbstractContentTest
         if (!$this->getTestsConfiguration()->hasLinksToAltar()) {
             self::assertCount(0, $linksToAltar, 'No link to Altar expected according to tests config');
         }
+        self::assertNotEmpty($linksToAltar, 'Expected some links to Altar');
         foreach ($linksToAltar as $linkToAltar) {
             self::assertStringStartsWith('https', $linkToAltar, "Every link to Altar should be via https: '$linkToAltar'");
         }
