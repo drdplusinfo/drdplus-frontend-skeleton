@@ -89,6 +89,8 @@ class WebVersionSwitcherTest extends SkeletonTestCase
         $versions = $webVersions->getAllWebVersions();
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');
+
+            return;
         }
         self::assertGreaterThan(
             1,
