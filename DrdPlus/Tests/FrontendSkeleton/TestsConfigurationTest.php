@@ -24,7 +24,7 @@ class TestsConfigurationTest extends TestCase
             $methodName = $method->getName();
             if (\strpos($methodName, 'get') === 0) {
                 $getters[] = $methodName;
-            } elseif (\strpos($methodName, 'has') === 0) {
+            } elseif (\strpos($methodName, 'has') === 0 || \strpos($methodName, 'can') === 0) {
                 $hasGetters[] = $methodName;
             } elseif (\strpos($methodName, 'disable') === 0) {
                 $disablingMethods[] = $methodName;
@@ -68,7 +68,7 @@ class TestsConfigurationTest extends TestCase
             self::assertContains(
                 $expectedHasGetter,
                 $hasGetters,
-                "$disablingMethod does not match to any 'has' getter: " . \var_export($hasGetters, true)
+                "$disablingMethod does not match to any 'has' nor 'can' getter: " . \var_export($hasGetters, true)
             );
             self::assertTrue($testsConfiguration->$expectedHasGetter());
             $testsConfiguration->$disablingMethod();
