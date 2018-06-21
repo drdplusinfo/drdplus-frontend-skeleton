@@ -103,8 +103,7 @@ class AnchorsTest extends AbstractContentTest
     public function All_external_anchors_can_be_reached(): void
     {
         $skippedExternalUrls = [];
-        foreach ($this->getExternalAnchors() as $anchor) {
-            $originalLink = $anchor->getAttribute('href');
+        foreach ($this->getExternalAnchors() as $originalLink) {
             $link = $this->turnToLocalLink($originalLink);
             if (\in_array($link, self::$checkedExternalAnchors, true)) {
                 continue;
@@ -184,7 +183,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @return array|Element[]
+     * @return array|string[]
      */
     protected function getExternalAnchors(): array
     {
@@ -193,8 +192,9 @@ class AnchorsTest extends AbstractContentTest
             $html = $this->getHtmlDocument();
             /** @var Element $anchor */
             foreach ($html->getElementsByTagName('a') as $anchor) {
-                if (\preg_match('~^(http|//)~', $anchor->getAttribute('href'))) {
-                    $externalAnchors[] = $anchor;
+                $link = $anchor->getAttribute('href');
+                if (\preg_match('~^(http|//)~', $link)) {
+                    $externalAnchors[] = $link;
                 }
             }
         }
@@ -218,9 +218,8 @@ class AnchorsTest extends AbstractContentTest
             return;
         }
         self::assertNotEmpty($externalAnchorsWithHash, 'Some external anchors expected');
-        foreach ($externalAnchorsWithHash as $anchor) {
-            $link = $anchor->getAttribute('href');
-            $link = $this->turnToLocalLink($link);
+        foreach ($externalAnchorsWithHash as $originalLink) {
+            $link = $this->turnToLocalLink($originalLink);
             $html = $this->getExternalHtmlDocument($link);
             $expectedId = \substr($link, \strpos($link, '#') + 1); // just remove leading #
             /** @var Element $target */
@@ -228,7 +227,7 @@ class AnchorsTest extends AbstractContentTest
             self::assertNotEmpty(
                 $target,
                 'No element found by ID ' . $expectedId . ' in a document with URL ' . $link
-                . ($link !== $anchor->getAttribute('href') ? ' (originally ' . $anchor->getAttribute('href') . ')' : '')
+                . ($link !== $originalLink ? ' (originally ' . $originalLink . ')' : '')
             );
             self::assertNotRegExp('~(display:\s*none|visibility:\s*hidden)~', (string)$target->getAttribute('style'));
         }
@@ -240,13 +239,13 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @return array|Element[]
+     * @return array|string[]
      */
     private function getExternalAnchorsWithHash(): array
     {
         $externalAnchorsWithHash = [];
         foreach ($this->getExternalAnchors() as $anchor) {
-            if (\strpos($anchor->getAttribute('href'), '#') > 0) {
+            if (\strpos($anchor, '#') > 0) {
                 $externalAnchorsWithHash[] = $anchor;
             }
         }
@@ -408,8 +407,7 @@ class AnchorsTest extends AbstractContentTest
     public function Links_to_altar_uses_https(): void
     {
         $linksToAltar = [];
-        foreach ($this->getExternalAnchors() as $anchor) {
-            $link = $anchor->getAttribute('href');
+        foreach ($this->getExternalAnchors() as $link) {
             if (!\strpos($link, 'altar.cz')) {
                 continue;
             }
@@ -417,6 +415,7 @@ class AnchorsTest extends AbstractContentTest
         }
         if (!$this->getTestsConfiguration()->hasLinksToAltar()) {
             self::assertCount(0, $linksToAltar, 'No link to Altar expected according to tests config');
+
             return;
         }
         self::assertNotEmpty($linksToAltar, 'Expected some links to Altar');
