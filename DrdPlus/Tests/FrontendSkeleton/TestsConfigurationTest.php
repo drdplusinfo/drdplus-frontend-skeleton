@@ -106,8 +106,14 @@ class TestsConfigurationTest extends TestCase
         foreach ($getters as $getter) {
             $expectedSetters[] = 'set' . \substr($getter, 3);
         }
+        $expectedSetters = \array_diff($expectedSetters, $this->getNonExistingSettersToSkip());
         $missingSetters = \array_diff($expectedSetters, $setters);
         self::assertSame([], $missingSetters, 'Some setters are missing');
+    }
+
+    protected function getNonExistingSettersToSkip(): array
+    {
+        return [];
     }
 
     /**
