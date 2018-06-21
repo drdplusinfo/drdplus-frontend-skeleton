@@ -11,7 +11,7 @@ class TestsConfigurationTest extends TestCase
      */
     public function I_can_use_it(): void
     {
-        $reflectionClass = new \ReflectionClass(TestsConfiguration::class);
+        $reflectionClass = new \ReflectionClass($this->getSutClass());
         $methods = $reflectionClass->getMethods(
             \ReflectionMethod::IS_PUBLIC ^ \ReflectionMethod::IS_STATIC ^ \ReflectionMethod::IS_ABSTRACT
         );
@@ -40,9 +40,21 @@ class TestsConfigurationTest extends TestCase
         $this->I_can_call_setters_in_chain($setterReflections);
     }
 
+    protected function createSut(): TestsConfiguration
+    {
+        $sutClass = $this->getSutClass();
+
+        return new $sutClass();
+    }
+
+    protected function getSutClass(): string
+    {
+        return \preg_replace('~Test$~', '', static::class);
+    }
+
     private function Every_boolean_setting_is_enabled_by_default(array $hasGetters): void
     {
-        $testsConfiguration = new TestsConfiguration();
+        $testsConfiguration = $this->createSut();
         foreach ($hasGetters as $hasGetter) {
             self::assertTrue($testsConfiguration->$hasGetter(), "$hasGetter should return true by default to ensure strict mode");
         }
@@ -50,7 +62,7 @@ class TestsConfigurationTest extends TestCase
 
     private function Every_boolean_setting_can_be_disabled_by_specific_method(array $disablingMethods, array $hasGetters): void
     {
-        $testsConfiguration = new TestsConfiguration();
+        $testsConfiguration = $this->createSut();
         foreach ($disablingMethods as $disablingMethod) {
             $expectedHasGetter = \lcfirst(\preg_replace('~^disable~', '', $disablingMethod));
             self::assertContains(
@@ -72,12 +84,12 @@ class TestsConfigurationTest extends TestCase
 
     private function I_can_call_disabling_methods_in_chain(array $disablingMethods): void
     {
-        $testsConfiguration = new TestsConfiguration();
+        $testsConfiguration = $this->createSut();
         foreach ($disablingMethods as $disablingMethod) {
             self::assertSame(
                 $testsConfiguration,
                 $testsConfiguration->$disablingMethod(),
-                "$disablingMethod should return the " . TestsConfiguration::class . ' to get fluent interface'
+                "$disablingMethod should return the " . $this->getSutClass() . ' to get fluent interface'
             );
         }
     }
@@ -104,7 +116,7 @@ class TestsConfigurationTest extends TestCase
      */
     private function I_can_call_setters_in_chain(array $setterReflections): void
     {
-        $testsConfiguration = new TestsConfiguration();
+        $testsConfiguration = $this->createSut();
         /** @var \ReflectionMethod $setterReflection */
         foreach ($setterReflections as $setterReflection) {
             $parameterReflections = $setterReflection->getParameters();
@@ -149,7 +161,7 @@ class TestsConfigurationTest extends TestCase
             self::assertSame(
                 $testsConfiguration,
                 $setterReflection->invokeArgs($testsConfiguration, $parameters),
-                "$setterReflection should return the " . TestsConfiguration::class . ' to get fluent interface'
+                "$setterReflection should return the {$this->getSutClass()} to get fluent interface"
             );
         }
     }
