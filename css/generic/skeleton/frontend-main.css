@@ -123,7 +123,7 @@ h1 + .quote, h2 + .quote, h3 + .quote, h4 + .quote, h5 + .quote, h6 + .quote {
     display: none;
 }
 
-.invisible-id {
+.invisible-id, .buried {
     visibility: hidden;
     position: absolute;
     right: 0;
