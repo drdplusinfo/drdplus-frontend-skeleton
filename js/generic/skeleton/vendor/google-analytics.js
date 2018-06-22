@@ -6,4 +6,4 @@ function gtag() {
 
 gtag('js', new Date());
 
-gtag('config', googleAnalyticsId);
+gtag('config', document.getElementById('googleAnalyticsId').dataset.googleAnalyticsId);
