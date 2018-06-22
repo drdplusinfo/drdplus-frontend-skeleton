@@ -111,13 +111,7 @@ class AnchorsTest extends AbstractContentTest
             if (\in_array($link, self::$checkedExternalAnchors, true)) {
                 continue;
             }
-            $weAreOffline = false;
-            if ($originalLink === $link) { // nothing changed so it is not an drdplus.info link and is still external
-                $host = \parse_url($link, \PHP_URL_HOST);
-                $weAreOffline = $host !== false
-                    && !\filter_var($host, \FILTER_VALIDATE_IP)
-                    && \gethostbyname($host) === $host; // instead of IP address we got again the site name
-            }
+            $weAreOffline = $this->isLinkAccessible($originalLink, $link);
             if ($weAreOffline) {
                 $skippedExternalUrls[] = $link;
             } else {
@@ -158,6 +152,18 @@ class AnchorsTest extends AbstractContentTest
                 \print_r($skippedExternalUrls, true)
             );
         }
+    }
+
+    private function isLinkAccessible(string $originalLink, string $localizedLink): bool
+    {
+        if ($originalLink !== $localizedLink) {
+            return false; // nothing changed so it is not an drdplus.info link and is still external
+        }
+        $host = \parse_url($localizedLink, \PHP_URL_HOST);
+
+        return $host !== false
+            && !\filter_var($host, \FILTER_VALIDATE_IP)
+            && \gethostbyname($host) === $host; // instead of IP address we got again the site name
     }
 
     private function getFromCache(string $cacheFileBaseName): string
@@ -227,8 +233,13 @@ class AnchorsTest extends AbstractContentTest
             return;
         }
         self::assertNotEmpty($externalAnchorsWithHash, 'Some external anchors expected');
+        $skippedExternalUrls = [];
         foreach ($externalAnchorsWithHash as $originalLink) {
             $link = $this->turnToLocalLink($originalLink);
+            if ($this->isLinkAccessible($originalLink, $link)) {
+                $skippedExternalUrls[] = $link;
+                continue;
+            }
             $html = $this->getExternalHtmlDocument($link);
             $expectedId = \substr($link, \strpos($link, '#') + 1); // just remove leading #
             /** @var Element $target */
@@ -239,6 +250,12 @@ class AnchorsTest extends AbstractContentTest
                 . ($link !== $originalLink ? ' (originally ' . $originalLink . ')' : '')
             );
             self::assertNotRegExp('~(display:\s*none|visibility:\s*hidden)~', (string)$target->getAttribute('style'));
+        }
+        if ($skippedExternalUrls) {
+            self::markTestSkipped(
+                'Some external URLs have been skipped as we are probably offline: ' .
+                \print_r($skippedExternalUrls, true)
+            );
         }
     }
 
