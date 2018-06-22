@@ -450,8 +450,8 @@ class AnchorsTest extends AbstractContentTest
         self::assertNotEmpty($calculations);
         foreach ($calculations as $calculation) {
             self::assertNotEmpty($calculation->id, 'Missing ID for calculation: ' . \trim($calculation->innerHTML));
-            self::assertRegExp('~^(Hodnota|Rozšířený hod na|Hod (démona )?na|Hod (démona )?proti|Výpočet) ~u', $calculation->getAttribute('data-original-id'));
-            self::assertRegExp('~^(hodnota|rozsireny_hod_na|hod_(demona_)?na|hod_(demona_)?proti|vypocet)_~u', $calculation->id);
+            self::assertRegExp('~^(Hodnota|Rozšířený hod na|Hod (démona )?na|Hod (démona )?proti|Výpočet|Zjištění) ~u', $calculation->getAttribute('data-original-id'));
+            self::assertRegExp('~^(hodnota|rozsireny_hod_na|hod_(demona_)?na|hod_(demona_)?proti|vypocet|zjisteni)_~u', $calculation->id);
         }
     }
 
