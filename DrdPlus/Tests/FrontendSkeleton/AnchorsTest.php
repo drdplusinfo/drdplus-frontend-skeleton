@@ -291,13 +291,13 @@ class AnchorsTest extends AbstractContentTest
                 $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
                 $curlError = \curl_error($curl);
                 \curl_close($curl);
-                $this->cacheContent($content, $tempFileName, $isDrdPlus, $responseHttpCode);
                 self::assertTrue(
                     $responseHttpCode >= 200 && $responseHttpCode < 300,
                     "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($curlError)"
                 );
+                self::assertNotEmpty($content, 'Nothing has been fetched from URL ' . $link);
+                $this->cacheContent($content, $tempFileName, $isDrdPlus, $responseHttpCode);
             }
-            self::assertNotEmpty($content, 'Nothing has been fetched from URL ' . $link);
             self::$externalHtmlDocuments[$link] = @new HTMLDocument($content);
             if ($isDrdPlus) {
                 self::assertCount(
