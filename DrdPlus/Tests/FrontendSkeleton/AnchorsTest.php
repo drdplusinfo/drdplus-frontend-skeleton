@@ -118,9 +118,8 @@ class AnchorsTest extends AbstractContentTest
                 $responseHttpCode = false;
                 $redirectUrl = '';
                 $error = '';
-                $isDrdPlus = \strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false;
-                $linkHash = \md5($link);
-                $tempFileName = 'external_anchor_' . $linkHash . '.tmp';
+                $isDrdPlus = $this->isDrdPlusLink($link);
+                $tempFileName = 'external_anchor_response_code_' . \md5($link) . '.tmp';
                 if (!$isDrdPlus) {
                     $responseHttpCode = (int)$this->getFromCache($tempFileName);
                 }
@@ -147,6 +146,11 @@ class AnchorsTest extends AbstractContentTest
                 \print_r($skippedExternalUrls, true)
             );
         }
+    }
+
+    private function isDrdPlusLink(string $link): bool
+    {
+        return \strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false;
     }
 
     private function isLinkAccessible(string $originalLink, string $localizedLink): bool
@@ -279,7 +283,7 @@ class AnchorsTest extends AbstractContentTest
         $link = \substr($href, 0, \strpos($href, '#') ?: null);
         if ((self::$externalHtmlDocuments[$link] ?? null) === null) {
             $isDrdPlus = false;
-            if (\strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false) {
+            if ($this->isDrdPlusLink($link)) {
                 self::assertNotEmpty(
                     \preg_match('~//(?<subDomain>[^.]+([.][^.]+)*)\.drdplus\.~', $link),
                     "Expected some sub-domain in link $link"
@@ -287,7 +291,7 @@ class AnchorsTest extends AbstractContentTest
                 $isDrdPlus = true;
             }
             $content = '';
-            $tempFileName = 'external_anchor_' . \md5($link) . '.tmp';
+            $tempFileName = 'external_anchor_content_' . \md5($link) . '.tmp';
             if (!$isDrdPlus) {
                 $content = $this->getFromCache($tempFileName);
             }
