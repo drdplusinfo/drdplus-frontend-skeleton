@@ -327,7 +327,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $originalIds = $document->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS);
-        if (!$this->getTestsConfiguration()->hasIds()) {
+        if (!$this->getTestsConfiguration()->hasLocalLinks()) {
             self::assertCount(
                 0,
                 $originalIds,

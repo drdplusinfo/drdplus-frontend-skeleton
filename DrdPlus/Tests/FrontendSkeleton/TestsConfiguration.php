@@ -26,6 +26,8 @@ class TestsConfiguration extends StrictObject
     /** @var bool */
     private $hasIds = true;
     /** @var bool */
+    private $hasLocalLinks = true;
+    /** @var bool */
     private $hasLinksToAltar = true;
     /** @var string */
     private $expectedWebName = 'HTML kostra pro DrD+ webový obsah';
@@ -158,6 +160,24 @@ class TestsConfiguration extends StrictObject
     public function disableHasIds(): TestsConfiguration
     {
         $this->hasIds = false;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasLocalLinks(): bool
+    {
+        return $this->hasLocalLinks;
+    }
+
+    /**
+     * @return TestsConfiguration
+     */
+    public function disableHasLocalLinks(): TestsConfiguration
+    {
+        $this->hasLocalLinks = false;
 
         return $this;
     }
