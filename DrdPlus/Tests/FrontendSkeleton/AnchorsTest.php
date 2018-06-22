@@ -117,6 +117,7 @@ class AnchorsTest extends AbstractContentTest
             } else {
                 $responseHttpCode = false;
                 $redirectUrl = '';
+                $error = '';
                 $isDrdPlus = \strpos($link, 'drdplus.loc') !== false || \strpos($link, 'drdplus.info') !== false;
                 $linkHash = \md5($link);
                 $tempFileName = 'external_anchor_' . $linkHash . '.tmp';
@@ -124,24 +125,18 @@ class AnchorsTest extends AbstractContentTest
                     $responseHttpCode = (int)$this->getFromCache($tempFileName);
                 }
                 if (!$responseHttpCode) {
-                    $curl = \curl_init($link);
-                    \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-                    \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
-                    \curl_setopt($curl, CURLOPT_HEADER, 1);
-                    \curl_setopt($curl, CURLOPT_NOBODY, 1); // to get headers only
-                    \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
-                    \curl_exec($curl);
-                    $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                    $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
-                    $curlError = \curl_error($curl);
-                    \curl_close($curl);
+                    [
+                        'responseHttpCode' => $responseHttpCode,
+                        'redirectUrl' => $redirectUrl,
+                        'error' => $error
+                    ] = $this->fetchContentFromLink($link, false /* just headers*/);
                     if (!$isDrdPlus && $responseHttpCode >= 200 && $responseHttpCode < 300) {
                         $this->cacheContent((string)$responseHttpCode, $tempFileName, $isDrdPlus, $responseHttpCode);
                     }
                 }
                 self::assertTrue(
                     $responseHttpCode >= 200 && $responseHttpCode < 300,
-                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($curlError)"
+                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($error)"
                 );
             }
             self::$checkedExternalAnchors[] = $link;
@@ -297,20 +292,16 @@ class AnchorsTest extends AbstractContentTest
                 $content = $this->getFromCache($tempFileName);
             }
             if (!$content) {
-                $curl = \curl_init($link);
-                \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-                \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-                if ($isDrdPlus) {
-                    \curl_setopt($curl, CURLOPT_POSTFIELDS, ['trial' => '1']);
-                }
-                $content = \curl_exec($curl);
-                $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
-                $curlError = \curl_error($curl);
-                \curl_close($curl);
+                $postData = $isDrdPlus ? ['trial' => '1'] : [];
+                [
+                    'responseHttpCode' => $responseHttpCode,
+                    'redirectUrl' => $redirectUrl,
+                    'error' => $error,
+                    'content' => $content
+                ] = $this->fetchContentFromLink($link, true /* fetch body */, $postData);
                 self::assertTrue(
                     $responseHttpCode >= 200 && $responseHttpCode < 300,
-                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($curlError)"
+                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($error)"
                 );
                 self::assertNotEmpty($content, 'Nothing has been fetched from URL ' . $link);
                 $this->cacheContent($content, $tempFileName, $isDrdPlus, $responseHttpCode);
@@ -326,6 +317,34 @@ class AnchorsTest extends AbstractContentTest
         }
 
         return self::$externalHtmlDocuments[$link];
+    }
+
+    protected function fetchContentFromLink(string $link, bool $withBody, array $postData = []): array
+    {
+        $curl = \curl_init($link);
+        \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
+        if (!$withBody) {
+            // to get headers only
+            \curl_setopt($curl, CURLOPT_HEADER, 1);
+            \curl_setopt($curl, CURLOPT_NOBODY, 1);
+        }
+        \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
+        if ($postData) {
+            \curl_setopt($curl, CURLOPT_POSTFIELDS, $postData);
+        }
+        $content = \curl_exec($curl);
+        $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+        $curlError = \curl_error($curl);
+        \curl_close($curl);
+
+        return [
+            'responseHttpCode' => $responseHttpCode,
+            'redirectUrl' => $redirectUrl,
+            'content' => $content,
+            'error' => $curlError,
+        ];
     }
 
     /**
