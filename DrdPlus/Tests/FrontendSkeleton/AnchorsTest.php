@@ -173,13 +173,14 @@ class AnchorsTest extends AbstractContentTest
 
     private function cacheContent(string $content, string $cacheFileBaseName): void
     {
+        self::assertNotSame('', $content, 'Given content to cache is empty');
         $tempDir = \sys_get_temp_dir() . '/frontend-skeleton';
         self::assertTrue(
             \file_exists($tempDir) || \mkdir($tempDir, 0775) || \is_dir($tempDir),
             "Can not create dir for cached test content $tempDir"
         );
         $tempFile = $tempDir . '/' . $cacheFileBaseName;
-        self::assertNotEmpty(\file_put_contents($tempFile, $content));
+        self::assertNotEmpty(\file_put_contents($tempFile, $content), "Nothing has been saved to $tempFile");
     }
 
     /**
