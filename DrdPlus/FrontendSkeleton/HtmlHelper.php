@@ -500,7 +500,7 @@ class HtmlHelper extends StrictObject
     private function addVersionToAsset(Element $element, string $attributeName): void
     {
         $source = $element->getAttribute($attributeName);
-        if (!$source) {
+        if (!$source || \strpos($source, 'https://') === 0 || \strpos($source, 'http://') === 0) {
             return;
         }
         $absolutePath = $this->getAbsolutePath($source, $this->rootDir);
