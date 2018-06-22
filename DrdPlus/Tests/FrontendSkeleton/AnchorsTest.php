@@ -142,7 +142,7 @@ class AnchorsTest extends AbstractContentTest
                     $curlError = \curl_error($curl);
                     \curl_close($curl);
                     if (!$isDrdPlus && $responseHttpCode >= 200 && $responseHttpCode < 300) {
-                        $this->cacheContent((string)$responseHttpCode, $tempFileName);
+                        $this->cacheContent((string)$responseHttpCode, $tempFileName, $isDrdPlus, $responseHttpCode);
                     }
                 }
                 self::assertTrue(
@@ -174,8 +174,11 @@ class AnchorsTest extends AbstractContentTest
         return '';
     }
 
-    private function cacheContent(string $content, string $cacheFileBaseName): void
+    private function cacheContent(string $content, string $cacheFileBaseName, bool $isDrdPlus, int $responseCode): bool
     {
+        if ($isDrdPlus || $responseCode < 200 || $responseCode >= 300) {
+            return false;
+        }
         self::assertNotSame('', $content, 'Given content to cache is empty');
         $tempDir = \sys_get_temp_dir() . '/frontend-skeleton';
         self::assertTrue(
@@ -184,6 +187,8 @@ class AnchorsTest extends AbstractContentTest
         );
         $tempFile = $tempDir . '/' . $cacheFileBaseName;
         self::assertNotEmpty(\file_put_contents($tempFile, $content), "Nothing has been saved to $tempFile");
+
+        return true;
     }
 
     /**
@@ -282,11 +287,15 @@ class AnchorsTest extends AbstractContentTest
                     \curl_setopt($curl, CURLOPT_POSTFIELDS, ['trial' => '1']);
                 }
                 $content = \curl_exec($curl);
+                $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+                $curlError = \curl_error($curl);
                 \curl_close($curl);
-                self::assertNotSame('', $content, "Nothing has been fetched from $link");
-                if (!$isDrdPlus) {
-                    $this->cacheContent($content, $tempFileName);
-                }
+                $this->cacheContent($content, $tempFileName, $isDrdPlus, $responseHttpCode);
+                self::assertTrue(
+                    $responseHttpCode >= 200 && $responseHttpCode < 300,
+                    "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($curlError)"
+                );
             }
             self::assertNotEmpty($content, 'Nothing has been fetched from URL ' . $link);
             self::$externalHtmlDocuments[$link] = @new HTMLDocument($content);
