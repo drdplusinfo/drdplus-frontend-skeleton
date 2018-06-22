@@ -6,4 +6,4 @@ function gtag() {
 
 gtag('js', new Date());
 
-gtag('config', 'UA-121206931-1');
+gtag('config', googleAnalyticsId);

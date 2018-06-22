@@ -6,6 +6,8 @@ use Granam\Strict\Object\StrictObject;
 
 class FrontendController extends StrictObject
 {
+    /** @var string */
+    private $googleAnalyticsId;
     /** @var HtmlHelper */
     private $htmlHelper;
     /** @var string */
@@ -48,6 +50,7 @@ class FrontendController extends StrictObject
     private $pageCache;
 
     public function __construct(
+        string $googleAnalyticsId,
         HtmlHelper $htmlHelper,
         string $documentRoot,
         string $webRoot = null,
@@ -57,6 +60,7 @@ class FrontendController extends StrictObject
         array $bodyClasses = []
     )
     {
+        $this->googleAnalyticsId = $googleAnalyticsId;
         $this->documentRoot = $documentRoot;
         $this->webRoot = $webRoot ?? ($documentRoot . '/web');
         $this->vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
@@ -66,6 +70,14 @@ class FrontendController extends StrictObject
         $this->jsRoot = $documentRoot . '/js';
         $this->bodyClasses = $bodyClasses;
         $this->htmlHelper = $htmlHelper;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGoogleAnalyticsId(): string
+    {
+        return $this->googleAnalyticsId;
     }
 
     /**

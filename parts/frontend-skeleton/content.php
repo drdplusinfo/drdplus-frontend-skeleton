@@ -21,7 +21,10 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
       <link rel="shortcut icon" href="/favicon.ico">
       <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-121206931-1"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=<?= $controller->getGoogleAnalyticsId() ?>"></script>
+      <script type="text/javascript">
+          var googleAnalyticsId = <?= json_encode($controller->getGoogleAnalyticsId()) ?>;
+      </script>
         <?php
         foreach ($controller->getJsFiles() as $jsFile) { ?>
           <script type="text/javascript" src="js/<?= $jsFile ?>"></script>

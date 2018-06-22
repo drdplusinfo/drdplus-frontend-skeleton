@@ -15,6 +15,7 @@ $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlo
 \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
 $controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController(
+        'UA-121206931-1',
         $htmlHelper,
         $documentRoot,
         null, // automatic web root

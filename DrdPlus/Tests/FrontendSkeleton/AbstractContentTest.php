@@ -113,7 +113,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getDefinedPageTitle(): string
     {
-        return (new FrontendController($this->createHtmlHelper(), $this->getDocumentRoot()))->getPageTitle();
+        return (new FrontendController('Google Foo', $this->createHtmlHelper(), $this->getDocumentRoot()))->getPageTitle();
     }
 
     /**
