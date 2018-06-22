@@ -79,7 +79,7 @@ class HtmlHelperTest extends AbstractContentTest
      * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\DuplicatedRequiredTableId
      * @expectedExceptionMessageRegExp ~IAmSoAlone~
      */
-    public function I_can_not_request_tables_with_ids_with_same_id_like_representation(): void
+    public function I_can_not_request_tables_with_ids_with_same_ids_after_their_unification(): void
     {
         $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
@@ -96,5 +96,53 @@ class HtmlHelperTest extends AbstractContentTest
         $htmlDocument = new HtmlDocument($content);
         $htmlHelper->addAnchorsToIds($htmlDocument);
         self::assertSame($content, \trim($htmlDocument->saveHTML()));
+    }
+
+    /**
+     * @test
+     */
+    public function Ids_are_turned_to_constant_like_diacritics_free_format(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        $originalId = 'Příliš # žluťoučký # kůň # úpěl # ďábelské # ódy';
+        $htmlDocument = new HtmlDocument(<<<HTML
+        <!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <div class="test" id="$originalId"
+</body>
+</htm>
+HTML
+        );
+        $htmlHelper->replaceDiacriticsFromIds($htmlDocument);
+        $divs = $htmlDocument->getElementsByClassName('test');
+        self::assertCount(1, $divs);
+        $div = $divs[0];
+        $id = $div->id;
+        self::assertNotEmpty($id);
+        $expectedId = StringTools::toConstantLikeValue($originalId);
+        self::assertSame($expectedId, $id);
+        $this->Original_id_is_accessible_without_change_via_data_attribute($div, $originalId);
+        $this->Original_id_can_be_used_as_anchor_via_inner_invisible_element($div, $originalId);
+    }
+
+    private function Original_id_is_accessible_without_change_via_data_attribute(Element $elementWithId, string $expectedOriginalId): void
+    {
+        $fetchedOriginalId = $elementWithId->getAttribute(HtmlHelper::DATA_ORIGINAL_ID);
+        self::assertNotEmpty($fetchedOriginalId);
+        self::assertSame($expectedOriginalId, $fetchedOriginalId);
+    }
+
+    private function Original_id_can_be_used_as_anchor_via_inner_invisible_element(Element $elementWithId, string $expectedOriginalId): void
+    {
+        $invisibleIdElements = $elementWithId->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS);
+        self::assertCount(1, $invisibleIdElements);
+        $invisibleIdElement = $invisibleIdElements[0];
+        $invisibleId = $invisibleIdElement->id;
+        self::assertNotEmpty($invisibleId);
+        self::assertSame(\str_replace('#', '_', $expectedOriginalId), $invisibleId);
     }
 }

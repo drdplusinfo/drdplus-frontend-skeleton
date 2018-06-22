@@ -13,6 +13,7 @@ class HtmlHelper extends StrictObject
 {
     public const INVISIBLE_ID_CLASS = 'invisible-id';
     public const CALCULATION_CLASS = 'calculation';
+    public const DATA_ORIGINAL_ID = 'data-original-id';
 
     /** @var bool */
     private $inDevMode;
@@ -130,12 +131,17 @@ class HtmlHelper extends StrictObject
             if ($idWithoutDiacritics === $id) {
                 continue;
             }
-            $child->setAttribute('data-original-id', $id);
-            $child->setAttribute('id', \urlencode($idWithoutDiacritics));
+            $child->setAttribute(self::DATA_ORIGINAL_ID, $id);
+            $child->setAttribute('id', $this->sanitizeId($idWithoutDiacritics));
             $child->appendChild($invisibleId = new Element('span'));
-            $invisibleId->setAttribute('id', \urlencode($id));
+            $invisibleId->setAttribute('id', $this->sanitizeId($id));
             $invisibleId->className = self::INVISIBLE_ID_CLASS;
         }
+    }
+
+    private function sanitizeId(string $id): string
+    {
+        return \str_replace('#', '_', $id);
     }
 
     private function unifyId(string $id): string
