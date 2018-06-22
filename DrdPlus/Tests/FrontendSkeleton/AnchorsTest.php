@@ -280,6 +280,7 @@ class AnchorsTest extends AbstractContentTest
                 }
                 $content = \curl_exec($curl);
                 \curl_close($curl);
+                self::assertNotSame('', $content, "Nothing has been fetched from $link");
                 if (!$isDrdPlus) {
                     $this->cacheContent($content, $tempFileName);
                 }
