@@ -38,9 +38,13 @@ class GoogleTest extends AbstractContentTest
                 $googleAnalyticsScript = $script;
             }
         }
-        $googleTagManagerScript = $sourcesToScripts['https://www.googletagmanager.com/gtag/js?id=UA-121206931-1'] ?? null;
+        $expectedGoogleAnalyticsId = $this->getTestsConfiguration()->getExpectedGoogleAnalyticsId();
+        $expectedGoogleAnalyticsScriptLink = 'https://www.googletagmanager.com/gtag/js?id=' . $expectedGoogleAnalyticsId;
+        $googleTagManagerScript = $sourcesToScripts[$expectedGoogleAnalyticsScriptLink] ?? null;
         if (!$googleTagManagerScript) {
-            self::fail('Google tag manager script is missing');
+            self::fail("Google tag manager script is missing, was looking for '$expectedGoogleAnalyticsScriptLink', available are only "
+                . \print_r(\array_keys($sourcesToScripts), true)
+            );
         }
         if (!$googleAnalyticsScript) {
             self::fail('Google analytics script is missing, available are only ' . \print_r(\array_keys($sourcesToScripts), true));

@@ -33,6 +33,8 @@ class TestsConfiguration extends StrictObject
     private $expectedWebName = 'HTML kostra pro DrD+ webový obsah';
     /** @var string */
     private $expectedPageTitle = 'HTML kostra pro DrD+ webový obsah';
+    /** @var string */
+    private $expectedGoogleAnalyticsId = 'UA-121206931-1';
 
     /**
      * @return bool
@@ -234,6 +236,25 @@ class TestsConfiguration extends StrictObject
     public function setExpectedPageTitle(string $expectedPageTitle): TestsConfiguration
     {
         $this->expectedPageTitle = $expectedPageTitle;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpectedGoogleAnalyticsId(): string
+    {
+        return $this->expectedGoogleAnalyticsId;
+    }
+
+    /**
+     * @param string $expectedGoogleAnalyticsId
+     * @return TestsConfiguration
+     */
+    public function setExpectedGoogleAnalyticsId(string $expectedGoogleAnalyticsId): TestsConfiguration
+    {
+        $this->expectedGoogleAnalyticsId = $expectedGoogleAnalyticsId;
 
         return $this;
     }
