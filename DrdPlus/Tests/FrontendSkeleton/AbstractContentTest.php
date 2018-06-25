@@ -148,4 +148,9 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
         return $content;
     }
+
+    protected function turnToLocalLink(string $link): string
+    {
+        return \preg_replace('~https?://((?:[[:alnum:]]+\.)*)drdplus\.info~', 'http://$1drdplus.loc', $link); // turn link into local version
+    }
 }
