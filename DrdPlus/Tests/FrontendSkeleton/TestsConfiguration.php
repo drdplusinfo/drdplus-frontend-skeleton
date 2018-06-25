@@ -286,7 +286,7 @@ class TestsConfiguration extends StrictObject
      */
     public function addAllowedCalculationIdPrefix(string $allowedCalculationIdPrefix): TestsConfiguration
     {
-        $this->allowedCalculationIdPrefixes = $allowedCalculationIdPrefix;
+        $this->allowedCalculationIdPrefixes[] = $allowedCalculationIdPrefix;
 
         return $this;
     }

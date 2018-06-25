@@ -174,4 +174,24 @@ class TestsConfigurationTest extends TestCase
             );
         }
     }
+
+    /**
+     * @test
+     */
+    public function I_can_add_allowed_calculation_id_prefix(): void
+    {
+        $testsConfiguration = new TestsConfiguration();
+        $originalAllowedCalculationIdPrefixes = $testsConfiguration->getAllowedCalculationIdPrefixes();
+        self::assertNotEmpty($originalAllowedCalculationIdPrefixes, 'Some allowed calculation ID prefixes expected');
+        $returnedTestsConfiguration = $testsConfiguration->addAllowedCalculationIdPrefix('foo allowed calculation id prefix');
+        self::assertSame(
+            $testsConfiguration,
+            $returnedTestsConfiguration,
+            'Method addAllowedCalculationIdPrefix should return ' . TestsConfiguration::class . ' instance for fluent interface'
+        );
+        $addedPrefixes = \array_values( // to re-index result from zero index
+            \array_diff($testsConfiguration->getAllowedCalculationIdPrefixes(), $originalAllowedCalculationIdPrefixes)
+        );
+        self::assertSame(['foo allowed calculation id prefix'], $addedPrefixes);
+    }
 }
