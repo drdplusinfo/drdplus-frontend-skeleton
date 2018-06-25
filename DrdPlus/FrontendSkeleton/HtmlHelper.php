@@ -197,9 +197,10 @@ class HtmlHelper extends StrictObject
     {
         /** @var Element $child */
         foreach ($children as $child) {
-            if ($child->nodeName !== 'a' && $child->getAttribute('id')
+            if (!\in_array($child->nodeName, ['a', 'button'], true)
+                && $child->getAttribute('id')
                 && !$child->prop_get_classList()->contains(self::INVISIBLE_ID_CLASS)
-                && $child->getElementsByTagName('a')->length === 0
+                && $child->getElementsByTagName('a')->length === 0 // already have some anchors, skipp it to avoid wrapping them by another one
             ) {
                 $toMove = [];
                 /** @var \DOMElement $grandChildNode */

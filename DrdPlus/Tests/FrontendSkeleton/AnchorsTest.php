@@ -495,4 +495,20 @@ class AnchorsTest extends AbstractContentTest
         }
         self::assertCount(0, $urlsWithLocalHosts, "There are forgotten local URLs \n" . \implode(",\n", $urlsWithLocalHosts));
     }
+
+    /**
+     * @test
+     */
+    public function Buttons_should_not_have_links_inside(): void
+    {
+        $buttons = $this->getHtmlDocument()->getElementsByTagName('button');
+        if (!$buttons && !$this->isSkeletonChecked()) {
+            self::assertCount(0, $buttons, 'Simply no buttons');
+        }
+        self::assertNotEmpty($buttons);
+        foreach ($buttons as $button) {
+            $buttonAnchors = $button->getElementsByTagName('a');
+            self::assertCount(0, $buttonAnchors, 'No anchors expected in button: ' . $button->outerHTML);
+        }
+    }
 }
