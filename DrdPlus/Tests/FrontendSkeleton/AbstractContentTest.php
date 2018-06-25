@@ -31,7 +31,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
      */
     protected function getContent(string $show = '', array $get = [], array $post = []): string
     {
-        $key = $this->createKey($show, $get);
+        $key = $this->createKey($show, $get, $post);
         if ((self::$contents[$key] ?? null) === null) {
             if ($show !== '') {
                 $_GET['show'] = $show;
@@ -60,7 +60,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function createKey(string $show, array $get, array $post = []): string
     {
-        return "{$this->passIn()}-$show-" . \serialize($get) . '-' . \serialize($post);
+        return "{$this->passIn()}-$show-" . \serialize($get) . '-' . \serialize($post) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
     }
 
     /**
