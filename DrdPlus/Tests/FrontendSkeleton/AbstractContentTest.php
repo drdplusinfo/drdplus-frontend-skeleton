@@ -13,6 +13,8 @@ abstract class AbstractContentTest extends SkeletonTestCase
 {
     private static $contents = [];
     private static $htmlDocuments = [];
+    protected $needPassIn = true;
+    protected $needPassOut = false;
 
     protected function setUp(): void
     {
@@ -24,9 +26,10 @@ abstract class AbstractContentTest extends SkeletonTestCase
     /**
      * @param string $show = ''
      * @param array $get = []
+     * @param array $post = []
      * @return string
      */
-    protected function getContent(string $show = '', array $get = []): string
+    protected function getContent(string $show = '', array $get = [], array $post = []): string
     {
         $key = $this->createKey($show, $get);
         if ((self::$contents[$key] ?? null) === null) {
@@ -36,7 +39,14 @@ abstract class AbstractContentTest extends SkeletonTestCase
             if ($get) {
                 $_GET = \array_merge($_GET, $get);
             }
-            $this->passIn();
+            if ($post) {
+                $_POST = \array_merge($_POST, $post);
+            }
+            if ($this->needPassIn()) {
+                $this->passIn();
+            } elseif ($this->needPassOut()) {
+                $this->passOut();
+            }
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
@@ -48,9 +58,9 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return self::$contents[$key];
     }
 
-    protected function createKey(string $show, array $get): string
+    protected function createKey(string $show, array $get, array $post = []): string
     {
-        return "{$this->passIn()}-$show-" . \serialize($get);
+        return "{$this->passIn()}-$show-" . \serialize($get) . '-' . \serialize($post);
     }
 
     /**
@@ -61,11 +71,29 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return true;
     }
 
-    protected function getHtmlDocument(string $show = '', array $get = []): \DrdPlus\FrontendSkeleton\HtmlDocument
+    protected function needPassIn(): bool
     {
-        $key = $this->createKey($show, $get);
+        return $this->needPassIn;
+    }
+
+    /**
+     * Intended for overwrite if protected content is accessed
+     */
+    protected function passOut(): bool
+    {
+        return true;
+    }
+
+    protected function needPassOut(): bool
+    {
+        return $this->needPassOut;
+    }
+
+    protected function getHtmlDocument(string $show = '', array $get = [], array $post = []): \DrdPlus\FrontendSkeleton\HtmlDocument
+    {
+        $key = $this->createKey($show, $get, $post);
         if (empty(self::$htmlDocuments[$key])) {
-            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($show, $get));
+            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($show, $get, $post));
         }
 
         return self::$htmlDocuments[$key];
