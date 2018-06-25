@@ -443,11 +443,27 @@ class AnchorsTest extends AbstractContentTest
             return;
         }
         self::assertNotEmpty($calculations);
+        $allowedCalculationIdPrefixes = $this->getTestsConfiguration()->getAllowedCalculationIdPrefixes();
+        $allowedCalculationIdPrefixesRegexp = $this->toRegexpOr($allowedCalculationIdPrefixes);
+        $allowedCalculationIdConstantLikePrefixes = \array_map(function (string $allowedPrefix) {
+            return StringTools::toConstantLikeValue($allowedPrefix);
+        }, $allowedCalculationIdPrefixes);
+        $allowedCalculationIdConstantLikePrefixesRegexp = $this->toRegexpOr($allowedCalculationIdConstantLikePrefixes);
         foreach ($calculations as $calculation) {
             self::assertNotEmpty($calculation->id, 'Missing ID for calculation: ' . \trim($calculation->innerHTML));
-            self::assertRegExp('~^(Hodnota|Rozšířený hod na|Hod (démona )?na|Hod (démona )?proti|Výpočet|Zjištění) ~u', $calculation->getAttribute('data-original-id'));
-            self::assertRegExp('~^(hodnota|rozsireny_hod_na|hod_(demona_)?na|hod_(demona_)?proti|vypocet|zjisteni)_~u', $calculation->id);
+            self::assertRegExp("~^($allowedCalculationIdPrefixesRegexp) ~u", $calculation->getAttribute('data-original-id'));
+            self::assertRegExp("~^($allowedCalculationIdConstantLikePrefixesRegexp)_~u", $calculation->id);
         }
+    }
+
+    private function toRegexpOr(array $values, string $regexpDelimiter = '~'): string
+    {
+        $escaped = [];
+        foreach ($values as $value) {
+            $escaped[] = \preg_quote($value, $regexpDelimiter);
+        }
+
+        return \implode('|', $escaped);
     }
 
     /**
@@ -464,8 +480,14 @@ class AnchorsTest extends AbstractContentTest
         }
         self::assertNotEmpty($calculations);
         foreach ($calculations as $calculation) {
-            $innerCalculation = $calculation->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
-            self::assertCount(0, $innerCalculation, 'Calculation should not has another calculation inside: ' . $calculation->outerHTML);
+            foreach ($calculation->children as $child) {
+                $innerCalculations = $child->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
+                self::assertCount(
+                    0,
+                    $innerCalculations,
+                    'Calculation should not has another calculation inside: ' . $calculation->outerHTML
+                );
+            }
         }
     }
 

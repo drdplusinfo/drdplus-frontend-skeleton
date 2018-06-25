@@ -35,6 +35,8 @@ class TestsConfiguration extends StrictObject
     private $expectedPageTitle = 'HTML kostra pro DrD+ webový obsah';
     /** @var string */
     private $expectedGoogleAnalyticsId = 'UA-121206931-1';
+    /** @var array|string[] */
+    private $allowedCalculationIdPrefixes = ['Hod proti', 'Hod na', 'Výpočet'];
 
     /**
      * @return bool
@@ -255,6 +257,36 @@ class TestsConfiguration extends StrictObject
     public function setExpectedGoogleAnalyticsId(string $expectedGoogleAnalyticsId): TestsConfiguration
     {
         $this->expectedGoogleAnalyticsId = $expectedGoogleAnalyticsId;
+
+        return $this;
+    }
+
+    /**
+     * @return array|string[]
+     */
+    public function getAllowedCalculationIdPrefixes(): array
+    {
+        return $this->allowedCalculationIdPrefixes;
+    }
+
+    /**
+     * @param array|string[] $allowedCalculationIdPrefixes
+     * @return TestsConfiguration
+     */
+    public function setAllowedCalculationIdPrefixes(array $allowedCalculationIdPrefixes): TestsConfiguration
+    {
+        $this->allowedCalculationIdPrefixes = $allowedCalculationIdPrefixes;
+
+        return $this;
+    }
+
+    /**
+     * @param string $allowedCalculationIdPrefix
+     * @return TestsConfiguration
+     */
+    public function addAllowedCalculationIdPrefix(string $allowedCalculationIdPrefix): TestsConfiguration
+    {
+        $this->allowedCalculationIdPrefixes = $allowedCalculationIdPrefix;
 
         return $this;
     }
