@@ -453,6 +453,25 @@ class AnchorsTest extends AbstractContentTest
     /**
      * @test
      */
+    public function Calculation_does_not_have_another_calculation_inside(): void
+    {
+        $document = $this->getHtmlDocument();
+        $calculations = $document->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
+        if (\count($calculations) === 0 && !$this->isSkeletonChecked()) {
+            self::assertFalse(false, 'No calculations in current document');
+
+            return;
+        }
+        self::assertNotEmpty($calculations);
+        foreach ($calculations as $calculation) {
+            $innerCalculation = $calculation->getElementsByClassName(HtmlHelper::CALCULATION_CLASS);
+            self::assertCount(0, $innerCalculation, 'Calculation should not has another calculation inside: ' . $calculation->outerHTML);
+        }
+    }
+
+    /**
+     * @test
+     */
     public function Links_to_altar_uses_https(): void
     {
         $linksToAltar = [];
