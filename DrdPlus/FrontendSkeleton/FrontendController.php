@@ -51,6 +51,8 @@ class FrontendController extends StrictObject
     private $webVersionSwitcher;
     /** @var PageCache */
     private $pageCache;
+    /** @var Redirect|null */
+    private $redirect;
 
     public function __construct(
         string $googleAnalyticsId,
@@ -73,6 +75,22 @@ class FrontendController extends StrictObject
         $this->jsRoot = $documentRoot . '/js';
         $this->bodyClasses = $bodyClasses;
         $this->htmlHelper = $htmlHelper;
+    }
+
+    /**
+     * @param Redirect $redirect
+     */
+    public function setRedirect(Redirect $redirect): void
+    {
+        $this->redirect = $redirect;
+    }
+
+    /**
+     * @return Redirect|null
+     */
+    public function getRedirect(): ?Redirect
+    {
+        return $this->redirect;
     }
 
     /**
