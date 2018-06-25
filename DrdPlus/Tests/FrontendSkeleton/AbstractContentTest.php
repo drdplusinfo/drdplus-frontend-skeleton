@@ -60,7 +60,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function createKey(string $show, array $get, array $post = []): string
     {
-        return "{$this->passIn()}-$show-" . \serialize($get) . '-' . \serialize($post) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
+        return "$show-" . \serialize($get) . '-' . \serialize($post) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
     }
 
     /**
