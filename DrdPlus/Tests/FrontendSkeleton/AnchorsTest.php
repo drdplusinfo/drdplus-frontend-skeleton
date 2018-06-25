@@ -291,13 +291,12 @@ class AnchorsTest extends AbstractContentTest
                 $content = $this->getFromCache($tempFileName);
             }
             if (!$content) {
-                $postData = $isDrdPlus ? ['trial' => '1'] : [];
                 [
                     'responseHttpCode' => $responseHttpCode,
                     'redirectUrl' => $redirectUrl,
                     'error' => $error,
                     'content' => $content
-                ] = $this->fetchContentFromLink($link, true /* fetch body */, $postData);
+                ] = $this->fetchContentFromLink($link, true /* fetch body */, $this->getPostDataToFetchContent($isDrdPlus));
                 self::assertTrue(
                     $responseHttpCode >= 200 && $responseHttpCode < 300,
                     "Could not reach $link, got response code $responseHttpCode and redirect URL '$redirectUrl' ($error)"
@@ -316,6 +315,11 @@ class AnchorsTest extends AbstractContentTest
         }
 
         return self::$externalHtmlDocuments[$link];
+    }
+
+    protected function getPostDataToFetchContent(bool $isDrdPlus): array
+    {
+        return [];
     }
 
     protected function fetchContentFromLink(string $link, bool $withBody, array $postData = []): array
