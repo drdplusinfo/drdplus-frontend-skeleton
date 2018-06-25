@@ -543,10 +543,10 @@ class AnchorsTest extends AbstractContentTest
     public function Buttons_should_not_have_links_inside(): void
     {
         $buttons = $this->getHtmlDocument()->getElementsByTagName('button');
-        if (!$buttons && !$this->isSkeletonChecked()) {
+        if ($buttons->count() === 0 && !$this->isSkeletonChecked()) {
             self::assertCount(0, $buttons, 'Simply no buttons');
         }
-        self::assertNotEmpty($buttons);
+        self::assertNotEmpty($buttons, 'Some buttons expected in a skeleton to test');
         foreach ($buttons as $button) {
             $buttonAnchors = $button->getElementsByTagName('a');
             self::assertCount(0, $buttonAnchors, 'No anchors expected in button: ' . $button->outerHTML);
