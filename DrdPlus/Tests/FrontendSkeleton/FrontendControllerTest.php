@@ -325,7 +325,7 @@ class FrontendControllerTest extends AbstractContentTest
      * @param HtmlDocument $document
      * @return array|Element[]
      */
-    private function getMetaRefreshes(HtmlDocument $document): array
+    protected function getMetaRefreshes(HtmlDocument $document): array
     {
         $metaElements = $document->head->getElementsByTagName('meta');
         $metaRefreshes = [];
