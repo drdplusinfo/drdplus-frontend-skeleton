@@ -7,6 +7,7 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 use DeviceDetector\Parser\Bot;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
+use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\Redirect;
 use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\FrontendSkeleton\WebFiles;
@@ -307,11 +308,7 @@ class FrontendControllerTest extends AbstractContentTest
     public function I_can_set_redirect_via_html_meta(): void
     {
         self::assertCount(0, $this->getMetaRefreshes($this->getHtmlDocument()), 'No meta tag with refresh meaning expected so far');
-        $controller = new FrontendController(
-            'Google Analytics Foo',
-            $this->createHtmlHelper(false /* not in production */),
-            $this->getDocumentRoot()
-        );
+        $controller = $this->createController();
         $controller->setRedirect(new Redirect('https://example.com/outsider', 12));
         $content = $this->fetchNonCachedContent($controller);
         $htmlDocument = new HtmlDocument($content);
@@ -319,6 +316,21 @@ class FrontendControllerTest extends AbstractContentTest
         self::assertCount(1, $metaRefreshes, 'One meta tag with refresh meaning expected');
         $metaRefresh = \current($metaRefreshes);
         self::assertSame('12; url=https://example.com/outsider', $metaRefresh->getAttribute('content'));
+    }
+
+    protected function createController(
+        string $googleAnalyticsId = 'Google Analytics Foo',
+        HtmlHelper $htmlHelper = null,
+        string $documentRoot = null
+    ): FrontendController
+    {
+        $controllerClass = $this->getSutClass();
+
+        return new $controllerClass(
+            $googleAnalyticsId,
+            $htmlHelper ?? $this->createHtmlHelper(false /* not in production */),
+            $documentRoot ?? $this->getDocumentRoot()
+        );
     }
 
     /**
