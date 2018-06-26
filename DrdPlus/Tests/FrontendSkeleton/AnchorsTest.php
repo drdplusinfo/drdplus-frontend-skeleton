@@ -309,7 +309,7 @@ class AnchorsTest extends AbstractContentTest
                 self::assertCount(
                     0,
                     self::$externalHtmlDocuments[$link]->getElementsByTagName('form'),
-                    'Seems we have not passed ownership check for ' . $href . ' by using trial=1'
+                    'Seems we have not passed ownership check for ' . $href
                 );
             }
         }
