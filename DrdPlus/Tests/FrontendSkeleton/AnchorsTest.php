@@ -549,6 +549,8 @@ class AnchorsTest extends AbstractContentTest
         $buttons = $this->getHtmlDocument()->getElementsByTagName('button');
         if ($buttons->count() === 0 && !$this->isSkeletonChecked()) {
             self::assertCount(0, $buttons, 'Simply no buttons');
+
+            return;
         }
         self::assertNotEmpty($buttons, 'Some buttons expected in a skeleton to test');
         foreach ($buttons as $button) {
