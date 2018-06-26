@@ -126,7 +126,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_set_contacts_fixed(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(false /* not in production */), $this->getDocumentRoot());
+        $controller = $this->createController();
         self::assertFalse($controller->isContactsFixed(), 'Contacts are expected to be simply on top by default');
         if ($this->isSkeletonChecked()) {
             /** @var Element $contacts */
@@ -166,7 +166,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_hide_home_button(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(false /* not in production */), $this->getDocumentRoot());
+        $controller = $this->createController();
         self::assertTrue($controller->isShownHomeButton(), 'Home button should be shown by default');
         if ($this->isSkeletonChecked()) {
             /** @var Element $homeButton */
