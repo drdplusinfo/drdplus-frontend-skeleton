@@ -122,6 +122,7 @@ class WebVersionSwitcherTest extends SkeletonTestCase
                 /** @noinspection DisconnectedForeachInstructionInspection */
                 $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
             }
+            $rulesVersionSwitcher->switchToVersion($this->currentWebVersion);
             self::assertSame($this->currentWebVersion, $webVersions->getCurrentVersion());
         } catch (\Throwable $throwable) {
             \exec('git checkout master');
