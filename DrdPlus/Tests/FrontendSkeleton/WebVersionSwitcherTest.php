@@ -19,12 +19,12 @@ class WebVersionSwitcherTest extends SkeletonTestCase
     {
         parent::setUp();
         /** @noinspection NotOptimalIfConditionsInspection */
-        if ($this->getTestsConfiguration()->hasMoreVersions() // otherwise you will have to solve it in every test
+        /*if ($this->getTestsConfiguration()->hasMoreVersions() // otherwise you will have to solve it in every test
             && $this->areThereUncommittedChanges()
             && !$this->trySafeStashOfChanges()
         ) {
             self::markTestSkipped('There are uncommitted changes, so can not test version switching');
-        }
+        }*/
         $this->currentWebVersion = (new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
     }
 
@@ -107,19 +107,24 @@ class WebVersionSwitcherTest extends SkeletonTestCase
         );
         $versionSwitchMutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
         $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, $versionSwitchMutex);
-        self::assertFalse(
-            $rulesVersionSwitcher->switchToVersion($this->currentWebVersion),
-            'Changing version to the same should result into false as nothing changed'
-        );
-        $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
-        $otherVersions = \array_diff($versions, [$this->currentWebVersion]);
-        foreach ($otherVersions as $otherVersion) {
-            self::assertTrue(
-                $rulesVersionSwitcher->switchToVersion($otherVersion),
-                'Changing version should result into true as changed'
+        try {
+            self::assertFalse(
+                $rulesVersionSwitcher->switchToVersion($this->currentWebVersion),
+                'Changing version to the same should result into false as nothing changed'
             );
-            /** @noinspection DisconnectedForeachInstructionInspection */
             $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
+            $otherVersions = \array_diff($versions, [$this->currentWebVersion]);
+            foreach ($otherVersions as $otherVersion) {
+                self::assertTrue(
+                    $rulesVersionSwitcher->switchToVersion($otherVersion),
+                    'Changing version should result into true as changed'
+                );
+                /** @noinspection DisconnectedForeachInstructionInspection */
+                $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
+            }
+        } catch (\Throwable $throwable) {
+            \exec('git checkout master');
+            self::fail($throwable->getMessage() . ';' . $throwable->getTraceAsString());
         }
     }
 }

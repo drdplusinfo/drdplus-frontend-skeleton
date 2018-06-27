@@ -238,21 +238,17 @@ class FrontendControllerTest extends AbstractContentTest
     /**
      * @test
      * @backupGlobals enabled
+     * @throws \ReflectionException
      */
     public function I_can_switch_to_wanted_version(): void
     {
-        try {
-            $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
-            $controllerReflection = new \ReflectionClass($controller);
-            $versionSwitcherProperty = $controllerReflection->getProperty('webVersionSwitcher');
-            $versionSwitcherProperty->setAccessible(true);
-            $this->I_will_be_switched_to_latest_stable_version_as_default_wanted_version($controller, $versionSwitcherProperty);
-            $this->I_will_be_switched_to_version_from_cookie($controller, $versionSwitcherProperty);
-            $this->I_will_be_switched_to_version_from_get($controller, $versionSwitcherProperty);
-        } catch (\Throwable $throwable) {
-            \exec('git checkout master');
-            self::fail($throwable->getMessage() . ';' . $throwable->getTraceAsString());
-        }
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controllerReflection = new \ReflectionClass($controller);
+        $versionSwitcherProperty = $controllerReflection->getProperty('webVersionSwitcher');
+        $versionSwitcherProperty->setAccessible(true);
+        $this->I_will_be_switched_to_latest_stable_version_as_default_wanted_version($controller, $versionSwitcherProperty);
+        $this->I_will_be_switched_to_version_from_cookie($controller, $versionSwitcherProperty);
+        $this->I_will_be_switched_to_version_from_get($controller, $versionSwitcherProperty);
     }
 
     /**
