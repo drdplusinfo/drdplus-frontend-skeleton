@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
@@ -317,7 +318,8 @@ class AnchorsTest extends AbstractContentTest
         return self::$externalHtmlDocuments[$link];
     }
 
-    protected function getPostDataToFetchContent(bool $isDrdPlus): array
+    protected function getPostDataToFetchContent(/** @noinspection PhpUnusedParameterInspection */
+        bool $isDrdPlus): array
     {
         return [];
     }

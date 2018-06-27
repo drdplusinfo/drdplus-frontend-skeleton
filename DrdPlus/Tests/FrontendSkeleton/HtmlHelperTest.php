@@ -6,6 +6,7 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
 

@@ -8,6 +8,7 @@ use DrdPlus\FrontendSkeleton\CacheRoot;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
+use DrdPlus\Tests\FrontendSkeleton\Partials\SkeletonTestCase;
 
 class WebVersionSwitcherTest extends SkeletonTestCase
 {

@@ -52,10 +52,27 @@ class WebVersions extends StrictObject
     }
 
     /**
+     * Gives last STABLE version, if any, or master of not
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    public function getLastVersion(): string
+    public function getLastStableVersion(): string
+    {
+        $versions = $this->getAllWebVersions();
+        $lastVersion = \array_pop($versions);
+        // last version is not a master (strange but...) or it is the only version we got
+        if ($lastVersion !== 'master' || \count($versions) === 0) {
+            return $lastVersion;
+        }
+
+        return \reset($versions); // next last version
+    }
+
+    /**
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     */
+    public function getLastUnstableVersion(): string
     {
         $versions = $this->getAllWebVersions();
 
@@ -120,28 +137,15 @@ class WebVersions extends StrictObject
 
     public function getVersionName(string $version): string
     {
-        return $version !== self::LATEST_VERSION ? "verze $version" : 'nejnovější';
+        return $version !== self::LATEST_VERSION ? "verze $version" : 'testovací!';
     }
 
     /**
      * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadGitHead
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
     public function getCurrentCommitHash(): string
     {
-        $head = \file_get_contents($this->documentRoot . '/.git/HEAD');
-        if (\preg_match('~^[[:alnum:]]{40,}$~', $head)) {
-            return $head; // the HEAD file contained the has itself
-        }
-        $gitHeadFile = \trim(\preg_replace('~ref:\s*~', '', \file_get_contents($this->documentRoot . '/.git/HEAD')));
-        $gitHeadFilePath = $this->documentRoot . '/.git/' . $gitHeadFile;
-        if (!\is_readable($gitHeadFilePath)) {
-            throw new Exceptions\CanNotReadGitHead(
-                "Could not read $gitHeadFilePath, in that dir are files "
-                . \implode(',', \scandir(\dirname($gitHeadFilePath), SCANDIR_SORT_NONE))
-            );
-        }
-
-        return \trim(\file_get_contents($gitHeadFilePath));
+        return $this->execute('git log --max-count=1 --format=%H --no-abbrev-commit');
     }
 }

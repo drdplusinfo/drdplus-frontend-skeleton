@@ -2,13 +2,14 @@
 declare(strict_types=1);
 /** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
-namespace DrdPlus\Tests\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
+use DrdPlus\Tests\FrontendSkeleton\TestsConfiguration;
 use Granam\Tests\Tools\TestWithMockery;
 
 abstract class SkeletonTestCase extends TestWithMockery
 {
-    /** @var TestsConfiguration */
+    /** @var TestConfigurationReader */
     private $testsConfiguration;
 
     /**
@@ -24,9 +25,9 @@ abstract class SkeletonTestCase extends TestWithMockery
     }
 
     /**
-     * @return TestsConfiguration
+     * @return TestConfigurationReader
      */
-    protected function getTestsConfiguration(): TestsConfiguration
+    protected function getTestsConfiguration(): TestConfigurationReader
     {
         return $this->testsConfiguration;
     }

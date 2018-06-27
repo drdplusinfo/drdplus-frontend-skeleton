@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
+
 class StandardModeTest extends AbstractContentTest
 {
     /**

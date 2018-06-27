@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\AssetsVersion;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class AssetsVersionTest extends AbstractContentTest
 {

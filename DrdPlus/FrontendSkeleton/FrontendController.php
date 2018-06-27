@@ -365,7 +365,7 @@ class FrontendController extends StrictObject
      */
     public function getWantedVersion(): string
     {
-        return $_GET['version'] ?? $_COOKIE['version'] ?? $this->getWebVersions()->getLastVersion();
+        return $_GET['version'] ?? $_COOKIE['version'] ?? $this->getWebVersions()->getLastStableVersion();
     }
 
     /**

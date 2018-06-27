@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Tracy\Debugger;
 
 class TracyTest extends AbstractContentTest
 {
     /**
      * @test
-     * @runInSeparateProcess
+     * @runInSeparateProcess enabled
      */
     public function Tracy_watch_it(): void
     {

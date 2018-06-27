@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
 

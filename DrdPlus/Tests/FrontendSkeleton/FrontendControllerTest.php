@@ -13,6 +13,7 @@ use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\FrontendSkeleton\WebFiles;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
 use Mockery\MockInterface;
