@@ -115,10 +115,10 @@ class WebVersionSwitcherTest extends SkeletonTestCase
             $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
             $otherVersions = \array_diff($versions, [$this->currentWebVersion]);
             foreach ($otherVersions as $otherVersion) {
-                /*self::assertTrue(
+                self::assertTrue(
                     $rulesVersionSwitcher->switchToVersion($otherVersion),
                     'Changing version should result into true as changed'
-                );*/
+                );
                 /** @noinspection DisconnectedForeachInstructionInspection */
                 $versionSwitchMutex->unlock(); // we need to unlock it as it is NOT unlocked by itself (intentionally)
             }

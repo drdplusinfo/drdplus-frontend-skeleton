@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 use DrdPlus\FrontendSkeleton\Cache;
+use DrdPlus\FrontendSkeleton\CacheRoot;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use DrdPlus\FrontendSkeleton\WebVersions;
+use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
+use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
 use Gt\Dom\HTMLDocument;
 
 abstract class AbstractContentTest extends SkeletonTestCase
@@ -20,6 +24,18 @@ abstract class AbstractContentTest extends SkeletonTestCase
     {
         if (!\defined('DRD_PLUS_INDEX_FILE_NAME_TO_TEST')) {
             self::markTestSkipped("Missing constant 'DRD_PLUS_INDEX_FILE_NAME_TO_TEST'");
+        }
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        if ($webVersions->getCurrentVersion() !== 'master') {
+            \trigger_error("Current test left code in version {$webVersions->getCurrentVersion()}, switching back to master", \E_USER_WARNING);
+            $cacheRoot = new CacheRoot($this->getDocumentRoot());
+            // seems some test does not clean up (probably called frontend in separate process which switches code to stable version)
+            (new WebVersionSwitcher($webVersions, new WebVersionSwitchMutex($cacheRoot)))->switchToVersion('master');
         }
     }
 

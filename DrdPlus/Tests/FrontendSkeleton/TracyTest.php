@@ -15,9 +15,10 @@ class TracyTest extends AbstractContentTest
      */
     public function Tracy_watch_it(): void
     {
+        self::assertFalse(Debugger::isEnabled(), 'Tracy debugger is not expected to be enabled before index call');
         \ob_start();
         include __DIR__ . '/../../../index.php';
         \ob_end_clean();
-        self::assertTrue(Debugger::isEnabled(), 'Tracy debugger is not loaded');
+        self::assertTrue(Debugger::isEnabled(), 'Tracy debugger is not enabled');
     }
 }
