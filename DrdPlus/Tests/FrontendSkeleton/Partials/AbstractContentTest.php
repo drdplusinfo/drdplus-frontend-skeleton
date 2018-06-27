@@ -19,7 +19,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
     protected function setUp(): void
     {
         if (!\defined('DRD_PLUS_INDEX_FILE_NAME_TO_TEST')) {
-            self::markTestSkipped('Missing constant \'DRD_PLUS_INDEX_FILE_NAME_TO_TEST\'');
+            self::markTestSkipped("Missing constant 'DRD_PLUS_INDEX_FILE_NAME_TO_TEST'");
         }
     }
 
@@ -47,12 +47,14 @@ abstract class AbstractContentTest extends SkeletonTestCase
             } elseif ($this->needPassOut()) {
                 $this->passOut();
             }
+            $hasCustomVersion = $this->setMasterVersionAsDefault();
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
             self::$contents[$key] = \ob_get_clean();
             self::assertNotEmpty(self::$contents[$key]);
             unset($_GET['show']);
+            $this->unsetMasterVersionAsDefault($hasCustomVersion);
         }
 
         return self::$contents[$key];
@@ -102,7 +104,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
     protected function isSkeletonChecked(): bool
     {
         $documentRootRealPath = \realpath($this->getDocumentRoot());
-        $frontendSkeletonRealPath = \realpath(__DIR__ . '/../../..');
+        $frontendSkeletonRealPath = \realpath(__DIR__ . '/../../../..');
 
         return $documentRootRealPath === $frontendSkeletonRealPath;
     }
@@ -126,7 +128,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
     {
         static $documentRoot;
         if ($documentRoot === null) {
-            $documentRoot = \dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
+            $documentRoot = \dirname(\DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
         }
 
         return $documentRoot;
@@ -168,13 +170,30 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $controller = $controller ?? null;
         $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
         $_GET[Cache::CACHE] = Cache::DISABLE;
+        $hasCustomVersion = $this->setMasterVersionAsDefault();
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';
         $content = \ob_get_clean();
         $_GET[Cache::CACHE] = $cacheOriginalValue;
+        $this->unsetMasterVersionAsDefault($hasCustomVersion);
 
         return $content;
+    }
+
+    protected function setMasterVersionAsDefault(): bool
+    {
+        $hasCustomVersion = ($_GET['version'] ?? null) !== null;
+        $_GET['version'] = $_GET['version'] ?? 'master'; // because tests should run against latest unstable version
+
+        return $hasCustomVersion;
+    }
+
+    protected function unsetMasterVersionAsDefault(bool $hasCustomVersion): void
+    {
+        if (!$hasCustomVersion) {
+            unset($_GET['version']);
+        }
     }
 
     protected function turnToLocalLink(string $link): string

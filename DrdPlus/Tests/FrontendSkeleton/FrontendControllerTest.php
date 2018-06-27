@@ -203,14 +203,18 @@ class FrontendControllerTest extends AbstractContentTest
     public function I_can_get_wanted_version(): void
     {
         $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
-        $this->I_will_get_master_as_default_wanted_version($controller);
+        $this->I_will_get_last_stable_version_as_default_wanted_version($controller);
         $this->I_will_get_version_from_cookie($controller);
         $this->I_will_get_version_from_get($controller);
     }
 
-    private function I_will_get_master_as_default_wanted_version(FrontendController $controller): void
+    private function I_will_get_last_stable_version_as_default_wanted_version(FrontendController $controller): void
     {
-        self::assertSame('master', $controller->getWantedVersion());
+        if ($this->getTestsConfiguration()->hasMoreVersions()) {
+            self::assertSame($controller->getWebVersions()->getLastStableVersion(), $controller->getWantedVersion());
+        } else {
+            self::assertSame('master', $controller->getWantedVersion());
+        }
     }
 
     private function I_will_get_version_from_cookie(FrontendController $controller): void
@@ -219,7 +223,7 @@ class FrontendControllerTest extends AbstractContentTest
         $_COOKIE['version'] = 'foo_from_cookie';
         self::assertSame('foo_from_cookie', $controller->getWantedVersion(), 'Wanted version should be taken from cookie');
         unset($_COOKIE['version']);
-        $this->I_will_get_master_as_default_wanted_version($controller);
+        $this->I_will_get_last_stable_version_as_default_wanted_version($controller);
     }
 
     private function I_will_get_version_from_get(FrontendController $controller): void
@@ -243,7 +247,7 @@ class FrontendControllerTest extends AbstractContentTest
         $controllerReflection = new \ReflectionClass($controller);
         $versionSwitcherProperty = $controllerReflection->getProperty('webVersionSwitcher');
         $versionSwitcherProperty->setAccessible(true);
-        $this->I_will_be_switched_to_master_as_default_wanted_version($controller, $versionSwitcherProperty);
+        $this->I_will_be_switched_to_latest_stable_version_as_default_wanted_version($controller, $versionSwitcherProperty);
         $this->I_will_be_switched_to_version_from_cookie($controller, $versionSwitcherProperty);
         $this->I_will_be_switched_to_version_from_get($controller, $versionSwitcherProperty);
     }
@@ -262,14 +266,15 @@ class FrontendControllerTest extends AbstractContentTest
         return $webVersionSwitcher;
     }
 
-    private function I_will_be_switched_to_master_as_default_wanted_version(
+    private function I_will_be_switched_to_latest_stable_version_as_default_wanted_version(
         FrontendController $controller,
         \ReflectionProperty $versionSwitcherProperty
     ): void
     {
-        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher('master'));
+        $lastStableVersion = $controller->getWebVersions()->getLastStableVersion();
+        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher($lastStableVersion));
         self::assertTrue($controller->switchToWantedVersion());
-        self::assertSame('master', $controller->getWantedVersion());
+        self::assertSame($lastStableVersion, $controller->getWantedVersion());
     }
 
     private function I_will_be_switched_to_version_from_cookie(
