@@ -7,16 +7,18 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 use DrdPlus\FrontendSkeleton\CacheRoot;
 use DrdPlus\FrontendSkeleton\Exceptions\CanNotLockVersionMutex;
 use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use PHPUnit\Framework\TestCase;
 
-class WebVersionSwitchMutexTest extends TestCase
+class WebVersionSwitchMutexTest extends AbstractContentTest
 {
     /**
      * @test
      */
     public function I_can_get_and_release_lock(): void
     {
-        $mutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
+        $mutex = new WebVersionSwitchMutex(new CacheRoot($this->getDocumentRoot()));
+        self::assertFalse($mutex->isLocked(), 'Should not be locked at all yet');
         self::assertFalse($mutex->isLockedForId('foo'), 'Should not be locked yet');
         self::assertFalse($mutex->isLockedForId('bar'), 'Should not be locked yet');
         self::assertTrue($mutex->lock('foo'), 'Can not get lock via mutex');
@@ -28,8 +30,8 @@ class WebVersionSwitchMutexTest extends TestCase
         self::assertFalse($mutex->unlock(), 'Second unlock in a row should NOT be successful');
         self::assertTrue($mutex->lock('foo'), 'Can not get lock via mutex');
         self::assertTrue($mutex->isLockedForId('foo'), 'Should be locked for "foo" version');
-        $anotherMutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
-        self::assertTrue($anotherMutex->isLockedForId('foo'), 'Should be locked for "foo" version using any mutex instance');
+        $anotherMutex = new WebVersionSwitchMutex(new CacheRoot($this->getDocumentRoot()));
+        self::assertTrue($anotherMutex->isLockedForId('foo'), 'Should be locked for "foo" version by previous mutex instance');
         $mutex->__destruct();
         unset($mutex);
         self::assertFalse($anotherMutex->isLockedForId('foo'), 'Lock should be already released as another instance of mutex has been destroyed');
@@ -40,7 +42,7 @@ class WebVersionSwitchMutexTest extends TestCase
      */
     public function I_can_not_lock_twice(): void
     {
-        $mutex = new WebVersionSwitchMutex(new CacheRoot(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)));
+        $mutex = new WebVersionSwitchMutex(new CacheRoot($this->getDocumentRoot()));
         $mutex->lock('foo');
         $mutexClass = WebVersionSwitchMutex::class;
         $cacheRootClass = CacheRoot::class;
@@ -71,6 +73,6 @@ PHP
     public function I_can_not_get_lock_with_invalid_lock_dir(): void
     {
         $mutex = new WebVersionSwitchMutex(new CacheRoot('/just/a/small/flash/memory/in/another/universe'));
-        $mutex->lock('foo');
+        @$mutex->lock('foo');
     }
 }

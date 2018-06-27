@@ -9,14 +9,24 @@ use Granam\Strict\Object\StrictObject;
 class WebVersionSwitchMutex extends StrictObject
 {
 
+    /** @var CacheRoot */
+    private $cacheRoot;
     /** @var string */
-    private $lockFile;
-    /** @var null|resource */
-    private $lockFileHandle;
+    private $lockFileLinkName;
+    /** @var string|null */
+    private $lockedForId;
 
     public function __construct(CacheRoot $cacheRoot)
     {
-        $this->lockFile = $cacheRoot->getCacheRootDir() . \basename(__FILE__, '.php') . '.lock';
+        $this->cacheRoot = $cacheRoot;
+        $this->lockFileLinkName = $this->createLockFileName('link');
+    }
+
+    private function createLockFileName(string $suffix): string
+    {
+        $lockFileName = $this->cacheRoot->getCacheRootDir() . '/' . \basename(__FILE__, '.php');
+
+        return "{$lockFileName}.{$suffix}.lock";
     }
 
     /**
@@ -28,53 +38,48 @@ class WebVersionSwitchMutex extends StrictObject
      */
     public function lock(string $lockId, int $wait = 2): bool
     {
+        $this->lockedForId = $lockId;
+        $lockFileWithId = $this->createLockFileName($lockId);
+        if (!\file_exists($lockFileWithId)) {
+            if (!\touch($lockFileWithId)) {
+                throw new Exceptions\CanNotWriteLockOfVersionMutex("Can not create file $lockFileWithId");
+            }
+            \system('sync', $syncReturn); // flushes any non-yet-written data from memory to disk
+            if ($syncReturn !== 0) {
+                throw new Exceptions\CanNotWriteBuffersToDisk("'sync' command failed with return value {$syncReturn}");
+            }
+        }
         $waitUntil = \time() + $wait;
-        $locked = null;
-        $handle = $this->getLockFileHandle();
         $attempts = 0;
         do {
             $attempts++;
-            if ($locked !== null) {
-                \sleep(1);
+            if (!\file_exists($this->lockFileLinkName)) {
+                $locked = \symlink($lockFileWithId, $this->lockFileLinkName);
+                if ($locked) {
+                    return true; // we did it!
+                }
+            } elseif (\file_get_contents($this->lockFileLinkName) === $lockId) {
+                return false; // already locked for required ID, but not by us
             }
-            $locked = \flock($handle, LOCK_EX | LOCK_NB);
-        } while (!$locked && \time() < $waitUntil);
-        if (!$locked) {
-            $this->unlock(); // closes file handle
-            throw new Exceptions\CanNotLockVersionMutex(
-                "Even after {$wait} seconds and {$attempts} attempts the lock has not been obtained on file {$this->lockFile}"
-            );
-        }
-        $written = \fwrite($handle, $lockId) > 0;
-        \system('sync', $syncReturn); // flushes any non-yet-written data from memory to disk
-        if ($syncReturn !== 0) {
-            throw new Exceptions\CanNotWriteBuffersToDisk("'sync' command failed with return value {$syncReturn}");
-        }
-
-        return $written;
+            \sleep(1); // let's wait a bit until previous process releases the lock
+        } while (\time() < $waitUntil);
+        $this->unlock(); // closes file handle
+        throw new Exceptions\CanNotLockVersionMutex(
+            "Even after {$wait} seconds and {$attempts} attempts the lock has not been obtained on file {$this->lockFileLinkName}"
+        );
     }
 
-    /**
-     * @return resource
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotWriteLockOfVersionMutex
-     */
-    private function getLockFileHandle()
+    public function isLocked(): bool
     {
-        if (!$this->lockFileHandle) {
-            $this->lockFileHandle = @\fopen($this->lockFile, 'ab');
-            if (!$this->lockFileHandle) {
-                throw new Exceptions\CanNotWriteLockOfVersionMutex(
-                    "Can not use {$this->lockFile} as a lock file, can not write to it"
-                );
-            }
-        }
-
-        return $this->lockFileHandle;
+        return \file_exists($this->lockFileLinkName);
     }
 
     public function isLockedForId(string $lockId): bool
     {
-        return \file_exists($this->lockFile) && \file_get_contents($this->lockFile) === $lockId;
+        return ($this->lockedForId === null // still may be locked by another instance or process
+                || $this->lockedForId === $lockId // we locked it
+            )
+            && \file_exists($this->lockFileLinkName) && \file_exists($this->createLockFileName($lockId));
     }
 
     public function __destruct()
@@ -84,16 +89,10 @@ class WebVersionSwitchMutex extends StrictObject
 
     public function unlock(): bool
     {
-        if (!$this->lockFileHandle) {
+        if ($this->lockedForId === null /* WE have not locked anything */ || !$this->isLockedForId($this->lockedForId)) {
             return false;
         }
-        $unlocked = \flock($this->lockFileHandle, LOCK_UN); // it is no harm to unlock it even if it was not locked
-        \fclose($this->lockFileHandle);
-        $this->lockFileHandle = null;
-        if (\file_exists($this->lockFile)) {
-            \unlink($this->lockFile);
-        }
 
-        return $unlocked;
+        return \unlink($this->lockFileLinkName);
     }
 }
