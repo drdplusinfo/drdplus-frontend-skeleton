@@ -41,7 +41,7 @@ class WebVersionSwitchMutex extends StrictObject
         $this->lockedForId = $lockId;
         $lockFileWithId = $this->createLockFileName($lockId);
         if (!\file_exists($lockFileWithId)) {
-            if (!\touch($lockFileWithId)) {
+            if (!\file_put_contents($lockFileWithId, $lockId)) {
                 throw new Exceptions\CanNotWriteLockOfVersionMutex("Can not create file $lockFileWithId");
             }
             \system('sync', $syncReturn); // flushes any non-yet-written data from memory to disk
