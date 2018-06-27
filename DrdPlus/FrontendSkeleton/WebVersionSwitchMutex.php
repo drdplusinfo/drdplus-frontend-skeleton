@@ -53,7 +53,7 @@ class WebVersionSwitchMutex extends StrictObject
         $attempts = 0;
         do {
             $attempts++;
-            if (!\file_exists($this->lockFileLinkName)) {
+            if (!\is_link($this->lockFileLinkName)) {
                 $locked = \symlink($lockFileWithId, $this->lockFileLinkName);
                 if ($locked) {
                     return true; // we did it!
