@@ -151,10 +151,10 @@ class TestsConfigurationTest extends TestCase
                             $parameters[] = 123.456;
                             break;
                         case 'string' :
-                            $parameters[] = '123.456';
+                            $parameters[] = 'Some parameter 123.456';
                             break;
                         case 'array' :
-                            $parameters[] = [123.456];
+                            $parameters[] = ['One of parameters 123.456'];
                             break;
                         default :
                             throw new \LogicException(
@@ -183,7 +183,7 @@ class TestsConfigurationTest extends TestCase
         $testsConfiguration = new TestsConfiguration();
         $originalAllowedCalculationIdPrefixes = $testsConfiguration->getAllowedCalculationIdPrefixes();
         self::assertNotEmpty($originalAllowedCalculationIdPrefixes, 'Some allowed calculation ID prefixes expected');
-        $returnedTestsConfiguration = $testsConfiguration->addAllowedCalculationIdPrefix('foo allowed calculation id prefix');
+        $returnedTestsConfiguration = $testsConfiguration->addAllowedCalculationIdPrefix('Foo allowed calculation id prefix');
         self::assertSame(
             $testsConfiguration,
             $returnedTestsConfiguration,
@@ -192,6 +192,30 @@ class TestsConfigurationTest extends TestCase
         $addedPrefixes = \array_values( // to re-index result from zero index
             \array_diff($testsConfiguration->getAllowedCalculationIdPrefixes(), $originalAllowedCalculationIdPrefixes)
         );
-        self::assertSame(['foo allowed calculation id prefix'], $addedPrefixes);
+        self::assertSame(['Foo allowed calculation id prefix'], $addedPrefixes);
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
+     * @expectedExceptionMessageRegExp ~říčany u čeho chceš~
+     */
+    public function I_can_not_add_allowed_calculation_id_prefix_with_lowercase_first_letter(): void
+    {
+        (new TestsConfiguration())->addAllowedCalculationIdPrefix('říčany u čeho chceš');
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
+     * @expectedExceptionMessageRegExp ~žbrdloch~
+     */
+    public function I_can_not_set_allowed_calculation_id_prefixes_with_even_single_one_with_lowercase_first_letter(): void
+    {
+        (new TestsConfiguration())->setAllowedCalculationIdPrefixes([
+            'Potvora na entou',
+            'Kuloár',
+            'žbrdloch',
+        ]);
     }
 }

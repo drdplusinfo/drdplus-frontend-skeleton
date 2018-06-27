@@ -272,10 +272,14 @@ class TestsConfiguration extends StrictObject
     /**
      * @param array|string[] $allowedCalculationIdPrefixes
      * @return TestsConfiguration
+     * @throws \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
      */
     public function setAllowedCalculationIdPrefixes(array $allowedCalculationIdPrefixes): TestsConfiguration
     {
-        $this->allowedCalculationIdPrefixes = $allowedCalculationIdPrefixes;
+        $this->allowedCalculationIdPrefixes = [];
+        foreach ($allowedCalculationIdPrefixes as $allowedCalculationIdPrefix) {
+            $this->addAllowedCalculationIdPrefix($allowedCalculationIdPrefix);
+        }
 
         return $this;
     }
@@ -283,9 +287,15 @@ class TestsConfiguration extends StrictObject
     /**
      * @param string $allowedCalculationIdPrefix
      * @return TestsConfiguration
+     * @throws \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
      */
     public function addAllowedCalculationIdPrefix(string $allowedCalculationIdPrefix): TestsConfiguration
     {
+        if (!\preg_match('~^[[:upper:]]~u', $allowedCalculationIdPrefix)) {
+            throw new Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter(
+                "First letter of allowed calculation prefix should be uppercase, got '$allowedCalculationIdPrefix'"
+            );
+        }
         $this->allowedCalculationIdPrefixes[] = $allowedCalculationIdPrefix;
 
         return $this;
