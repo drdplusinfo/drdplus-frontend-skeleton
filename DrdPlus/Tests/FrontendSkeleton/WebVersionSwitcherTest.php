@@ -19,12 +19,12 @@ class WebVersionSwitcherTest extends SkeletonTestCase
     {
         parent::setUp();
         /** @noinspection NotOptimalIfConditionsInspection */
-        /*if ($this->getTestsConfiguration()->hasMoreVersions() // otherwise you will have to solve it in every test
+        if ($this->getTestsConfiguration()->hasMoreVersions() // otherwise you will have to solve it in every test
             && $this->areThereUncommittedChanges()
             && !$this->trySafeStashOfChanges()
         ) {
             self::markTestSkipped('There are uncommitted changes, so can not test version switching');
-        }*/
+        }
         $this->currentWebVersion = (new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
     }
 
