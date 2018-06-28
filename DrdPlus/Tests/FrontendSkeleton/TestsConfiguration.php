@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\Tests\FrontendSkeleton\Partials\TestConfigurationReader;
+use DrdPlus\Tests\FrontendSkeleton\Partials\TestsConfigurationReader;
 use Granam\Scalar\Tools\ToString;
 use Granam\Strict\Object\StrictObject;
 
-class TestsConfiguration extends StrictObject implements TestConfigurationReader
+class TestsConfiguration extends StrictObject implements TestsConfigurationReader
 {
     // every setting SHOULD be strict (expecting instead of ignoring)
 

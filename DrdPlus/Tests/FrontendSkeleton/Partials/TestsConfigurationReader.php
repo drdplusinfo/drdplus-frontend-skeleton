@@ -1,7 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
-interface TestConfigurationReader
+interface TestsConfigurationReader
 {
     public function hasTables(): bool;
 

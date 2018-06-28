@@ -9,7 +9,7 @@ use Granam\Tests\Tools\TestWithMockery;
 
 abstract class SkeletonTestCase extends TestWithMockery
 {
-    /** @var TestConfigurationReader */
+    /** @var TestsConfigurationReader */
     private $testsConfiguration;
 
     /**
@@ -25,9 +25,9 @@ abstract class SkeletonTestCase extends TestWithMockery
     }
 
     /**
-     * @return TestConfigurationReader
+     * @return TestsConfigurationReader
      */
-    protected function getTestsConfiguration(): TestConfigurationReader
+    protected function getTestsConfiguration(): TestsConfigurationReader
     {
         return $this->testsConfiguration;
     }
