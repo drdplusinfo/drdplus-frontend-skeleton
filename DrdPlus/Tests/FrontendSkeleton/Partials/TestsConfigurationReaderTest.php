@@ -1,6 +1,7 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
+use DrdPlus\Tests\FrontendSkeleton\TestsConfiguration;
 use Granam\Tests\Tools\TestWithMockery;
 
 class TestsConfigurationReaderTest extends TestWithMockery
@@ -39,10 +40,16 @@ class TestsConfigurationReaderTest extends TestWithMockery
         $testsConfigurationReflection = new \ReflectionClass($testsConfigurationClass);
         $methods = $testsConfigurationReflection->getMethods(\ReflectionMethod::IS_PUBLIC ^ \ReflectionMethod::IS_ABSTRACT);
         $getters = [];
+        $testsConfigurationClasses = \array_unique([ // descendants can inherit current configuration class
+            TestsConfiguration::class,
+            TestsConfigurationReader::class,
+            $testsConfigurationClass,
+            $this->getTestsConfigurationReaderClass()
+        ]);
         foreach ($methods as $method) {
             if ($method->getNumberOfParameters() > 0
                 || !$method->hasReturnType()
-                || $method->getReturnType()->getName() === $testsConfigurationClass
+                || \in_array($method->getReturnType()->getName(), $testsConfigurationClasses, true)
             ) {
                 continue;
             }
