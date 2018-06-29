@@ -3,6 +3,8 @@ namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 interface TestsConfigurationReader
 {
+    public function getLocalUrl(): string;
+
     public function hasTables(): bool;
 
     public function getSomeExpectedTableIds(): array;

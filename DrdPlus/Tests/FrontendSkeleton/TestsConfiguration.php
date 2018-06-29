@@ -12,6 +12,8 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
 {
     // every setting SHOULD be strict (expecting instead of ignoring)
 
+    /** @var string */
+    private $localUrl;
     /** @var bool */
     private $hasTables = true;
     /** @var array|string[] */
@@ -38,6 +40,35 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     private $expectedGoogleAnalyticsId = 'UA-121206931-1';
     /** @var array|string[] */
     private $allowedCalculationIdPrefixes = ['Hod proti', 'Hod na', 'Výpočet'];
+
+    /**
+     * @param string $localUrl
+     * @throws \DrdPlus\Tests\FrontendSkeleton\Exceptions\InvalidUrl
+     */
+    public function __construct(string $localUrl)
+    {
+        $this->guardValidUrl($localUrl);
+        $this->localUrl = $localUrl;
+    }
+
+    /**
+     * @param string $url
+     * @throws \DrdPlus\Tests\FrontendSkeleton\Exceptions\InvalidUrl
+     */
+    protected function guardValidUrl(string $url): void
+    {
+        if (!\filter_var($url, \FILTER_VALIDATE_URL)) {
+            throw new Exceptions\InvalidUrl("Given URL is not valid: '$url'");
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocalUrl(): string
+    {
+        return $this->localUrl;
+    }
 
     /**
      * @return bool

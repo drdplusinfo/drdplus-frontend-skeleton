@@ -21,7 +21,7 @@ abstract class SkeletonTestCase extends TestWithMockery
     {
         parent::__construct($name, $data, $dataName);
         global $testsConfiguration;
-        $this->testsConfiguration = $testsConfiguration ?? new TestsConfiguration();
+        $this->testsConfiguration = $testsConfiguration ?? new TestsConfiguration('https://example.com');
     }
 
     /**

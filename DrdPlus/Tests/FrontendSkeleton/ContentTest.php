@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
@@ -105,25 +106,27 @@ class ContentTest extends AbstractContentTest
     /**
      * @test
      * @dataProvider provideRequestSource
-     * @runInSeparateProcess enabled
      * @param string $source
      */
     public function I_can_switch_to_every_version(string $source): void
     {
-        foreach ((new WebVersions($this->getDocumentRoot()))->getAllWebVersions() as $webVersion) {
-            $requestParameters = ['version' => $webVersion];
-            $get = [];
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        foreach ($webVersions->getAllWebVersions() as $webVersion) {
             $post = [];
             $cookies = [];
+            $url = $this->getTestsConfiguration()->getLocalUrl();
             if ($source === 'get') {
-                $get = $requestParameters;
+                $url .= '?version=' . $webVersion;
             } elseif ($source === 'post') {
-                $post = $requestParameters;
+                $post = ['version' => $webVersion];
             } elseif ($source === 'cookies') {
-                $cookies = $requestParameters;
+                $cookies = ['version' => $webVersion];
             }
-            $drdPlusVersionElement = $this->getHtmlDocument($get, $post, $cookies)->getElementById('drdPlusVersion');
-            self::assertNotEmpty($drdPlusVersionElement, 'Can not find #drdPlusVersion element');
+            $content = $this->fetchContentFromLink($url, true, $post, $cookies)['content'];
+            self::assertNotEmpty($content);
+            $document = new HtmlDocument($content);
+            $drdPlusVersionElement = $document->getElementById('drd_plus_version');
+            self::assertNotEmpty($drdPlusVersionElement, 'Can not find element by ID drdPlusVersion for version ' . $webVersion);
             self::assertSame($webVersion, $drdPlusVersionElement->textContent, 'Expected different version');
         }
     }
@@ -135,17 +138,5 @@ class ContentTest extends AbstractContentTest
             ['post'],
             ['cookies'],
         ];
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_switch_to_every_version_by_get(): void
-    {
-        foreach ((new WebVersions($this->getDocumentRoot()))->getAllWebVersions() as $webVersion) {
-            $drdPlusVersionElement = $this->getHtmlDocument(['version' => $webVersion])->getElementById('drdPlusVersion');
-            self::assertNotEmpty($drdPlusVersionElement, 'Can not find #drdPlusVersion element');
-            self::assertSame($webVersion, $drdPlusVersionElement->textContent);
-        }
     }
 }
