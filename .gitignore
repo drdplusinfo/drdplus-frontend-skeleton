@@ -1,5 +1,4 @@
 /.idea/
 /vendor/
 /phpunit_log/
-/composer.lock
 /composer_install_result.txt
