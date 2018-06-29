@@ -11,9 +11,6 @@ $vendorRoot = $documentRoot . '/vendor';
 /** @noinspection PhpIncludeInspection */
 $autoLoader = require $vendorRoot . '/autoload.php';
 
-$htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
-\DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
-
 $versionIndexFile = __FILE__;
 if (!empty($_GET['version']) && (!\defined('VERSION_SWITCHED') || !VERSION_SWITCHED)) {
     $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
@@ -31,6 +28,9 @@ if ($versionIndexFile !== __FILE__ && \realpath($versionIndexFile) !== \realpath
     /** @noinspection PhpIncludeInspection */
     require $versionIndexFile;
 } else {
+    $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
+    \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
+
     $controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController(
             'UA-121206931-1',
             $htmlHelper,

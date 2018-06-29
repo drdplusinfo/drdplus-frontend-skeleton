@@ -76,7 +76,7 @@ class WebVersionSwitcher extends StrictObject
                 );
             }
         } else {
-            $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && git pull --ff-only';
+            $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && git reset HEAD --hard && git pull --ff-only 2>&1';
             $rows = []; // resetting rows as they may NOT be changed on failure
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
@@ -87,7 +87,7 @@ class WebVersionSwitcher extends StrictObject
                 );
             }
             if ($rows !== ['Already up to date.']) {
-                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && export COMPOSER_HOME=. && composer install';
+                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && export COMPOSER_HOME=. && composer install 2>&1';
                 $rows = []; // resetting rows as they may NOT be changed on failure
                 \exec($command, $rows, $returnCode);
                 if ($returnCode !== 0) {
