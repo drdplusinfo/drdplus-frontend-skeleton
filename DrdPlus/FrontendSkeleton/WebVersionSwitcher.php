@@ -87,14 +87,17 @@ class WebVersionSwitcher extends StrictObject
                 );
             }
             if ($rows !== ['Already up to date.']) {
-                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && composer install';
+                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && export COMPOSER_HOME=. && composer install';
                 $rows = []; // resetting rows as they may NOT be changed on failure
                 \exec($command, $rows, $returnCode);
                 if ($returnCode !== 0) {
                     throw new Exceptions\CanNotInstallLibraries(
                         "Can not install libraries via Composer by command '{$command}'"
-                        . ", got return code '{$returnCode}' and output\n"
-                        . \implode("\n", $rows)
+                        . ", got return code '{$returnCode}' and output:"
+                        . ($rows
+                            ? "\n" . \implode("\n", $rows)
+                            : " ''"
+                        )
                     );
                 }
             }
