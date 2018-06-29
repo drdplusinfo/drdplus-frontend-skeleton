@@ -12,11 +12,9 @@ use DrdPlus\FrontendSkeleton\Redirect;
 use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\FrontendSkeleton\WebFiles;
 use DrdPlus\FrontendSkeleton\WebVersions;
-use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
-use Mockery\MockInterface;
 
 class FrontendControllerTest extends AbstractContentTest
 {
@@ -233,67 +231,6 @@ class FrontendControllerTest extends AbstractContentTest
         self::assertSame('bar_from_get', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
         unset($_GET['version']);
         self::assertSame('some_version_from_cookie', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
-    }
-
-    /**
-     * @test
-     * @backupGlobals enabled
-     * @throws \ReflectionException
-     */
-    public function I_can_switch_to_wanted_version(): void
-    {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
-        $controllerReflection = new \ReflectionClass($controller);
-        $versionSwitcherProperty = $controllerReflection->getProperty('webVersionSwitcher');
-        $versionSwitcherProperty->setAccessible(true);
-        $this->I_will_be_switched_to_latest_version_as_default_wanted_version($controller, $versionSwitcherProperty);
-        $this->I_will_be_switched_to_version_from_cookie($controller, $versionSwitcherProperty);
-        $this->I_will_be_switched_to_version_from_get($controller, $versionSwitcherProperty);
-    }
-
-    /**
-     * @param string $expectedVersionToSwitchTo
-     * @return WebVersionSwitcher|MockInterface
-     */
-    private function createWebVersionSwitcher(string $expectedVersionToSwitchTo): WebVersionSwitcher
-    {
-        $webVersionSwitcher = $this->mockery(WebVersionSwitcher::class);
-        $webVersionSwitcher->expects('switchToVersion')
-            ->with($expectedVersionToSwitchTo)
-            ->andReturn(true);
-
-        return $webVersionSwitcher;
-    }
-
-    private function I_will_be_switched_to_latest_version_as_default_wanted_version(
-        FrontendController $controller,
-        \ReflectionProperty $versionSwitcherProperty
-    ): void
-    {
-        $lastUnstableVersion = $controller->getWebVersions()->getLastUnstableVersion();
-        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher($lastUnstableVersion));
-        self::assertTrue($controller->switchToWantedVersion());
-        self::assertSame($lastUnstableVersion, $controller->getWantedVersion());
-    }
-
-    private function I_will_be_switched_to_version_from_cookie(
-        FrontendController $controller,
-        \ReflectionProperty $versionSwitcherProperty
-    ): void
-    {
-        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher('foo_from_cookie'));
-        $_COOKIE['version'] = 'foo_from_cookie';
-        self::assertTrue($controller->switchToWantedVersion());
-    }
-
-    private function I_will_be_switched_to_version_from_get(
-        FrontendController $controller,
-        \ReflectionProperty $versionSwitcherProperty
-    ): void
-    {
-        $versionSwitcherProperty->setValue($controller, $this->createWebVersionSwitcher('bar_from_get'));
-        $_GET['version'] = 'bar_from_get';
-        self::assertTrue($controller->switchToWantedVersion());
     }
 
     /**

@@ -1,10 +1,5 @@
 <?php
-// switch to version has to be BEFORE cache usage
-try {
-    $controller->switchToWantedVersion();
-} catch (\DrdPlus\FrontendSkeleton\Exceptions\Exception $exception) {
-    \trigger_error($exception->getMessage() . '; ' . $exception->getTraceAsString(), E_USER_WARNING);
-}
+/** @var \DrdPlus\FrontendSkeleton\FrontendController $controller */
 
 $cachedContent = $controller->getCachedContent();
 if ($cachedContent !== '') {

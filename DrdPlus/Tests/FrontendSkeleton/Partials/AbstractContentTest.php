@@ -5,12 +5,8 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 use DrdPlus\FrontendSkeleton\Cache;
-use DrdPlus\FrontendSkeleton\CacheRoot;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
-use DrdPlus\FrontendSkeleton\WebVersions;
-use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
-use DrdPlus\FrontendSkeleton\WebVersionSwitchMutex;
 use Gt\Dom\HTMLDocument;
 
 abstract class AbstractContentTest extends SkeletonTestCase
@@ -27,18 +23,6 @@ abstract class AbstractContentTest extends SkeletonTestCase
         }
     }
 
-    public function tearDown(): void
-    {
-        parent::tearDown();
-        $webVersions = new WebVersions($this->getDocumentRoot());
-        if ($webVersions->getCurrentVersion() !== 'master') {
-            \trigger_error("Current test left code in version {$webVersions->getCurrentVersion()}, switching back to master", \E_USER_WARNING);
-            $cacheRoot = new CacheRoot($this->getDocumentRoot());
-            // seems some test does not clean up (probably called frontend in separate process which switches code to stable version)
-            (new WebVersionSwitcher($webVersions, new WebVersionSwitchMutex($cacheRoot)))->switchToVersion('master');
-        }
-    }
-
     /**
      * @param string $show = ''
      * @param array $get = []
@@ -52,7 +36,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
             $originalGet = $_GET;
             $originalPost = $_POST;
             if ($show !== '') {
-                $_GET['show'] = $show;
+                $get['show'] = $show;
             }
             if ($get) {
                 $_GET = \array_merge($_GET, $get);
@@ -65,14 +49,17 @@ abstract class AbstractContentTest extends SkeletonTestCase
             } elseif ($this->needPassOut()) {
                 $this->passOut();
             }
-            $this->setMasterVersionAsDefault();
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
             self::$contents[$key] = \ob_get_clean();
-            $_GET = $originalGet;
             $_POST = $originalPost;
-            self::assertNotEmpty(self::$contents[$key]);
+            $_GET = $originalGet;
+            self::assertNotEmpty(
+                self::$contents[$key],
+                'Nothing has been fetched with GET ' . \var_export($get, true) . ' and POST ' . \var_export($post, true)
+                . ' from ' . DRD_PLUS_INDEX_FILE_NAME_TO_TEST
+            );
         }
 
         return self::$contents[$key];
@@ -152,6 +139,11 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $documentRoot;
     }
 
+    protected function getDirForVersions(): string
+    {
+        return $this->getDocumentRoot() . '/versions';
+    }
+
     protected function getVendorRoot(): string
     {
         return $this->getDocumentRoot() . '/vendor';
@@ -188,30 +180,13 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $controller = $controller ?? null;
         $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
         $_GET[Cache::CACHE] = Cache::DISABLE;
-        $hasCustomVersion = $this->setMasterVersionAsDefault();
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';
         $content = \ob_get_clean();
         $_GET[Cache::CACHE] = $cacheOriginalValue;
-        $this->unsetMasterVersionAsDefault($hasCustomVersion);
 
         return $content;
-    }
-
-    protected function setMasterVersionAsDefault(): bool
-    {
-        $hasCustomVersion = ($_GET['version'] ?? null) !== null;
-        $_GET['version'] = $_GET['version'] ?? 'master'; // because tests should run against latest unstable version
-
-        return $hasCustomVersion;
-    }
-
-    protected function unsetMasterVersionAsDefault(bool $hasCustomVersion): void
-    {
-        if (!$hasCustomVersion) {
-            unset($_GET['version']);
-        }
     }
 
     protected function turnToLocalLink(string $link): string

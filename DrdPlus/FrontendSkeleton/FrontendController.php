@@ -45,10 +45,6 @@ class FrontendController extends StrictObject
     private $showHomeButton = true;
     /** @var CacheRoot */
     private $cacheRoot;
-    /** @var WebVersionSwitchMutex */
-    private $versionSwitchMutex;
-    /** @var WebVersionSwitcher */
-    private $webVersionSwitcher;
     /** @var PageCache */
     private $pageCache;
     /** @var Redirect|null */
@@ -107,6 +103,14 @@ class FrontendController extends StrictObject
     public function getDocumentRoot(): string
     {
         return $this->documentRoot;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDirForVersions(): string
+    {
+        return $this->getDocumentRoot() . '/versions';
     }
 
     /**
@@ -327,24 +331,6 @@ class FrontendController extends StrictObject
         return $this->cacheRoot;
     }
 
-    public function getVersionSwitchMutex(): WebVersionSwitchMutex
-    {
-        if ($this->versionSwitchMutex === null) {
-            $this->versionSwitchMutex = new WebVersionSwitchMutex($this->getCacheRoot());
-        }
-
-        return $this->versionSwitchMutex;
-    }
-
-    public function getWebVersionSwitcher(): WebVersionSwitcher
-    {
-        if ($this->webVersionSwitcher === null) {
-            $this->webVersionSwitcher = new WebVersionSwitcher($this->getWebVersions(), $this->getVersionSwitchMutex());
-        }
-
-        return $this->webVersionSwitcher;
-    }
-
     public function getPageCache(): PageCache
     {
         if ($this->pageCache === null) {
@@ -366,19 +352,6 @@ class FrontendController extends StrictObject
     public function getWantedVersion(): string
     {
         return $_GET['version'] ?? $_COOKIE['version'] ?? $this->getWebVersions()->getLastUnstableVersion();
-    }
-
-    /**
-     * @return bool
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidVersionToSwitchInto
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotSwitchGitVersion
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotWriteLockOfVersionMutex
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLockVersionMutex
-     */
-    public function switchToWantedVersion(): bool
-    {
-        return $this->getWebVersionSwitcher()->switchToVersion($this->getWantedVersion());
     }
 
     public function getCachedContent(): string

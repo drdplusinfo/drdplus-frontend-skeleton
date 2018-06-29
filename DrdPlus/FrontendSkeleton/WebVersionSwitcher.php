@@ -11,46 +11,67 @@ class WebVersionSwitcher extends StrictObject
 
     /** @var WebVersions */
     private $webVersions;
-    /** @var WebVersionSwitchMutex */
-    private $webVersionSwitchMutex;
+    /** @var string */
+    private $documentRoot;
+    /** @var string */
+    private $dirForVersions;
 
-    public function __construct(WebVersions $webVersions, WebVersionSwitchMutex $webVersionSwitchMutex)
+    public function __construct(WebVersions $webVersions, string $documentRoot, string $dirForVersions)
     {
         $this->webVersions = $webVersions;
-        $this->webVersionSwitchMutex = $webVersionSwitchMutex;
+        $this->documentRoot = $documentRoot;
+        $this->dirForVersions = $dirForVersions;
     }
 
     /**
-     * @param string $version
+     * @param string $toVersion
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidVersionToSwitchInto
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
+     */
+    public function getVersionIndexFile(string $toVersion): string
+    {
+        $this->ensureVersion($toVersion);
+
+        return $this->getVersionDocumentRoot($toVersion) . '/index.php';
+    }
+
+    public function getVersionDocumentRoot(string $version): string
+    {
+        if ($version === 'master') {
+            return $this->documentRoot; // main version to use
+        }
+
+        return $this->dirForVersions . '/' . $version;
+    }
+
+    /**
+     * @param string $toVersion
      * @return bool
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidVersionToSwitchInto
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotSwitchGitVersion
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotWriteLockOfVersionMutex
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLockVersionMutex
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
      */
-    public function switchToVersion(string $version): bool
+    protected function ensureVersion(string $toVersion): bool
     {
-        // do NOT unlock it as we need the version to be locked until we fill or use the cache (lock will be unlocked automatically on script end)
-        if ($version === $this->webVersions->getCurrentVersion()) {
-            if (!$this->webVersionSwitchMutex->isLockedForId($version)) {
-                $this->webVersionSwitchMutex->lock($version);
+        if ($toVersion === $this->webVersions->getCurrentVersion()) {
+            return true; // we are done
+        }
+        if (!$this->webVersions->hasVersion($toVersion)) {
+            throw new Exceptions\InvalidVersionToSwitchInto("Required version {$toVersion} does not exist");
+        }
+        $toVersionDir = $this->dirForVersions . '/' . $toVersion;
+        if (!\file_exists($toVersionDir)) {
+            $command = 'git clone --branch ' . \escapeshellarg($toVersion) . ' --depth 1 . ' . \escapeshellarg($toVersionDir) . ' && composer install 2>&1';
+            \exec($command, $rows, $returnCode);
+            if ($returnCode !== 0) {
+                throw new Exceptions\CanNotLocallyCloneGitVersion(
+                    "Can not git clone required version '{$toVersion}' by command '{$command}'"
+                    . ", got return code '{$returnCode}' and output\n"
+                    . \implode("\n", $rows)
+                );
             }
-
-            return false;
-        }
-        $this->webVersionSwitchMutex->lock($version);
-        if (!$this->webVersions->hasVersion($version)) {
-            throw new Exceptions\InvalidVersionToSwitchInto("Required version {$version} does not exist");
-        }
-        $command = 'git checkout ' . \escapeshellarg($version) . ' 2>&1';
-        \exec($command, $rows, $returnCode);
-        if ($returnCode !== 0) {
-            throw new Exceptions\CanNotSwitchGitVersion(
-                "Can not switch to required version '{$version}' by command '{$command}'"
-                . ", got return code '{$returnCode}' and output\n"
-                . \implode("\n", $rows)
-            );
         }
 
         return true;

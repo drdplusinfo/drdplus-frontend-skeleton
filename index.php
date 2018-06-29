@@ -6,7 +6,7 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
     \ini_set('display_errors', '0');
 }
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
-$vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
+$vendorRoot = $documentRoot . '/vendor';
 
 /** @noinspection PhpIncludeInspection */
 require_once $vendorRoot . '/autoload.php';
@@ -14,18 +14,34 @@ require_once $vendorRoot . '/autoload.php';
 $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
 \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
-$controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController(
-        'UA-121206931-1',
-        $htmlHelper,
+$versionIndexFile = __FILE__;
+if (!empty($_GET['version']) && (!\defined('VERSION_SWITCHED') || !VERSION_SWITCHED)) {
+    $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
+        new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
         $documentRoot,
-        null, // automatic web root
-        $vendorRoot,
-        $partsRoot ?? null,
-        $genericPartsRoot ?? null
+        $documentRoot . '/versions'
     );
-$vendorRoot = $controller->getVendorRoot();
-$partsRoot = $controller->getPartsRoot();
-$genericPartsRoot = $controller->getGenericPartsRoot();
+    $versionIndexFile = $webVersionSwitcher->getVersionIndexFile($_GET['version']);
+}
+if ($versionIndexFile !== __FILE__ && \realpath($versionIndexFile) !== \realpath(__FILE__)) {
+    \define('VERSION_SWITCHED', true);
+    $documentRoot = $webVersionSwitcher->getVersionDocumentRoot($_GET['version']);
+    /** @noinspection PhpIncludeInspection */
+    require $versionIndexFile;
+} else {
+    $controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController(
+            'UA-121206931-1',
+            $htmlHelper,
+            $documentRoot,
+            null, // automatic web root
+            $vendorRoot,
+            $partsRoot ?? null,
+            $genericPartsRoot ?? null
+        );
+    $vendorRoot = $controller->getVendorRoot();
+    $partsRoot = $controller->getPartsRoot();
+    $genericPartsRoot = $controller->getGenericPartsRoot();
 
-/** @noinspection PhpIncludeInspection */
-echo require $genericPartsRoot . '/content.php';
+    /** @noinspection PhpIncludeInspection */
+    echo require $genericPartsRoot . '/content.php';
+}
