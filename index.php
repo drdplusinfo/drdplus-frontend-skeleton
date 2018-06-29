@@ -9,7 +9,7 @@ $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER[
 $vendorRoot = $documentRoot . '/vendor';
 
 /** @noinspection PhpIncludeInspection */
-require_once $vendorRoot . '/autoload.php';
+$autoLoader = require $vendorRoot . '/autoload.php';
 
 $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
 \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
@@ -26,6 +26,8 @@ if (!empty($_GET['version']) && (!\defined('VERSION_SWITCHED') || !VERSION_SWITC
 if ($versionIndexFile !== __FILE__ && \realpath($versionIndexFile) !== \realpath(__FILE__)) {
     \define('VERSION_SWITCHED', true);
     $documentRoot = $webVersionSwitcher->getVersionDocumentRoot($_GET['version']);
+    /** @var \Composer\Autoload\ClassLoader $autoLoader */
+    $autoLoader->unregister(); // as version index will use its own
     /** @noinspection PhpIncludeInspection */
     require $versionIndexFile;
 } else {
