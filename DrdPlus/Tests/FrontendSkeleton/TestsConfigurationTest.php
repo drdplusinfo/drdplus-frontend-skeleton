@@ -47,7 +47,7 @@ class TestsConfigurationTest extends TestCase
     {
         $sutClass = $this->getSutClass();
 
-        return new $sutClass();
+        return new $sutClass('https://example.com');
     }
 
     protected function getSutClass(): string
@@ -116,7 +116,7 @@ class TestsConfigurationTest extends TestCase
 
     protected function getNonExistingSettersToSkip(): array
     {
-        return [];
+        return ['setLocalUrl'];
     }
 
     /**
@@ -180,7 +180,7 @@ class TestsConfigurationTest extends TestCase
      */
     public function I_can_add_allowed_calculation_id_prefix(): void
     {
-        $testsConfiguration = new TestsConfiguration();
+        $testsConfiguration = new TestsConfiguration('https://example.com');
         $originalAllowedCalculationIdPrefixes = $testsConfiguration->getAllowedCalculationIdPrefixes();
         self::assertNotEmpty($originalAllowedCalculationIdPrefixes, 'Some allowed calculation ID prefixes expected');
         $returnedTestsConfiguration = $testsConfiguration->addAllowedCalculationIdPrefix('Foo allowed calculation id prefix');
@@ -202,7 +202,7 @@ class TestsConfigurationTest extends TestCase
      */
     public function I_can_not_add_allowed_calculation_id_prefix_with_lowercase_first_letter(): void
     {
-        (new TestsConfiguration())->addAllowedCalculationIdPrefix('říčany u čeho chceš');
+        (new TestsConfiguration('https://example.com'))->addAllowedCalculationIdPrefix('říčany u čeho chceš');
     }
 
     /**
@@ -212,7 +212,7 @@ class TestsConfigurationTest extends TestCase
      */
     public function I_can_not_set_allowed_calculation_id_prefixes_with_even_single_one_with_lowercase_first_letter(): void
     {
-        (new TestsConfiguration())->setAllowedCalculationIdPrefixes([
+        (new TestsConfiguration('https://example.com'))->setAllowedCalculationIdPrefixes([
             'Potvora na entou',
             'Kuloár',
             'žbrdloch',

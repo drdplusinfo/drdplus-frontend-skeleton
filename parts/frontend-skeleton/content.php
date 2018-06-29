@@ -36,7 +36,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         } ?>
     </head>
     <body class="container <?= \implode(' ', $controller->getBodyClasses()) ?>">
-      <span class="hidden" id="drd_plus_version"><?= $controller->getCurrentVersion() ?></span>
+      <span class="collapse" id="drd_plus_version"><?= $controller->getCurrentVersion() ?></span>
       <div class="background-image"></div>
         <?php
         // $contactsFixed = true; // (default is on top or bottom of the content)
