@@ -353,4 +353,9 @@ class FrontendController extends StrictObject
 
         return '';
     }
+
+    public function getCurrentVersion(): string
+    {
+        return $this->getWebVersions()->getCurrentVersion();
+    }
 }

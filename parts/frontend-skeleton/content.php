@@ -34,6 +34,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
               <link rel="stylesheet" type="text/css" href="css/<?= $cssFile ?>">
             <?php }
         } ?>
+      <version id="drdPlusVersion"><?= $controller->getCurrentVersion() ?></version>
     </head>
     <body class="container <?= \implode(' ', $controller->getBodyClasses()) ?>">
       <div class="background-image"></div>
@@ -52,6 +53,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
 $content .= \ob_get_clean();
 $controller->getPageCache()->saveContentForDebug($content); // for debugging purpose
 $htmlDocument = new \DrdPlus\FrontendSkeleton\HtmlDocument($content);
+/** @var \DrdPlus\FrontendSkeleton\HtmlHelper $htmlHelper */
 $htmlHelper->prepareSourceCodeLinks($htmlDocument);
 $htmlHelper->addIdsToTablesAndHeadings($htmlDocument);
 $htmlHelper->replaceDiacriticsFromIds($htmlDocument);

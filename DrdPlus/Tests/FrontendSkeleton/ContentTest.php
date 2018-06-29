@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
@@ -99,5 +100,52 @@ class ContentTest extends AbstractContentTest
     protected function getPartsRoot(): string
     {
         return $this->getDocumentRoot() . '/parts';
+    }
+
+    /**
+     * @test
+     * @dataProvider provideRequestSource
+     * @runInSeparateProcess enabled
+     * @param string $source
+     */
+    public function I_can_switch_to_every_version(string $source): void
+    {
+        foreach ((new WebVersions($this->getDocumentRoot()))->getAllWebVersions() as $webVersion) {
+            $requestParameters = ['version' => $webVersion];
+            $get = [];
+            $post = [];
+            $cookies = [];
+            if ($source === 'get') {
+                $get = $requestParameters;
+            } elseif ($source === 'post') {
+                $post = $requestParameters;
+            } elseif ($source === 'cookies') {
+                $cookies = $requestParameters;
+            }
+            $drdPlusVersionElement = $this->getHtmlDocument($get, $post, $cookies)->getElementById('drdPlusVersion');
+            self::assertNotEmpty($drdPlusVersionElement, 'Can not find #drdPlusVersion element');
+            self::assertSame($webVersion, $drdPlusVersionElement->textContent, 'Expected different version');
+        }
+    }
+
+    public function provideRequestSource(): array
+    {
+        return [
+            ['get'],
+            ['post'],
+            ['cookies'],
+        ];
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_switch_to_every_version_by_get(): void
+    {
+        foreach ((new WebVersions($this->getDocumentRoot()))->getAllWebVersions() as $webVersion) {
+            $drdPlusVersionElement = $this->getHtmlDocument(['version' => $webVersion])->getElementById('drdPlusVersion');
+            self::assertNotEmpty($drdPlusVersionElement, 'Can not find #drdPlusVersion element');
+            self::assertSame($webVersion, $drdPlusVersionElement->textContent);
+        }
     }
 }

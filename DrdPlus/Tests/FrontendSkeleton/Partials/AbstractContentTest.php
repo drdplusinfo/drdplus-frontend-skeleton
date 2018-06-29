@@ -26,19 +26,24 @@ abstract class AbstractContentTest extends SkeletonTestCase
     /**
      * @param array $get = []
      * @param array $post = []
+     * @param array $cookies = []
      * @return string
      */
-    protected function getContent(array $get = [], array $post = []): string
+    protected function getContent(array $get = [], array $post = [], array $cookies = []): string
     {
-        $key = $this->createKey($get, $post);
+        $key = $this->createKey($get, $post, $cookies);
         if ((self::$contents[$key] ?? null) === null) {
             $originalGet = $_GET;
             $originalPost = $_POST;
+            $originalCookies = $_COOKIE;
             if ($get) {
                 $_GET = \array_merge($_GET, $get);
             }
             if ($post) {
                 $_POST = \array_merge($_POST, $post);
+            }
+            if ($cookies) {
+                $_COOKIE = \array_merge($_COOKIE, $post);
             }
             if ($this->needPassIn()) {
                 $this->passIn();
@@ -51,9 +56,11 @@ abstract class AbstractContentTest extends SkeletonTestCase
             self::$contents[$key] = \ob_get_clean();
             $_POST = $originalPost;
             $_GET = $originalGet;
+            $_COOKIE = $originalCookies;
             self::assertNotEmpty(
                 self::$contents[$key],
-                'Nothing has been fetched with GET ' . \var_export($get, true) . ' and POST ' . \var_export($post, true)
+                'Nothing has been fetched with GET ' . \var_export($get, true) . ', POST ' . \var_export($post, true)
+                . ' and COOKIE ' . \var_export($cookies, true)
                 . ' from ' . DRD_PLUS_INDEX_FILE_NAME_TO_TEST
             );
         }
@@ -61,9 +68,9 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return self::$contents[$key];
     }
 
-    protected function createKey(array $get, array $post = []): string
+    protected function createKey(array $get, array $post, array $cookies): string
     {
-        return \json_encode($get) . '-' . \json_encode($post) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
+        return \json_encode($get) . '-' . \json_encode($post) . '-' . \json_encode($cookies) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
     }
 
     /**
@@ -95,13 +102,14 @@ abstract class AbstractContentTest extends SkeletonTestCase
     /**
      * @param array $get
      * @param array $post
+     * @param array $cookies
      * @return \DrdPlus\FrontendSkeleton\HtmlDocument
      */
-    protected function getHtmlDocument(array $get = [], array $post = []): \DrdPlus\FrontendSkeleton\HtmlDocument
+    protected function getHtmlDocument(array $get = [], array $post = [], array $cookies = []): \DrdPlus\FrontendSkeleton\HtmlDocument
     {
-        $key = $this->createKey($get, $post);
+        $key = $this->createKey($get, $post, $cookies);
         if (empty(self::$htmlDocuments[$key])) {
-            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($get, $post));
+            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($get, $post, $cookies));
         }
 
         return self::$htmlDocuments[$key];

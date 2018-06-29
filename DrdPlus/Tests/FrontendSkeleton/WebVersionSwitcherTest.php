@@ -10,20 +10,13 @@ use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class WebVersionSwitcherTest extends AbstractContentTest
 {
-    private $currentWebVersion;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->currentWebVersion = (new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST)))->getCurrentVersion();
-    }
 
     /**
      * @test
      */
     public function I_can_get_index_of_another_version(): void
     {
-        $webVersions = new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
+        $webVersions = new WebVersions($this->getDocumentRoot());
         $versions = $webVersions->getAllWebVersions();
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');
@@ -35,15 +28,15 @@ class WebVersionSwitcherTest extends AbstractContentTest
             \count($versions),
             'Expected at least two versions to test, got only ' . \implode(',', $versions)
         );
-        self::assertSame($this->currentWebVersion, $webVersions->getCurrentVersion());
+        $currentWebVersion = $webVersions->getCurrentVersion();
         $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, $this->getDocumentRoot(), $this->getDirForVersions());
         $currentIndexFile = $this->getDocumentRoot() . '/index.php';
         self::assertSame(
             $currentIndexFile,
-            $rulesVersionSwitcher->getVersionIndexFile($this->currentWebVersion),
+            $rulesVersionSwitcher->getVersionIndexFile($currentWebVersion),
             "'Changing' version to the same should result into current index file"
         );
-        $otherVersions = \array_diff($versions, [$this->currentWebVersion]);
+        $otherVersions = \array_diff($versions, [$currentWebVersion]);
         foreach ($otherVersions as $otherVersion) {
             self::assertNotSame(
                 $currentIndexFile,
