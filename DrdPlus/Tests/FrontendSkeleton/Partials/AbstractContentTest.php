@@ -49,6 +49,8 @@ abstract class AbstractContentTest extends SkeletonTestCase
     {
         $key = $this->createKey($show, $get, $post);
         if ((self::$contents[$key] ?? null) === null) {
+            $originalGet = $_GET;
+            $originalPost = $_POST;
             if ($show !== '') {
                 $_GET['show'] = $show;
             }
@@ -63,14 +65,14 @@ abstract class AbstractContentTest extends SkeletonTestCase
             } elseif ($this->needPassOut()) {
                 $this->passOut();
             }
-            $hasCustomVersion = $this->setMasterVersionAsDefault();
+            $this->setMasterVersionAsDefault();
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
             self::$contents[$key] = \ob_get_clean();
+            $_GET = $originalGet;
+            $_POST = $originalPost;
             self::assertNotEmpty(self::$contents[$key]);
-            unset($_GET['show']);
-            $this->unsetMasterVersionAsDefault($hasCustomVersion);
         }
 
         return self::$contents[$key];
