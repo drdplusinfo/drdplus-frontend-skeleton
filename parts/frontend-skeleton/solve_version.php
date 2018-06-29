@@ -8,6 +8,7 @@ $version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? null;
 if (!$version || (\defined('VERSION_SWITCHED') && VERSION_SWITCHED)) {
     return false;
 }
+\DrdPlus\FrontendSkeleton\TracyDebugger::enable();
 $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
     new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
     $documentRoot,
