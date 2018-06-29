@@ -65,7 +65,7 @@ class WebVersionSwitcher extends StrictObject
         }
         $toVersionDir = $this->dirForVersions . '/' . $toVersion;
         if (!\file_exists($toVersionDir)) {
-            $command = 'git clone --branch ' . \escapeshellarg($toVersion) . ' --depth 1 . ' . \escapeshellarg($toVersionDir)
+            $command = 'git clone --branch ' . \escapeshellarg($toVersion) . ' --depth 1 . ' . \escapeshellarg($toVersionDir) . ' 2>&1'
                 . ' && composer --working-dir ' . \escapeshellarg($toVersionDir) . ' install 2>&1';
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
@@ -76,7 +76,7 @@ class WebVersionSwitcher extends StrictObject
                 );
             }
         } else {
-            $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && git reset HEAD --hard && git pull --ff-only 2>&1';
+            $command = 'cd ' . \escapeshellarg($toVersionDir) . ' 2>&1 && git reset HEAD --hard 2>&1 && git pull --ff-only 2>&1';
             $rows = []; // resetting rows as they may NOT be changed on failure
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
@@ -86,8 +86,8 @@ class WebVersionSwitcher extends StrictObject
                     . \implode("\n", $rows)
                 );
             }
-            if ($rows !== ['Already up to date.']) {
-                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && export COMPOSER_HOME=. && composer install 2>&1';
+            if (\end($rows) !== ['Already up to date.']) {
+                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' 2>&1 && export COMPOSER_HOME=. && composer install 2>&1';
                 $rows = []; // resetting rows as they may NOT be changed on failure
                 \exec($command, $rows, $returnCode);
                 if ($returnCode !== 0) {
