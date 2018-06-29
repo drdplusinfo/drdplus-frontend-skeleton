@@ -66,7 +66,7 @@ class WebVersionSwitcher extends StrictObject
         $toVersionDir = $this->dirForVersions . '/' . $toVersion;
         if (!\file_exists($toVersionDir)) {
             $command = 'git clone --branch ' . \escapeshellarg($toVersion) . ' . ' . \escapeshellarg($toVersionDir) . ' 2>&1'
-                . ' && composer --working-dir ' . \escapeshellarg($toVersionDir) . ' install 2>&1';
+                . ' && composer --working-dir=' . \escapeshellarg($toVersionDir) . ' install 2>&1';
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
                 throw new Exceptions\CanNotLocallyCloneGitVersion(
