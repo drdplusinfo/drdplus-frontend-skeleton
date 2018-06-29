@@ -86,7 +86,7 @@ class WebVersionSwitcher extends StrictObject
                     . \implode("\n", $rows)
                 );
             }
-            if (\end($rows) !== ['Already up to date.']) {
+            if (\end($rows) !== 'Already up to date.') {
                 $command = 'cd ' . \escapeshellarg($toVersionDir) . ' 2>&1 && export COMPOSER_HOME=. && composer install 2>&1';
                 $rows = []; // resetting rows as they may NOT be changed on failure
                 \exec($command, $rows, $returnCode);
