@@ -23,7 +23,7 @@ if ($version && (!\defined('VERSION_SWITCHED') || !VERSION_SWITCHED)) {
 }
 if ($versionIndexFile !== __FILE__ && \realpath($versionIndexFile) !== \realpath(__FILE__)) {
     \define('VERSION_SWITCHED', true);
-    $documentRoot = $webVersionSwitcher->getVersionDocumentRoot($_GET['version']);
+    $documentRoot = $webVersionSwitcher->getVersionDocumentRoot($version);
     /** @var \Composer\Autoload\ClassLoader $autoLoader */
     $autoLoader->unregister(); // as version index will use its own
     /** @noinspection PhpIncludeInspection */
