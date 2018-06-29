@@ -7,28 +7,9 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
 }
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
 $vendorRoot = $documentRoot . '/vendor';
+$currentIndexFile = $documentRoot . '/index.php';
 
-/** @noinspection PhpIncludeInspection */
-$autoLoader = require $vendorRoot . '/autoload.php';
-
-$versionIndexFile = __FILE__;
-$version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? null;
-if ($version && (!\defined('VERSION_SWITCHED') || !VERSION_SWITCHED)) {
-    $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
-        new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
-        $documentRoot,
-        $documentRoot . '/versions'
-    );
-    $versionIndexFile = $webVersionSwitcher->getVersionIndexFile($version);
-}
-if ($versionIndexFile !== __FILE__ && \realpath($versionIndexFile) !== \realpath(__FILE__)) {
-    \define('VERSION_SWITCHED', true);
-    $documentRoot = $webVersionSwitcher->getVersionDocumentRoot($version);
-    /** @var \Composer\Autoload\ClassLoader $autoLoader */
-    $autoLoader->unregister(); // as version index will use its own
-    /** @noinspection PhpIncludeInspection */
-    require $versionIndexFile;
-} else {
+if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') {
     $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
     \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
