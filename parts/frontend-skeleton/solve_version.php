@@ -17,6 +17,7 @@ $versionIndexFile = $webVersionSwitcher->getVersionIndexFile($version);
 if ($versionIndexFile === $currentIndexFile || \realpath($versionIndexFile) === \realpath($currentIndexFile)) {
     return false;
 }
+$documentRoot = $webVersionSwitcher->getVersionDocumentRoot($version);
 \define('VERSION_SWITCHED', true);
 /** @var \Composer\Autoload\ClassLoader $autoLoader */
 $autoLoader->unregister(); // as version index will use its own
