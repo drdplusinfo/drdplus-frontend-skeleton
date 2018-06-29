@@ -528,7 +528,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $urlsWithLocalHosts = [];
         /** @var Element $anchor */
-        foreach ($this->getHtmlDocument('', ['mode' => 'prod' /* do not turn links to local */])->getElementsByTagName('a') as $anchor) {
+        foreach ($this->getHtmlDocument(['mode' => 'prod' /* do not turn links to local */])->getElementsByTagName('a') as $anchor) {
             $href = $anchor->getAttribute('href');
             self::assertNotEmpty($href);
             $parsedUrl = \parse_url($href);

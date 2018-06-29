@@ -24,20 +24,16 @@ abstract class AbstractContentTest extends SkeletonTestCase
     }
 
     /**
-     * @param string $show = ''
      * @param array $get = []
      * @param array $post = []
      * @return string
      */
-    protected function getContent(string $show = '', array $get = [], array $post = []): string
+    protected function getContent(array $get = [], array $post = []): string
     {
-        $key = $this->createKey($show, $get, $post);
+        $key = $this->createKey($get, $post);
         if ((self::$contents[$key] ?? null) === null) {
             $originalGet = $_GET;
             $originalPost = $_POST;
-            if ($show !== '') {
-                $get['show'] = $show;
-            }
             if ($get) {
                 $_GET = \array_merge($_GET, $get);
             }
@@ -65,9 +61,9 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return self::$contents[$key];
     }
 
-    protected function createKey(string $show, array $get, array $post = []): string
+    protected function createKey(array $get, array $post = []): string
     {
-        return "$show-" . \serialize($get) . '-' . \serialize($post) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
+        return \json_encode($get) . '-' . \json_encode($post) . '-' . (int)$this->needPassIn() . (int)$this->needPassOut();
     }
 
     /**
@@ -96,11 +92,16 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $this->needPassOut;
     }
 
-    protected function getHtmlDocument(string $show = '', array $get = [], array $post = []): \DrdPlus\FrontendSkeleton\HtmlDocument
+    /**
+     * @param array $get
+     * @param array $post
+     * @return \DrdPlus\FrontendSkeleton\HtmlDocument
+     */
+    protected function getHtmlDocument(array $get = [], array $post = []): \DrdPlus\FrontendSkeleton\HtmlDocument
     {
-        $key = $this->createKey($show, $get, $post);
+        $key = $this->createKey($get, $post);
         if (empty(self::$htmlDocuments[$key])) {
-            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($show, $get, $post));
+            self::$htmlDocuments[$key] = new \DrdPlus\FrontendSkeleton\HtmlDocument($this->getContent($get, $post));
         }
 
         return self::$htmlDocuments[$key];
