@@ -10,6 +10,8 @@ $vendorRoot = $documentRoot . '/vendor';
 $currentIndexFile = $documentRoot . '/index.php';
 
 if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') {
+    /** @noinspection PhpIncludeInspection */
+    require_once $vendorRoot . '/autoload.php';
     $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
     \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
