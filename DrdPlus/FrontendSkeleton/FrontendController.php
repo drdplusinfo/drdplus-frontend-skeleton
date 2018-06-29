@@ -345,15 +345,6 @@ class FrontendController extends StrictObject
         return $this->pageCache;
     }
 
-    /**
-     * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     */
-    public function getWantedVersion(): string
-    {
-        return $_GET['version'] ?? $_COOKIE['version'] ?? $this->getWebVersions()->getLastUnstableVersion();
-    }
-
     public function getCachedContent(): string
     {
         if ($this->getPageCache()->isCacheValid()) {

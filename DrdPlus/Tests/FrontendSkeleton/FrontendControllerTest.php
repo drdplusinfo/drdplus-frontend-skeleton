@@ -195,46 +195,6 @@ class FrontendControllerTest extends AbstractContentTest
 
     /**
      * @test
-     * @backupGlobals enabled
-     */
-    public function I_can_get_wanted_version(): void
-    {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
-        $this->I_will_get_last_version_as_default_wanted_version($controller);
-        $this->I_will_get_version_from_cookie($controller);
-        $this->I_will_get_version_from_get($controller);
-    }
-
-    private function I_will_get_last_version_as_default_wanted_version(FrontendController $controller): void
-    {
-        if ($this->getTestsConfiguration()->hasMoreVersions()) {
-            self::assertSame($controller->getWebVersions()->getLastUnstableVersion(), $controller->getWantedVersion());
-        } else {
-            self::assertSame('master', $controller->getWantedVersion());
-        }
-    }
-
-    private function I_will_get_version_from_cookie(FrontendController $controller): void
-    {
-        unset($_GET['version']);
-        $_COOKIE['version'] = 'foo_from_cookie';
-        self::assertSame('foo_from_cookie', $controller->getWantedVersion(), 'Wanted version should be taken from cookie');
-        unset($_COOKIE['version']);
-        $this->I_will_get_last_version_as_default_wanted_version($controller);
-    }
-
-    private function I_will_get_version_from_get(FrontendController $controller): void
-    {
-        $_GET['version'] = 'bar_from_get';
-        self::assertSame('bar_from_get', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
-        $_COOKIE['version'] = 'some_version_from_cookie';
-        self::assertSame('bar_from_get', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
-        unset($_GET['version']);
-        self::assertSame('some_version_from_cookie', $controller->getWantedVersion(), 'Wanted version should be taken from get, then from cookie');
-    }
-
-    /**
-     * @test
      */
     public function I_can_set_and_get_redirect(): void
     {

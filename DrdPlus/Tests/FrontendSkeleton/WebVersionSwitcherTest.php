@@ -21,7 +21,7 @@ class WebVersionSwitcherTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_can_switch_to_another_version(): void
+    public function I_can_get_index_of_another_version(): void
     {
         $webVersions = new WebVersions(\dirname(DRD_PLUS_INDEX_FILE_NAME_TO_TEST));
         $versions = $webVersions->getAllWebVersions();

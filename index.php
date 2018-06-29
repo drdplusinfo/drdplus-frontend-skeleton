@@ -12,13 +12,14 @@ $vendorRoot = $documentRoot . '/vendor';
 $autoLoader = require $vendorRoot . '/autoload.php';
 
 $versionIndexFile = __FILE__;
-if (!empty($_GET['version']) && (!\defined('VERSION_SWITCHED') || !VERSION_SWITCHED)) {
+$version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? null;
+if ($version && (!\defined('VERSION_SWITCHED') || !VERSION_SWITCHED)) {
     $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
         new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
         $documentRoot,
         $documentRoot . '/versions'
     );
-    $versionIndexFile = $webVersionSwitcher->getVersionIndexFile($_GET['version']);
+    $versionIndexFile = $webVersionSwitcher->getVersionIndexFile($version);
 }
 if ($versionIndexFile !== __FILE__ && \realpath($versionIndexFile) !== \realpath(__FILE__)) {
     \define('VERSION_SWITCHED', true);
