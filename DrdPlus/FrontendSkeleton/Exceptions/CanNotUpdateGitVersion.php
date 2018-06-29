@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton\Exceptions;
 
-class InvalidVersionToSwitchInto extends \LogicException implements Logic
+class CanNotUpdateGitVersion extends ExecutingCommandFailed
 {
 
 }

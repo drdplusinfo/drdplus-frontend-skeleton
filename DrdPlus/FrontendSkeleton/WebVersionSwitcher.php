@@ -26,9 +26,10 @@ class WebVersionSwitcher extends StrictObject
     /**
      * @param string $toVersion
      * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidVersionToSwitchInto
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownVersionToSwitchInto
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateGitVersion
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotInstallLibraries
      */
     public function getVersionIndexFile(string $toVersion): string
     {
@@ -49,9 +50,10 @@ class WebVersionSwitcher extends StrictObject
     /**
      * @param string $toVersion
      * @return bool
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidVersionToSwitchInto
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownVersionToSwitchInto
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateGitVersion
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotInstallLibraries
      */
     protected function ensureVersion(string $toVersion): bool
     {
@@ -59,11 +61,12 @@ class WebVersionSwitcher extends StrictObject
             return true; // we are done
         }
         if (!$this->webVersions->hasVersion($toVersion)) {
-            throw new Exceptions\InvalidVersionToSwitchInto("Required version {$toVersion} does not exist");
+            throw new Exceptions\UnknownVersionToSwitchInto("Required version {$toVersion} does not exist");
         }
         $toVersionDir = $this->dirForVersions . '/' . $toVersion;
         if (!\file_exists($toVersionDir)) {
-            $command = 'git clone --branch ' . \escapeshellarg($toVersion) . ' --depth 1 . ' . \escapeshellarg($toVersionDir) . ' && composer install 2>&1';
+            $command = 'git clone --branch ' . \escapeshellarg($toVersion) . ' --depth 1 . ' . \escapeshellarg($toVersionDir)
+                . ' && composer --working-dir ' . \escapeshellarg($toVersionDir) . ' install 2>&1';
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
                 throw new Exceptions\CanNotLocallyCloneGitVersion(
@@ -71,6 +74,29 @@ class WebVersionSwitcher extends StrictObject
                     . ", got return code '{$returnCode}' and output\n"
                     . \implode("\n", $rows)
                 );
+            }
+        } else {
+            $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && git pull --ff-only';
+            $rows = []; // resetting rows as they may NOT be changed on failure
+            \exec($command, $rows, $returnCode);
+            if ($returnCode !== 0) {
+                throw new Exceptions\CanNotUpdateGitVersion(
+                    "Can not update required version '{$toVersion}' by command '{$command}'"
+                    . ", got return code '{$returnCode}' and output\n"
+                    . \implode("\n", $rows)
+                );
+            }
+            if ($rows !== ['Already up to date.']) {
+                $command = 'cd ' . \escapeshellarg($toVersionDir) . ' && composer install';
+                $rows = []; // resetting rows as they may NOT be changed on failure
+                \exec($command, $rows, $returnCode);
+                if ($returnCode !== 0) {
+                    throw new Exceptions\CanNotInstallLibraries(
+                        "Can not install libraries via Composer by command '{$command}'"
+                        . ", got return code '{$returnCode}' and output\n"
+                        . \implode("\n", $rows)
+                    );
+                }
             }
         }
 
