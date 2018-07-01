@@ -1,9 +1,9 @@
 <?php
+$vendorRoot = $documentRoot . '/vendor';
 /** @noinspection PhpIncludeInspection */
 $autoLoader = require $vendorRoot . '/autoload.php';
 
-$versionIndexFile = $documentRoot . '/index.php';
-$masterVersionIndexFile = $versionIndexFile;
+$currentIndexFile = $documentRoot . '/index.php';
 $version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? null;
 if (!$version || (\defined('VERSION_SWITCHED') && VERSION_SWITCHED)) {
     return false;

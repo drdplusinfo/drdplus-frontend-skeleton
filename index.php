@@ -7,7 +7,6 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
 }
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
 $vendorRoot = $documentRoot . '/vendor';
-$currentIndexFile = $documentRoot . '/index.php';
 
 if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') {
     /** @noinspection PhpIncludeInspection */
