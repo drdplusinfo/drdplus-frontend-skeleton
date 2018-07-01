@@ -126,7 +126,7 @@ class ContentTest extends AbstractContentTest
             self::assertNotEmpty($content);
             $document = new HtmlDocument($content);
             $versionFromContent = $document->documentElement->getAttribute('data-version');
-            self::assertNotNull($versionFromContent, "Can not find attribute 'data-version' in html of version $webVersion");
+            self::assertNotNull($versionFromContent, "Can not find attribute 'data-version' in content fetched from $url");
             self::assertSame($webVersion, $versionFromContent, 'Expected different version');
         }
     }
