@@ -64,7 +64,7 @@ $htmlHelper->externalLinksTargetToBlank($htmlDocument);
 $htmlHelper->injectIframesWithRemoteTables($htmlDocument);
 $htmlHelper->addVersionHashToAssets($htmlDocument);
 if (!$htmlHelper->isInProduction()) {
-    $htmlHelper->makeExternalLinksLocal($htmlDocument);
+    $htmlHelper->makeExternalDrdPlusLinksLocal($htmlDocument);
 }
 $updatedContent = $htmlDocument->saveHTML();
 $controller->getPageCache()->cacheContent($updatedContent);

@@ -468,25 +468,28 @@ class HtmlHelper extends StrictObject
     }
 
     /**
-     * @param HtmlDocument $html
+     * @param HtmlDocument $htmlDocument
+     * @return HtmlDocument
      */
-    public function makeExternalLinksLocal(HtmlDocument $html): void
+    public function makeExternalDrdPlusLinksLocal(HtmlDocument $htmlDocument): HtmlDocument
     {
-        foreach ($html->getElementsByClassName('external-url') as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
             $anchor->setAttribute('href', $this->makeDrdPlusHostLocal($anchor->getAttribute('href')));
         }
         /** @var Element $iFrame */
-        foreach ($html->getElementsByTagName('iframe') as $iFrame) {
+        foreach ($htmlDocument->getElementsByTagName('iframe') as $iFrame) {
             $iFrame->setAttribute('src', $this->makeDrdPlusHostLocal($iFrame->getAttribute('src')));
             $iFrame->setAttribute('id', \str_replace('drdplus.info', 'drdplus.loc', $iFrame->getAttribute('id')));
         }
+
+        return $htmlDocument;
     }
 
     private function makeDrdPlusHostLocal(string $linkWithRemoteDrdPlusHost): string
     {
         return \preg_replace(
-            '~(?:https?:)?//([[:alpha:]]+)[.]drdplus[.]info~',
-            'http://$1.drdplus.loc',
+            '~(?:https?:)?//((?:[^.]+[.])+)drdplus[.]info~',
+            'http://$1drdplus.loc',
             $linkWithRemoteDrdPlusHost
         );
     }

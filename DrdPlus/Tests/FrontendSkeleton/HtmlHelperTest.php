@@ -116,7 +116,7 @@ class HtmlHelperTest extends AbstractContentTest
   <meta charset="utf-8">
 </head>
 <body>
-  <div class="test" id="$originalId"
+  <div class="test" id="$originalId"></div>
 </body>
 </htm>
 HTML
@@ -148,5 +148,28 @@ HTML
         $invisibleId = $invisibleIdElement->id;
         self::assertNotEmpty($invisibleId);
         self::assertSame(\str_replace('#', '_', $expectedOriginalId), $invisibleId);
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_turn_public_drd_plus_links_to_locals(): void
+    {
+        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        $htmlDocument = new HtmlDocument(<<<HTML
+        <!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <a href="https://foo-bar.baz.drdplus.info" id="single_link" class="external-url">Sub-doména na DrD+ info</a>
+</body>
+</htm>
+HTML
+        );
+        /** @var Element $localizedLink */
+        $localizedLink = $htmlHelper->makeExternalDrdPlusLinksLocal($htmlDocument)->getElementById('single_link');
+        self::assertSame('http://foo-bar.baz.drdplus.loc', $localizedLink->getAttribute('href'));
     }
 }
