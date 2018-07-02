@@ -23,8 +23,6 @@ class HtmlHelper extends StrictObject
     private $shouldHideCovered;
     /** @var bool */
     private $showIntroductionOnly;
-    /** @var bool */
-    private $externalUrlsMarked = false;
     /** @var string */
     private $rootDir;
 
@@ -406,30 +404,34 @@ class HtmlHelper extends StrictObject
         return false;
     }
 
-    public function markExternalLinksByClass(HtmlDocument $html): void
+    public function markExternalLinksByClass(HtmlDocument $htmlDocument): HtmlDocument
     {
         /** @var Element $anchor */
-        foreach ($html->getElementsByTagName('a') as $anchor) {
+        foreach ($htmlDocument->getElementsByTagName('a') as $anchor) {
             if (!$anchor->classList->contains('internal')
                 && \preg_match('~^(https?:)?//[^#]~', $anchor->getAttribute('href'))
             ) {
                 $anchor->classList->add('external-url');
             }
         }
-        $this->externalUrlsMarked = true;
+        $htmlDocument->body->setAttribute('data-has-marked-external-urls', '1');
+
+        return $htmlDocument;
     }
 
     /**
-     * @param HtmlDocument $html
+     * @param HtmlDocument $htmlDocument
      * @throws \LogicException
      */
-    public function externalLinksTargetToBlank(HtmlDocument $html): void
+    public function externalLinksTargetToBlank(HtmlDocument $htmlDocument): void
     {
-        if (!$this->externalUrlsMarked) {
-            throw new \LogicException('External links have to be marked first, use markExternalLinksByClass method for that');
+        if (!$this->hasMarkedExternalUrls($htmlDocument)) {
+            throw new Exceptions\ExternalUrlsHaveToBeMarkedFirst(
+                'External links have to be marked first, use markExternalLinksByClass method for that'
+            );
         }
         /** @var Element $anchor */
-        foreach ($html->getElementsByClassName('external-url') as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
             if (!$anchor->getAttribute('target')) {
                 $anchor->setAttribute('target', '_blank');
             }
@@ -437,34 +439,47 @@ class HtmlHelper extends StrictObject
     }
 
     /**
-     * @param HtmlDocument $html
+     * @param HtmlDocument $htmlDocument
+     * @return HtmlDocument
      * @throws \LogicException
      */
-    public function injectIframesWithRemoteTables(HtmlDocument $html): void
+    public function injectIframesWithRemoteTables(HtmlDocument $htmlDocument): HtmlDocument
     {
-        if (!$this->externalUrlsMarked) {
-            throw new \LogicException('External links have to be marked first, use markExternalLinksByClass method for that');
+        if (!$this->hasMarkedExternalUrls($htmlDocument)) {
+            throw new Exceptions\ExternalUrlsHaveToBeMarkedFirst(
+                'External links have to be marked first, use markExternalLinksByClass method for that'
+            );
         }
         $remoteDrdPlusLinks = [];
         /** @var Element $anchor */
-        foreach ($html->getElementsByClassName('external-url') as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
             if (!\preg_match('~(?:https?:)?//(?<host>[[:alpha:]]+\.drdplus\.info)/[^#]*#(?<tableId>tabulka_\w+)~', $anchor->getAttribute('href'), $matches)) {
                 continue;
             }
             $remoteDrdPlusLinks[$matches['host']][] = $matches['tableId'];
         }
         if (\count($remoteDrdPlusLinks) === 0) {
-            return;
+            return $htmlDocument;
         }
         /** @var Element $body */
-        $body = $html->getElementsByTagName('body')[0];
+        $body = $htmlDocument->getElementsByTagName('body')[0];
         foreach ($remoteDrdPlusLinks as $remoteDrdPlusHost => $tableIds) {
-            $iFrame = $html->createElement('iframe');
+            $iFrame = $htmlDocument->createElement('iframe');
             $body->appendChild($iFrame);
             $iFrame->setAttribute('id', $remoteDrdPlusHost); // we will target that iframe via JS by remote host name
-            $iFrame->setAttribute('src', "https://{$remoteDrdPlusHost}/?tables=" . \htmlspecialchars(\implode(',', $tableIds)));
+            $iFrame->setAttribute(
+                'src',
+                "https://{$remoteDrdPlusHost}/?tables=" . \htmlspecialchars(\implode(',', \array_unique($tableIds)))
+            );
             $iFrame->setAttribute('style', 'display:none');
         }
+
+        return $htmlDocument;
+    }
+
+    private function hasMarkedExternalUrls(HtmlDocument $htmlDocument): bool
+    {
+        return (bool)$htmlDocument->body->getAttribute('data-has-marked-external-urls');
     }
 
     /**
@@ -473,6 +488,11 @@ class HtmlHelper extends StrictObject
      */
     public function makeExternalDrdPlusLinksLocal(HtmlDocument $htmlDocument): HtmlDocument
     {
+        if (!$this->hasMarkedExternalUrls($htmlDocument)) {
+            throw new Exceptions\ExternalUrlsHaveToBeMarkedFirst(
+                'External links have to be marked first, use markExternalLinksByClass method for that'
+            );
+        }
         foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
             $anchor->setAttribute('href', $this->makeDrdPlusHostLocal($anchor->getAttribute('href')));
         }
