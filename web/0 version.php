@@ -5,5 +5,5 @@
     ?>
 </div>
 <div>
-  Taková ta <strong>vývojová</strong>
+  Stabilní verze <strong>1.0</strong>
 </div>
