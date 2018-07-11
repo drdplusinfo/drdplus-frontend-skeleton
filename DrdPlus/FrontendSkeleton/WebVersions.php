@@ -69,7 +69,7 @@ class WebVersions extends StrictObject
     }
 
     /**
-     * @return string probably 'master' 
+     * @return string probably 'master'
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
     public function getLastUnstableVersion(): string
@@ -115,9 +115,7 @@ class WebVersions extends StrictObject
      */
     public function getCurrentVersion(): string
     {
-        $branch = $this->execute('cd ' . \escapeshellarg($this->documentRoot) . ' && git branch | grep -P \'^[*]\' | head -n 1');
-
-        return \ltrim($branch, '* ');
+        return $this->execute('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
     }
 
     /**
