@@ -50,6 +50,8 @@ abstract class AbstractContentTest extends SkeletonTestCase
             } elseif ($this->needPassOut()) {
                 $this->passOut();
             }
+            /** @noinspection PhpUnusedLocalVariableInspection */
+            $latestVersion = 'master';
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
@@ -189,6 +191,8 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $controller = $controller ?? null;
         $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
         $_GET[Cache::CACHE] = Cache::DISABLE;
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $latestVersion = 'master';
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';
@@ -203,30 +207,33 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return \preg_replace('~https?://((?:[[:alnum:]]+\.)*)drdplus\.info~', 'http://$1drdplus.loc', $link); // turn link into local version
     }
 
-    protected function fetchContentFromLink(string $link, bool $withBody, array $post = [], array $cookies = []): array
+    protected function fetchContentFromLink(string $link, bool $withBody, array $post = [], array $cookies = [], array $headers = []): array
     {
         $curl = \curl_init($link);
-        \curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        \curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 7);
+        \curl_setopt($curl, \CURLOPT_RETURNTRANSFER, 1);
+        \curl_setopt($curl, \CURLOPT_CONNECTTIMEOUT, 7);
         if (!$withBody) {
             // to get headers only
-            \curl_setopt($curl, CURLOPT_HEADER, 1);
-            \curl_setopt($curl, CURLOPT_NOBODY, 1);
+            \curl_setopt($curl, \CURLOPT_HEADER, 1);
+            \curl_setopt($curl, \CURLOPT_NOBODY, 1);
         }
-        \curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
+        \curl_setopt($curl, \CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0'); // to get headers only
         if ($post) {
-            \curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
+            \curl_setopt($curl, \CURLOPT_POSTFIELDS, $post);
         }
         if ($cookies) {
             $cookieData = [];
             foreach ($cookies as $name => $value) {
                 $cookieData[] = "$name=$value";
             }
-            \curl_setopt($curl, CURLOPT_COOKIE, \implode('; ', $cookieData));
+            \curl_setopt($curl, \CURLOPT_COOKIE, \implode('; ', $cookieData));
+        }
+        foreach ($headers as $headerName => $headerValue) {
+            \curl_setopt($curl, \CURLOPT_HEADER, "$headerName=$headerValue");
         }
         $content = \curl_exec($curl);
-        $responseHttpCode = \curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $redirectUrl = \curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+        $responseHttpCode = \curl_getinfo($curl, \CURLINFO_HTTP_CODE);
+        $redirectUrl = \curl_getinfo($curl, \CURLINFO_REDIRECT_URL);
         $curlError = \curl_error($curl);
         \curl_close($curl);
 

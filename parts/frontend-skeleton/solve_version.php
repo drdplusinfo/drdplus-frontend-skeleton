@@ -4,7 +4,7 @@ $vendorRoot = $documentRoot . '/vendor';
 $autoLoader = require $vendorRoot . '/autoload.php';
 
 $currentIndexFile = $documentRoot . '/index.php';
-$version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? null;
+$version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? $latestVersion ?? null;
 if (!$version || (\defined('VERSION_SWITCHED') && VERSION_SWITCHED)) {
     return false;
 }

@@ -33,7 +33,7 @@ class WebVersionSwitcher extends StrictObject
      */
     public function getVersionIndexFile(string $toVersion): string
     {
-        $this->ensureVersion($toVersion);
+        $this->ensureVersionExists($toVersion);
 
         return $this->getVersionDocumentRoot($toVersion) . '/index.php';
     }
@@ -55,7 +55,7 @@ class WebVersionSwitcher extends StrictObject
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateGitVersion
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotInstallLibraries
      */
-    protected function ensureVersion(string $toVersion): bool
+    protected function ensureVersionExists(string $toVersion): bool
     {
         if ($toVersion === $this->webVersions->getCurrentVersion()) {
             return true; // we are done

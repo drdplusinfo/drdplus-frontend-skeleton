@@ -30,4 +30,6 @@ interface TestsConfigurationReader
     public function getExpectedGoogleAnalyticsId(): string;
 
     public function getAllowedCalculationIdPrefixes(): array;
+
+    public function getExpectedLastVersion(): string;
 }

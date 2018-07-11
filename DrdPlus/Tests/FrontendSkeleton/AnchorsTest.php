@@ -43,7 +43,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Local_anchors_with_hashes_point_to_existing_ids(): void
     {
@@ -102,7 +102,7 @@ class AnchorsTest extends AbstractContentTest
     private static $checkedExternalAnchors = [];
 
     /**
-     * @test
+     * @test1
      */
     public function All_external_anchors_can_be_reached(): void
     {
@@ -218,7 +218,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function External_anchors_with_hashes_point_to_existing_ids(): void
     {
@@ -325,7 +325,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Anchor_to_ID_self_is_not_created_if_contains_anchor_element(): void
     {
@@ -348,7 +348,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Original_ids_do_not_have_links_to_self(): void
     {
@@ -383,7 +383,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Only_allowed_elements_are_moved_into_injected_link(): void
     {
@@ -409,7 +409,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function I_can_navigate_to_every_calculation_as_it_has_its_id_with_anchor(): void
     {
@@ -445,7 +445,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Calculation_does_not_have_another_calculation_inside(): void
     {
@@ -470,7 +470,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Links_to_altar_uses_https(): void
     {
@@ -493,7 +493,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      * @backupGlobals enabled
      */
     public function No_links_point_to_local_hosts(): void
@@ -516,7 +516,7 @@ class AnchorsTest extends AbstractContentTest
     }
 
     /**
-     * @test
+     * @test1
      */
     public function Buttons_should_not_have_links_inside(): void
     {

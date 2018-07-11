@@ -38,13 +38,18 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_last_stable_version(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        if ($this->getTestsConfiguration()->hasMoreVersions()) {
-            $lastStableVersion = $webVersions->getLastStableVersion();
+        $lastStableVersion = $webVersions->getLastStableVersion();
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
+            self::assertSame('master', $webVersions->getLastStableVersion());
+        } else {
             self::assertNotSame('master', $lastStableVersion);
             self::assertGreaterThanOrEqual(0, \version_compare($lastStableVersion, '1.0'));
-        } else {
-            self::assertSame('master', $webVersions->getLastStableVersion());
         }
+        self::assertSame(
+            $this->getTestsConfiguration()->getExpectedLastVersion(),
+            $lastStableVersion,
+            'Tests configuration requires different version'
+        );
     }
 
     /**
