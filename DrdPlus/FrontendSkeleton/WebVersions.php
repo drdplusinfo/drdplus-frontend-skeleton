@@ -69,7 +69,7 @@ class WebVersions extends StrictObject
     }
 
     /**
-     * @return string
+     * @return string probably 'master' 
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
     public function getLastUnstableVersion(): string
