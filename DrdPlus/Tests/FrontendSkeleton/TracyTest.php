@@ -11,7 +11,6 @@ class TracyTest extends AbstractContentTest
 {
     /**
      * @test
-     * @runInSeparateProcess enabled
      * @throws \ReflectionException
      */
     public function Tracy_watch_it(): void
@@ -21,8 +20,11 @@ class TracyTest extends AbstractContentTest
         $enabled->setAccessible(true);
         $enabled->setValue(null, false);
         self::assertFalse(Debugger::isEnabled(), 'Tracy debugger is not expected to be enabled before index call');
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $latestVersion = 'master';
         \ob_start();
-        include __DIR__ . '/../../../index.php';
+        /** @noinspection PhpIncludeInspection */
+        include $this->getDocumentRoot() . '/index.php';
         \ob_end_clean();
         self::assertTrue(Debugger::isEnabled(), 'Tracy debugger is not enabled');
     }

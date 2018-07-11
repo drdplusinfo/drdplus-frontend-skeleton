@@ -1,3 +1,6 @@
 <div class="keyword">
-  <pre><?php \passthru('git branch'); ?></pre>
+    <?php
+    /** @var \DrdPlus\FrontendSkeleton\FrontendController $controller */
+    echo $controller->getDocumentRoot();
+    ?>
 </div>

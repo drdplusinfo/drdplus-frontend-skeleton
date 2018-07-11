@@ -12,6 +12,8 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
 {
     // every setting SHOULD be strict (expecting instead of ignoring)
 
+    protected const DEFAULT_ALLOWED_CALCULATION_ID_PREFIXES = ['Hod proti', 'Hod na', 'Výpočet'];
+
     /** @var string */
     private $localUrl;
     /** @var bool */
@@ -39,7 +41,9 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     /** @var string */
     private $expectedGoogleAnalyticsId = 'UA-121206931-1';
     /** @var array|string[] */
-    private $allowedCalculationIdPrefixes = ['Hod proti', 'Hod na', 'Výpočet'];
+    private $allowedCalculationIdPrefixes = self::DEFAULT_ALLOWED_CALCULATION_ID_PREFIXES;
+    /** @var string */
+    private $expectedLastVersion = '1.0';
 
     /**
      * @param string $localUrl
@@ -329,6 +333,26 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
             );
         }
         $this->allowedCalculationIdPrefixes[] = $allowedCalculationIdPrefix;
+
+        return $this;
+    }
+
+    /**
+     * Latest stable version if available, master if not
+     * @return string
+     */
+    public function getExpectedLastVersion(): string
+    {
+        return $this->expectedLastVersion;
+    }
+
+    /**
+     * @param string $expectedLastVersion
+     * @return TestsConfiguration
+     */
+    public function setExpectedLastVersion(string $expectedLastVersion): TestsConfiguration
+    {
+        $this->expectedLastVersion = $expectedLastVersion;
 
         return $this;
     }

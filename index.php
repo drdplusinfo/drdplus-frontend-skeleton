@@ -7,8 +7,9 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
 }
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
 $vendorRoot = $documentRoot . '/vendor';
+$latestVersion = $latestVersion ?? '1.0';
 
-if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') {
+if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') { // returns true if version has been switched and solved
     /** @noinspection PhpIncludeInspection */
     require_once $vendorRoot . '/autoload.php';
     $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);

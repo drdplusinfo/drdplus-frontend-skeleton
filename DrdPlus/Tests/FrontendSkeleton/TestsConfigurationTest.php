@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use PHPUnit\Framework\TestCase;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
-class TestsConfigurationTest extends TestCase
+class TestsConfigurationTest extends AbstractContentTest
 {
     /**
      * @test
@@ -14,8 +14,8 @@ class TestsConfigurationTest extends TestCase
      */
     public function I_can_use_it(): void
     {
-        $reflectionClass = new \ReflectionClass($this->getSutClass());
-        $methods = $reflectionClass->getMethods(
+        $testsConfigurationReflection = new \ReflectionClass(static::getSutClass());
+        $methods = $testsConfigurationReflection->getMethods(
             \ReflectionMethod::IS_PUBLIC ^ \ReflectionMethod::IS_STATIC ^ \ReflectionMethod::IS_ABSTRACT
         );
         $getters = [];
@@ -43,16 +43,16 @@ class TestsConfigurationTest extends TestCase
         $this->I_can_call_setters_in_chain($setterReflections);
     }
 
-    protected function createSut(): TestsConfiguration
+    protected static function getSutClass(string $sutTestClass = null, string $regexp = '~(.+)Test$~'): string
     {
-        $sutClass = $this->getSutClass();
-
-        return new $sutClass('https://example.com');
+        return parent::getSutClass($sutTestClass, $regexp);
     }
 
-    protected function getSutClass(): string
+    protected function createSut(): TestsConfiguration
     {
-        return \preg_replace('~Test$~', '', static::class);
+        $sutClass = static::getSutClass();
+
+        return new $sutClass('https://example.com');
     }
 
     private function Every_boolean_setting_is_enabled_by_default(array $hasGetters): void
@@ -217,5 +217,24 @@ class TestsConfigurationTest extends TestCase
             'Kuloár',
             'žbrdloch',
         ]);
+    }
+
+    /**
+     * @test
+     */
+    public function I_will_get_some_stable_version_if_has_more_versions(): void
+    {
+        $testsConfiguration = new TestsConfiguration('https://example.com');
+        if ($this->isSkeletonChecked() && !$testsConfiguration->hasMoreVersions()) {
+            self::assertSame('master', $testsConfiguration->getExpectedLastVersion(), 'Expected master as a single version');
+
+            return;
+        }
+        self::assertTrue($testsConfiguration->hasMoreVersions(), 'More versions expected');
+        self::assertRegExp(
+            '~^\d+[.]\d+([.]\d+)?$~',
+            $testsConfiguration->getExpectedLastVersion(),
+            'Expected stable version in format x.y[.z]'
+        );
     }
 }
