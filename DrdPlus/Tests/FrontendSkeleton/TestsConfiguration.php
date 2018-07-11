@@ -44,6 +44,8 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     private $allowedCalculationIdPrefixes = self::DEFAULT_ALLOWED_CALCULATION_ID_PREFIXES;
     /** @var string */
     private $expectedLastVersion = '1.0';
+    /** @var string */
+    private $expectedLastUnstableVersion = 'master';
 
     /**
      * @param string $localUrl
@@ -353,6 +355,22 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     public function setExpectedLastVersion(string $expectedLastVersion): TestsConfiguration
     {
         $this->expectedLastVersion = $expectedLastVersion;
+
+        return $this;
+    }
+
+    public function getExpectedLastUnstableVersion(): string
+    {
+        return $this->expectedLastUnstableVersion;
+    }
+
+    /**
+     * @param string $expectedLastUnstableVersion
+     * @return TestsConfiguration
+     */
+    public function setExpectedLastUnstableVersion(string $expectedLastUnstableVersion): TestsConfiguration
+    {
+        $this->expectedLastUnstableVersion = $expectedLastUnstableVersion;
 
         return $this;
     }

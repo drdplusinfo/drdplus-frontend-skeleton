@@ -92,7 +92,7 @@ class TestsConfigurationTest extends AbstractContentTest
             self::assertSame(
                 $testsConfiguration,
                 $testsConfiguration->$disablingMethod(),
-                "$disablingMethod should return the " . $this->getSutClass() . ' to get fluent interface'
+                "$disablingMethod should return the " . static::getSutClass() . ' to get fluent interface'
             );
         }
     }
@@ -170,7 +170,7 @@ class TestsConfigurationTest extends AbstractContentTest
             self::assertSame(
                 $testsConfiguration,
                 $setterReflection->invokeArgs($testsConfiguration, $parameters),
-                "$setterReflection should return the {$this->getSutClass()} to get fluent interface"
+                "$setterReflection should return the " . static::getSutClass() . ' to get fluent interface'
             );
         }
     }
@@ -200,7 +200,8 @@ class TestsConfigurationTest extends AbstractContentTest
      * @expectedException \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
      * @expectedExceptionMessageRegExp ~říčany u čeho chceš~
      */
-    public function I_can_not_add_allowed_calculation_id_prefix_with_lowercase_first_letter(): void
+    public
+    function I_can_not_add_allowed_calculation_id_prefix_with_lowercase_first_letter(): void
     {
         (new TestsConfiguration('https://example.com'))->addAllowedCalculationIdPrefix('říčany u čeho chceš');
     }
@@ -210,7 +211,8 @@ class TestsConfigurationTest extends AbstractContentTest
      * @expectedException \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
      * @expectedExceptionMessageRegExp ~žbrdloch~
      */
-    public function I_can_not_set_allowed_calculation_id_prefixes_with_even_single_one_with_lowercase_first_letter(): void
+    public
+    function I_can_not_set_allowed_calculation_id_prefixes_with_even_single_one_with_lowercase_first_letter(): void
     {
         (new TestsConfiguration('https://example.com'))->setAllowedCalculationIdPrefixes([
             'Potvora na entou',
@@ -222,7 +224,8 @@ class TestsConfigurationTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_will_get_some_stable_version_if_has_more_versions(): void
+    public
+    function I_will_get_some_stable_version_if_has_more_versions(): void
     {
         $testsConfiguration = new TestsConfiguration('https://example.com');
         if ($this->isSkeletonChecked() && !$testsConfiguration->hasMoreVersions()) {
@@ -236,5 +239,22 @@ class TestsConfigurationTest extends AbstractContentTest
             $testsConfiguration->getExpectedLastVersion(),
             'Expected stable version in format x.y[.z]'
         );
+    }
+
+    /**
+     * @test
+     */
+    public
+    function I_can_get_last_unstable_version(): void
+    {
+        $testsConfiguration = new TestsConfiguration('https://example.com');
+        self::assertSame('master', $testsConfiguration->getExpectedLastUnstableVersion());
+        if (!$testsConfiguration->hasMoreVersions()) {
+            self::assertSame(
+                $testsConfiguration->getExpectedLastVersion(),
+                $testsConfiguration->getExpectedLastUnstableVersion(),
+                'Expected same last version and last unstable version as only a single version is expected'
+            );
+        }
     }
 }

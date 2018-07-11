@@ -21,7 +21,7 @@ class TracyTest extends AbstractContentTest
         $enabled->setValue(null, false);
         self::assertFalse(Debugger::isEnabled(), 'Tracy debugger is not expected to be enabled before index call');
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $latestVersion = 'master';
+        $latestVersion = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';

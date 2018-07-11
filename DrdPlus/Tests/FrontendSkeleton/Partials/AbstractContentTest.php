@@ -51,7 +51,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
                 $this->passOut();
             }
             /** @noinspection PhpUnusedLocalVariableInspection */
-            $latestVersion = 'master';
+            $latestVersion = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
@@ -192,7 +192,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
         $_GET[Cache::CACHE] = Cache::DISABLE;
         /** @noinspection PhpUnusedLocalVariableInspection */
-        $latestVersion = 'master';
+        $latestVersion = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';

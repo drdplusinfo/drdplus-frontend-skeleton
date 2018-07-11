@@ -25,7 +25,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_ask_it_if_code_has_specific_version(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        self::assertTrue($webVersions->hasVersion('master'));
+        self::assertTrue($webVersions->hasVersion($this->getTestsConfiguration()->getExpectedLastUnstableVersion()));
         if ($this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertTrue($webVersions->hasVersion('1.0'));
         }
@@ -40,9 +40,9 @@ class WebVersionsTest extends AbstractContentTest
         $webVersions = new WebVersions($this->getDocumentRoot());
         $lastStableVersion = $webVersions->getLastStableVersion();
         if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
-            self::assertSame('master', $webVersions->getLastStableVersion());
+            self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $webVersions->getLastStableVersion());
         } else {
-            self::assertNotSame('master', $lastStableVersion);
+            self::assertNotSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $lastStableVersion);
             self::assertGreaterThanOrEqual(0, \version_compare($lastStableVersion, '1.0'));
         }
         self::assertSame(
@@ -58,7 +58,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_last_unstable_version(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        self::assertSame('master', $webVersions->getLastUnstableVersion());
+        self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $webVersions->getLastUnstableVersion());
     }
 
     /**
@@ -67,7 +67,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_czech_version_name(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        self::assertSame('testovací!', $webVersions->getVersionName('master'));
+        self::assertSame('testovací!', $webVersions->getVersionName($this->getTestsConfiguration()->getExpectedLastUnstableVersion()));
         self::assertSame('verze 1.2.3', $webVersions->getVersionName('1.2.3'));
     }
 
@@ -111,7 +111,7 @@ class WebVersionsTest extends AbstractContentTest
         $allWebVersions = $webVersions->getAllWebVersions();
         self::assertNotEmpty($allWebVersions, 'At least single web version (from GIT) expected');
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
-            self::assertSame(['master'], $allWebVersions);
+            self::assertSame([$this->getTestsConfiguration()->getExpectedLastUnstableVersion()], $allWebVersions);
         } else {
             self::assertSame($this->getBranchesFromFileSystem(), $allWebVersions);
         }
