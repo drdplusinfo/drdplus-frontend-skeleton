@@ -78,7 +78,6 @@ abstract class Cache extends StrictObject
 
     /**
      * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadGitHead
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
@@ -89,7 +88,6 @@ abstract class Cache extends StrictObject
 
     /**
      * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadGitHead
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
@@ -118,7 +116,7 @@ abstract class Cache extends StrictObject
         \exec('git diff', $changedRows, $return);
         if ($return !== 0) {
             throw new Exceptions\CanNotGetGitStatus(
-                'Can not run `git status --porcelain`, got result code ' . $return
+                'Can not run `git diff`, got result code ' . $return
             );
         }
         if (\count($changedRows) === 0) {
@@ -164,7 +162,6 @@ abstract class Cache extends StrictObject
 
     /**
      * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadGitHead
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
