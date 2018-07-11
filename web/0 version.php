@@ -4,3 +4,6 @@
     echo $controller->getDocumentRoot();
     ?>
 </div>
+<div>
+  Taková ta <strong>vývojová</strong>
+</div>
