@@ -32,4 +32,6 @@ interface TestsConfigurationReader
     public function getAllowedCalculationIdPrefixes(): array;
 
     public function getExpectedLastVersion(): string;
+
+    public function getExpectedLastUnstableVersion(): string;
 }

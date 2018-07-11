@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\HtmlDocument;
-use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
@@ -101,42 +99,5 @@ class ContentTest extends AbstractContentTest
     protected function getPartsRoot(): string
     {
         return $this->getDocumentRoot() . '/parts';
-    }
-
-    /**
-     * @test
-     * @dataProvider provideRequestSource
-     * @param string $source
-     */
-    public function I_can_switch_to_every_version(string $source): void
-    {
-        $webVersions = new WebVersions($this->getDocumentRoot());
-        foreach ($webVersions->getAllWebVersions() as $webVersion) {
-            $post = [];
-            $cookies = [];
-            $url = $this->getTestsConfiguration()->getLocalUrl();
-            if ($source === 'get') {
-                $url .= '?version=' . $webVersion;
-            } elseif ($source === 'post') {
-                $post = ['version' => $webVersion];
-            } elseif ($source === 'cookies') {
-                $cookies = ['version' => $webVersion];
-            }
-            $content = $this->fetchContentFromLink($url, true, $post, $cookies)['content'];
-            self::assertNotEmpty($content);
-            $document = new HtmlDocument($content);
-            $versionFromContent = $document->documentElement->getAttribute('data-version');
-            self::assertNotNull($versionFromContent, "Can not find attribute 'data-version' in content fetched from $url");
-            self::assertSame($webVersion, $versionFromContent, 'Expected different version, seems version switching does not work');
-        }
-    }
-
-    public function provideRequestSource(): array
-    {
-        return [
-            ['get'],
-            ['post'],
-            ['cookies'],
-        ];
     }
 }
