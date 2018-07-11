@@ -40,8 +40,8 @@ class WebVersionSwitcher extends StrictObject
 
     public function getVersionDocumentRoot(string $version): string
     {
-        if ($version === 'master') {
-            return $this->documentRoot; // main version to use
+        if ($version === $this->webVersions->getCurrentVersion()) {
+            return $this->documentRoot; // current version to use
         }
 
         return $this->dirForVersions . '/' . $version;
