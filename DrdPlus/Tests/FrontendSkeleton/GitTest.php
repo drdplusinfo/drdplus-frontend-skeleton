@@ -16,7 +16,12 @@ class GitTest extends AbstractContentTest
         $documentRootEscaped = \escapeshellarg($this->getDocumentRoot());
         $vendorRootEscaped = \escapeshellarg($this->getVendorRoot());
         \exec("git -C $documentRootEscaped check-ignore $vendorRootEscaped 2>&1", $output, $result);
-        self::assertLessThanOrEqual(1, $result); // GIT results into 1 if dir is not ignored
-        self::assertSame([], $output, 'The vendor dir should be versioned, but is ignored');
+        if ($this->isSkeletonChecked()) {
+            self::assertSame(0, $result);
+            self::assertSame([$this->getVendorRoot()], $output, 'The vendor dir should be ignored for skeleton');
+        } else {
+            self::assertLessThanOrEqual(1, $result); // GIT results into 1 if dir is not ignored
+            self::assertSame([], $output, 'The vendor dir should be versioned, but is ignored');
+        }
     }
 }
