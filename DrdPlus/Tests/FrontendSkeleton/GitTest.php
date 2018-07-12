@@ -13,7 +13,10 @@ class GitTest extends AbstractContentTest
      */
     public function Vendor_dir_is_versioned_as_well(): void
     {
-        $lastRow = $this->executeCommand('git check-ignore vendor');
-        self::assertSame('', $lastRow, 'The vendor dir should be versioned, but is ignored');
+        $documentRootEscaped = \escapeshellarg($this->getDocumentRoot());
+        $vendorRootEscaped = \escapeshellarg($this->getVendorRoot());
+        \exec("git -C $documentRootEscaped check-ignore $vendorRootEscaped 2>&1", $output, $result);
+        self::assertLessThanOrEqual(1, $result); // GIT results into 1 if dir is not ignored
+        self::assertSame([], $output, 'The vendor dir should be versioned, but is ignored');
     }
 }
