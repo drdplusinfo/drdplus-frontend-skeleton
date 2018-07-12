@@ -269,4 +269,22 @@ class FrontendControllerTest extends AbstractContentTest
             ->andReturn('foo');
         self::assertSame('foo', $controller->getCurrentVersion());
     }
+
+    /**
+     * @test
+     * @throws \ReflectionException
+     */
+    public function I_can_get_current_patch_version(): void
+    {
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $reflection = new \ReflectionClass(FrontendController::class);
+        self::assertTrue($reflection->hasProperty('webVersions'), FrontendController::class . ' no more has webVersions property');
+        $webVersionsProperty = $reflection->getProperty('webVersions');
+        $webVersionsProperty->setAccessible(true);
+        $webVersions = $this->mockery(WebVersions::class);
+        $webVersionsProperty->setValue($controller, $webVersions);
+        $webVersions->expects('getCurrentPatchVersion')
+            ->andReturn('foo');
+        self::assertSame('foo', $controller->getCurrentPatchVersion());
+    }
 }

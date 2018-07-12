@@ -10,7 +10,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
 \ob_start();
 ?>
   <!DOCTYPE html>
-  <html lang="cs" data-version="<?= $controller->getCurrentVersion() ?>">
+  <html lang="cs" data-version="<?= $controller->getCurrentPatchVersion() ?>">
     <head>
       <title><?= $controller->getPageTitle() ?></title>
       <link rel="shortcut icon" href="/favicon.ico">

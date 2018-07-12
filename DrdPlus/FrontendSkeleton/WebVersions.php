@@ -122,7 +122,17 @@ class WebVersions extends StrictObject
      */
     public function getCurrentVersion(): string
     {
+        $possibleDirVersion = \basename($this->documentRoot);
+        if ($this->hasVersion($possibleDirVersion)) {
+            return $possibleDirVersion;
+        }
+
         return $this->executeCommand('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
+    }
+
+    public function getCurrentPatchVersion(): string
+    {
+        return $this->getLastPatchVersionOf($this->getCurrentVersion());
     }
 
     /**
