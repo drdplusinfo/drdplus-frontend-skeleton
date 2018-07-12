@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DeviceDetector\Parser\Bot;
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
@@ -26,18 +27,9 @@ class FrontendControllerTest extends AbstractContentTest
         $controller = new FrontendController(
             'Google Analytics Foo',
             $this->createHtmlHelper(),
-            $this->getDocumentRoot(),
-            'some web root',
-            'some vendor root',
-            'some parts root',
-            'some generic parts root'
+            new Dirs($this->getDocumentRoot())
         );
         self::assertSame('Google Analytics Foo', $controller->getGoogleAnalyticsId());
-        self::assertSame($this->getDocumentRoot(), $controller->getDocumentRoot());
-        self::assertSame('some web root', $controller->getWebRoot());
-        self::assertSame('some vendor root', $controller->getVendorRoot());
-        self::assertSame('some parts root', $controller->getPartsRoot());
-        self::assertSame('some generic parts root', $controller->getGenericPartsRoot());
     }
 
     /**
@@ -45,7 +37,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_web_name(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertSame($this->getTestsConfiguration()->getExpectedWebName(), $controller->getWebName());
     }
 
@@ -54,7 +46,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_page_title(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertSame($this->getTestsConfiguration()->getExpectedPageTitle(), $controller->getPageTitle());
     }
 
@@ -65,7 +57,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_not_get_page_title_if_text_file_with_its_name_does_not_exist(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), 'Not from this world');
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs('Not from this world'));
         $controller->getPageTitle();
     }
 
@@ -74,7 +66,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_web_versions(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertEquals(new WebVersions($this->getDocumentRoot()), $controller->getWebVersions());
     }
 
@@ -83,7 +75,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_web_files(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertEquals(new WebFiles($this->getWebFilesRoot()), $controller->getWebFiles());
     }
 
@@ -92,19 +84,8 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_request(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertEquals(new Request(new Bot()), $controller->getRequest());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_change_web_root(): void
-    {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
-        self::assertSame($this->getDocumentRoot() . '/web', $controller->getWebRoot());
-        $controller->setWebRoot('another web root');
-        self::assertSame('another web root', $controller->getWebRoot());
     }
 
     /**
@@ -112,7 +93,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_add_body_class(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertSame([], $controller->getBodyClasses());
         $controller->addBodyClass('rumbling');
         $controller->addBodyClass('cracking');
@@ -187,9 +168,9 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_page_cache_with_properly_set_production_mode(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(true /* in production */), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(true /* in production */), new Dirs($this->getDocumentRoot()));
         self::assertTrue($controller->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(false /* not in production */), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(false /* not in production */), new Dirs($this->getDocumentRoot()));
         self::assertFalse($controller->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
     }
 
@@ -198,7 +179,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_set_and_get_redirect(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         self::assertNull($controller->getRedirect());
         $controller->setRedirect($redirect = new Redirect('redirect to the future', 999));
         self::assertSame($redirect, $controller->getRedirect());
@@ -226,12 +207,12 @@ class FrontendControllerTest extends AbstractContentTest
         string $documentRoot = null
     ): FrontendController
     {
-        $controllerClass = $this->getSutClass();
+        $controllerClass = static::getSutClass();
 
         return new $controllerClass(
             $googleAnalyticsId,
             $htmlHelper ?? $this->createHtmlHelper(false /* not in production */),
-            $documentRoot ?? $this->getDocumentRoot()
+            new Dirs($documentRoot ?? $this->getDocumentRoot())
         );
     }
 
@@ -258,7 +239,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_current_version(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         $reflection = new \ReflectionClass(FrontendController::class);
         self::assertTrue($reflection->hasProperty('webVersions'), FrontendController::class . ' no more has webVersions property');
         $webVersionsProperty = $reflection->getProperty('webVersions');
@@ -276,7 +257,7 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_get_current_patch_version(): void
     {
-        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), $this->getDocumentRoot());
+        $controller = new FrontendController('Google Analytics Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot()));
         $reflection = new \ReflectionClass(FrontendController::class);
         self::assertTrue($reflection->hasProperty('webVersions'), FrontendController::class . ' no more has webVersions property');
         $webVersionsProperty = $reflection->getProperty('webVersions');

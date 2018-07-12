@@ -16,4 +16,4 @@ $requireAutoloadIfUnique = $requireAutoloadIfUnique
         return $composer;
     };
 
-return $requireAutoloadIfUnique($vendorRoot);
+return $requireAutoloadIfUnique($documentRoot . '/vendor');

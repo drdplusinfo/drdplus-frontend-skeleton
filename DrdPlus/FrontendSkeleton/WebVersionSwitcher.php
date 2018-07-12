@@ -11,16 +11,20 @@ class WebVersionSwitcher extends StrictObject
 
     /** @var WebVersions */
     private $webVersions;
-    /** @var string */
-    private $documentRoot;
-    /** @var string */
-    private $dirForVersions;
+    /** @var Dirs */
+    private $dirs;
+    /** @var CookiesService */
+    private $cookiesService;
 
-    public function __construct(WebVersions $webVersions, string $documentRoot, string $dirForVersions)
+    public function __construct(
+        WebVersions $webVersions,
+        Dirs $dirs,
+        CookiesService $cookiesService
+    )
     {
         $this->webVersions = $webVersions;
-        $this->documentRoot = $documentRoot;
-        $this->dirForVersions = $dirForVersions;
+        $this->dirs = $dirs;
+        $this->cookiesService = $cookiesService;
     }
 
     /**
@@ -40,10 +44,10 @@ class WebVersionSwitcher extends StrictObject
     public function getVersionDocumentRoot(string $version): string
     {
         if ($version === $this->webVersions->getCurrentVersion()) {
-            return $this->documentRoot; // current version to use
+            return $this->dirs->getDocumentRoot(); // current version to use
         }
 
-        return $this->dirForVersions . '/' . $version;
+        return $this->dirs->getDirForVersions() . '/' . $version;
     }
 
     /**
@@ -63,7 +67,7 @@ class WebVersionSwitcher extends StrictObject
             throw new Exceptions\UnknownVersionToSwitchInto("Required version {$toVersion} does not exist");
         }
         $lastPatchVersion = $this->webVersions->getLastPatchVersionOf($toVersion);
-        $toVersionDir = $this->dirForVersions . '/' . $toVersion;
+        $toVersionDir = $this->dirs->getDirForVersions() . '/' . $toVersion;
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
         $toVersionEscaped = \escapeshellarg($toVersion);
         $toLastPatchVersionEscaped = \escapeshellarg($lastPatchVersion);
@@ -135,5 +139,10 @@ class WebVersionSwitcher extends StrictObject
         }
 
         return \count($rows) === 0; // GIT returns ignored dirs, so if is not ignored, gives nothing
+    }
+
+    public function persistCurrentVersion(string $versionSwitchedTo): bool
+    {
+        return $this->cookiesService->setCookie('version', $versionSwitchedTo, true /* not readable from JS */, new \DateTime('+ 1 year'));
     }
 }

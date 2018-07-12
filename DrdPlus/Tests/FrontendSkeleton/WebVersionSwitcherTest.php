@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\CookiesService;
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\FrontendSkeleton\WebVersionSwitcher;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
@@ -29,7 +31,7 @@ class WebVersionSwitcherTest extends AbstractContentTest
             'Expected at least two versions to test, got only ' . \implode(',', $versions)
         );
         $currentWebVersion = $webVersions->getCurrentVersion();
-        $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, $this->getDocumentRoot(), $this->getDirForVersions());
+        $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, new Dirs($this->getDocumentRoot()), new CookiesService());
         $currentIndexFile = $this->getDocumentRoot() . '/index.php';
         self::assertSame(
             $currentIndexFile,

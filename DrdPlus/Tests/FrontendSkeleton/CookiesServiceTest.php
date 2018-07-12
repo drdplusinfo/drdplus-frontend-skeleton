@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\Cookie;
+use DrdPlus\FrontendSkeleton\CookiesService;
 use Granam\Tests\Tools\TestWithMockery;
 
-class CookieTest extends TestWithMockery
+class CookiesServiceTest extends TestWithMockery
 {
     /**
      * @test
      */
     public function I_can_set_get_and_delete_cookie(): void
     {
-        self::assertNull(Cookie::getCookie('foo'));
-        self::assertTrue(Cookie::setCookie('foo', 'bar'));
-        self::assertSame('bar', Cookie::getCookie('foo'));
+        $cookiesService = new CookiesService();
+        self::assertNull($cookiesService->getCookie('foo'));
+        self::assertTrue($cookiesService->setCookie('foo', 'bar'));
+        self::assertSame('bar', $cookiesService->getCookie('foo'));
         self::assertSame('bar', $_COOKIE['foo'] ?? false);
-        self::assertTrue(Cookie::deleteCookie('foo'));
-        self::assertNull(Cookie::getCookie('foo'));
+        self::assertTrue($cookiesService->deleteCookie('foo'));
+        self::assertNull($cookiesService->getCookie('foo'));
         self::assertFalse(\array_key_exists('foo', $_COOKIE), 'Cookie should be removed from global array as well');
     }
 }

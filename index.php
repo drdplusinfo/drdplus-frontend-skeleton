@@ -6,7 +6,6 @@ if ((!empty($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1')
     \ini_set('display_errors', '0');
 }
 $documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
-$vendorRoot = $documentRoot . '/vendor';
 $latestVersion = $latestVersion ?? '1.0';
 
 if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') { // returns true if version has been switched and solved
@@ -15,19 +14,10 @@ if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') { // return
     $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
     \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
-    $controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController(
-            'UA-121206931-1',
-            $htmlHelper,
-            $documentRoot,
-            null, // automatic web root
-            $vendorRoot,
-            $partsRoot ?? null,
-            $genericPartsRoot ?? null
-        );
-    $vendorRoot = $controller->getVendorRoot();
-    $partsRoot = $controller->getPartsRoot();
-    $genericPartsRoot = $controller->getGenericPartsRoot();
+    $dirs = new \DrdPlus\FrontendSkeleton\Dirs($documentRoot);
+    $controller = $controller
+        ?? new \DrdPlus\FrontendSkeleton\FrontendController('UA-121206931-1', $htmlHelper, $dirs);
 
     /** @noinspection PhpIncludeInspection */
-    echo require $genericPartsRoot . '/content.php';
+    echo require $dirs->getGenericPartsRoot() . '/content.php';
 }

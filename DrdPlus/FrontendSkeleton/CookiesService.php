@@ -6,7 +6,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class Cookie extends StrictObject
+class CookiesService extends StrictObject
 {
     /**
      * @param string $cookieName
@@ -16,7 +16,7 @@ class Cookie extends StrictObject
      * @return bool
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CookieCanNotBeSet
      */
-    public static function setCookie(string $cookieName, string $value, bool $httpOnly = true, \DateTime $expiresAt = null): bool
+    public function setCookie(string $cookieName, string $value, bool $httpOnly = true, \DateTime $expiresAt = null): bool
     {
         if (PHP_SAPI !== 'cli') {
             $cookieSet = \setcookie(
@@ -42,14 +42,14 @@ class Cookie extends StrictObject
      * @param string $cookieName
      * @return mixed|null
      */
-    public static function getCookie(string $cookieName)
+    public function getCookie(string $cookieName)
     {
         return $_COOKIE[$cookieName] ?? null;
     }
 
-    public static function deleteCookie(string $cookieName): bool
+    public function deleteCookie(string $cookieName): bool
     {
-        $set = self::setCookie($cookieName, '');
+        $set = $this->setCookie($cookieName, '');
         if ($set) {
             unset($_COOKIE[$cookieName]);
         }

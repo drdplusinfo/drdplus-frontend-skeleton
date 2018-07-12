@@ -24,16 +24,12 @@ class VersionTest extends AbstractContentTest
             $this->getTestsConfiguration()->getExpectedLastVersion(),
             'Expected some stable version'
         );
+        $version = $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version');
+        self::assertNotEmpty($version, 'No version get from document data-version attribute');
         if ($this->getTestsConfiguration()->getExpectedLastVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
-            self::assertSame(
-                $this->getTestsConfiguration()->getExpectedLastVersion(),
-                $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version')
-            );
+            self::assertSame($this->getTestsConfiguration()->getExpectedLastVersion(), $version);
         } else {
-            self::assertStringStartsWith(
-                $this->getTestsConfiguration()->getExpectedLastVersion() . '.',
-                $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version')
-            );
+            self::assertStringStartsWith($this->getTestsConfiguration()->getExpectedLastVersion() . '.', $version);
         }
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 use DrdPlus\FrontendSkeleton\Cache;
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use Gt\Dom\HTMLDocument;
@@ -167,7 +168,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getDefinedPageTitle(): string
     {
-        return (new FrontendController('Google Foo', $this->createHtmlHelper(), $this->getDocumentRoot()))->getPageTitle();
+        return (new FrontendController('Google Foo', $this->createHtmlHelper(), new Dirs($this->getDocumentRoot())))->getPageTitle();
     }
 
     /**

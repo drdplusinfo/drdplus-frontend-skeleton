@@ -13,20 +13,8 @@ class FrontendController extends StrictObject
     private $googleAnalyticsId;
     /** @var HtmlHelper */
     private $htmlHelper;
-    /** @var string */
-    private $documentRoot;
-    /** @var string */
-    private $webRoot;
-    /** @var string */
-    private $vendorRoot;
-    /** @var string */
-    private $partsRoot;
-    /** @var string */
-    private $genericPartsRoot;
-    /** @var string */
-    private $jsRoot;
-    /** @var string */
-    private $cssRoot;
+    /** @var Dirs */
+    private $dirs;
     /** @var string */
     private $webName;
     /** @var string */
@@ -50,25 +38,10 @@ class FrontendController extends StrictObject
     /** @var Redirect|null */
     private $redirect;
 
-    public function __construct(
-        string $googleAnalyticsId,
-        HtmlHelper $htmlHelper,
-        string $documentRoot,
-        string $webRoot = null,
-        string $vendorRoot = null,
-        string $partsRoot = null,
-        string $genericPartsRoot = null,
-        array $bodyClasses = []
-    )
+    public function __construct(string $googleAnalyticsId, HtmlHelper $htmlHelper, Dirs $dirs, array $bodyClasses = [])
     {
         $this->googleAnalyticsId = $googleAnalyticsId;
-        $this->documentRoot = $documentRoot;
-        $this->webRoot = $webRoot ?? ($documentRoot . '/web');
-        $this->vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
-        $this->partsRoot = $partsRoot ?? ($documentRoot . '/parts');
-        $this->genericPartsRoot = $genericPartsRoot ?? (__DIR__ . '/../../parts/frontend-skeleton');
-        $this->cssRoot = $documentRoot . '/css';
-        $this->jsRoot = $documentRoot . '/js';
+        $this->dirs = $dirs;
         $this->bodyClasses = $bodyClasses;
         $this->htmlHelper = $htmlHelper;
     }
@@ -90,6 +63,14 @@ class FrontendController extends StrictObject
     }
 
     /**
+     * @return Dirs
+     */
+    public function getDirs(): Dirs
+    {
+        return $this->dirs;
+    }
+
+    /**
      * @return string
      */
     public function getGoogleAnalyticsId(): string
@@ -97,97 +78,25 @@ class FrontendController extends StrictObject
         return $this->googleAnalyticsId;
     }
 
-    /**
-     * @return string
-     */
-    public function getDocumentRoot(): string
-    {
-        return $this->documentRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDirForVersions(): string
-    {
-        return $this->getDocumentRoot() . '/versions';
-    }
-
-    /**
-     * @return string
-     */
-    public function getWebRoot(): string
-    {
-        return $this->webRoot;
-    }
-
-    /**
-     * @param string $webRoot
-     */
-    public function setWebRoot(string $webRoot): void
-    {
-        $this->webRoot = $webRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVendorRoot(): string
-    {
-        return $this->vendorRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPartsRoot(): string
-    {
-        return $this->partsRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGenericPartsRoot(): string
-    {
-        return $this->genericPartsRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getJsRoot(): string
-    {
-        return $this->jsRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCssRoot(): string
-    {
-        return $this->cssRoot;
-    }
-
     public function getCssFiles(): CssFiles
     {
-        return new CssFiles($this->getCssRoot());
+        return new CssFiles($this->dirs->getCssRoot());
     }
 
     public function getJsFiles(): JsFiles
     {
-        return new JsFiles($this->getJsRoot());
+        return new JsFiles($this->dirs->getJsRoot());
     }
 
     public function getWebName(): string
     {
         if ($this->webName === null) {
-            if (!\file_exists($this->getDocumentRoot() . '/name.txt')) {
-                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->getDocumentRoot()}/name.txt'");
+            if (!\file_exists($this->dirs->getDocumentRoot() . '/name.txt')) {
+                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->dirs->getDocumentRoot()}/name.txt'");
             }
-            $webName = \trim((string)\file_get_contents($this->getDocumentRoot() . '/name.txt'));
+            $webName = \trim((string)\file_get_contents($this->dirs->getDocumentRoot() . '/name.txt'));
             if ($webName === '') {
-                throw new Exceptions\FileWithPageNameIsEmpty("File '{$this->getDocumentRoot()}/name.txt' is empty");
+                throw new Exceptions\FileWithPageNameIsEmpty("File '{$this->dirs->getDocumentRoot()}/name.txt' is empty");
             }
             $this->webName = $webName;
         }
@@ -199,8 +108,8 @@ class FrontendController extends StrictObject
     {
         if ($this->pageTitle === null) {
             $name = $this->getWebName();
-            $smiley = \file_exists($this->getDocumentRoot() . '/title_smiley.txt')
-                ? \trim(\file_get_contents($this->getDocumentRoot() . '/title_smiley.txt'))
+            $smiley = \file_exists($this->dirs->getDocumentRoot() . '/title_smiley.txt')
+                ? \trim(\file_get_contents($this->dirs->getDocumentRoot() . '/title_smiley.txt'))
                 : '';
 
             $this->pageTitle = ($smiley !== '')
@@ -217,14 +126,14 @@ class FrontendController extends StrictObject
         $controller = $this;
         \ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $this->getGenericPartsRoot() . '/contacts.php';
+        include $this->dirs->getGenericPartsRoot() . '/contacts.php';
 
         return \ob_get_clean();
     }
 
     public function getCustomBodyContent(): string
     {
-        if (!\file_exists($this->getPartsRoot() . '/custom_body_content.php')) {
+        if (!\file_exists($this->dirs->getPartsRoot() . '/custom_body_content.php')) {
             return '';
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -232,7 +141,7 @@ class FrontendController extends StrictObject
         $content = '<div id="customBodyContent">';
         \ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $this->getPartsRoot() . '/custom_body_content.php';
+        include $this->dirs->getPartsRoot() . '/custom_body_content.php';
         $content .= \ob_get_clean();
         $content .= '</div>';
 
@@ -261,7 +170,7 @@ class FrontendController extends StrictObject
     public function getWebFiles(): WebFiles
     {
         if ($this->webFiles === null) {
-            $this->webFiles = new WebFiles($this->getWebRoot());
+            $this->webFiles = new WebFiles($this->dirs->getWebRoot());
         }
 
         return $this->webFiles;
@@ -270,7 +179,7 @@ class FrontendController extends StrictObject
     public function getWebVersions(): WebVersions
     {
         if ($this->webVersions === null) {
-            $this->webVersions = new WebVersions($this->getDocumentRoot());
+            $this->webVersions = new WebVersions($this->dirs->getDocumentRoot());
         }
 
         return $this->webVersions;
@@ -325,7 +234,7 @@ class FrontendController extends StrictObject
     public function getCacheRoot(): CacheRoot
     {
         if ($this->cacheRoot === null) {
-            $this->cacheRoot = new CacheRoot($this->getDocumentRoot());
+            $this->cacheRoot = new CacheRoot($this->dirs->getDocumentRoot());
         }
 
         return $this->cacheRoot;
@@ -338,7 +247,7 @@ class FrontendController extends StrictObject
                 $this->getCacheRoot(),
                 $this->getWebVersions(),
                 $this->htmlHelper->isInProduction(),
-                $this->getWebRoot()
+                $this->dirs->getWebRoot()
             );
         }
 
