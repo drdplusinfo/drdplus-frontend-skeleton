@@ -109,4 +109,15 @@ class VersionTest extends AbstractContentTest
             self::assertNotEmpty($stableVersionTags, "No tags found for $stableVersion, got only " . \print_r($tags, true));
         }
     }
+
+    /**
+     * @test
+     */
+    public function Current_version_is_written_into_cookie(): void
+    {
+        unset($_COOKIE['version']);
+        $this->fetchNonCachedContent();
+        // unstable version is forced by test, it should be stable version by default
+        self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $_COOKIE['version']);
+    }
 }
