@@ -63,11 +63,11 @@ class WebVersionSwitcher extends StrictObject
         }
         $lastPatchVersion = $this->webVersions->getLastPatchVersionOf($toVersion);
         $toVersionDir = $this->dirForVersions . '/' . $toVersion;
+        $toVersionDirEscaped = \escapeshellarg($toVersionDir);
+        $toVersionEscaped = \escapeshellarg($toVersion);
+        $toLastPatchVersionEscaped = \escapeshellarg($lastPatchVersion);
         if (!\file_exists($toVersionDir)) {
-            $toVersionEscaped = \escapeshellarg($toVersion);
-            $toLastPatchVersionEscaped = \escapeshellarg($lastPatchVersion);
-            $toVersionDirEscaped = \escapeshellarg($toVersionDir);
-            $command = "git clone --branch $toVersionEscaped . $toVersionDirEscaped 2>&1 && git -D $toVersionDirEscaped checkout $toLastPatchVersionEscaped";
+            $command = "git clone --branch $toVersionEscaped . $toVersionDirEscaped 2>&1 && git -C $toVersionDirEscaped checkout $toLastPatchVersionEscaped";
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
                 throw new Exceptions\CanNotLocallyCloneGitVersion(
@@ -77,7 +77,7 @@ class WebVersionSwitcher extends StrictObject
                 );
             }
         } else {
-            $command = 'cd ' . \escapeshellarg($toVersionDir) . ' 2>&1 && git reset HEAD --hard 2>&1 && git pull --ff-only 2>&1';
+            $command = "git -C $toVersionDirEscaped checkout $toVersionEscaped 2>&1 && git -C $toVersionDirEscaped pull --ff-only 2>&1 && git -C $toVersionDirEscaped checkout $toLastPatchVersionEscaped 2>&1";
             $rows = []; // resetting rows as they may NOT be changed on failure
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
