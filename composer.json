@@ -27,8 +27,8 @@
     "piwik/device-detector": "^3.9",
     "tracy/tracy": "^2.4",
     "phpmailer/phpmailer": "^6.0",
-    "granam/string": "dev-master",
-    "granam/exceptions-hierarchy": "dev-master"
+    "granam/string": "^3.0",
+    "granam/exceptions-hierarchy": "^4.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~7.0",
