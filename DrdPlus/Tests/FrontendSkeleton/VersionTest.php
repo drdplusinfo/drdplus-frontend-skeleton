@@ -24,10 +24,17 @@ class VersionTest extends AbstractContentTest
             $this->getTestsConfiguration()->getExpectedLastVersion(),
             'Expected some stable version'
         );
-        self::assertSame(
-            $this->getTestsConfiguration()->getExpectedLastVersion(),
-            $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version')
-        );
+        if ($this->getTestsConfiguration()->getExpectedLastVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
+            self::assertSame(
+                $this->getTestsConfiguration()->getExpectedLastVersion(),
+                $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version')
+            );
+        } else {
+            self::assertStringStartsWith(
+                $this->getTestsConfiguration()->getExpectedLastVersion() . '.',
+                $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version')
+            );
+        }
     }
 
     protected function fetchHtmlDocumentFromLocalUrl(): HtmlDocument
@@ -62,7 +69,11 @@ class VersionTest extends AbstractContentTest
             $document = new HtmlDocument($content);
             $versionFromContent = $document->documentElement->getAttribute('data-version');
             self::assertNotNull($versionFromContent, "Can not find attribute 'data-version' in content fetched from $url");
-            self::assertSame($webVersion, $versionFromContent, 'Expected different version, seems version switching does not work');
+            if ($webVersion === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
+                self::assertSame($webVersion, $versionFromContent, 'Expected different version, seems version switching does not work');
+            } else {
+                self::assertStringStartsWith("$webVersion.", $versionFromContent, 'Expected different version, seems version switching does not work');
+            }
         }
     }
 
