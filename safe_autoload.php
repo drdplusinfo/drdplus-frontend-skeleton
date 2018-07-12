@@ -8,6 +8,9 @@ $requireAutoloadIfUnique = $requireAutoloadIfUnique
             /** @noinspection PhpIncludeInspection */
             $composer = require $vendorRoot . '/autoload.php';
             $composerHash = $matches['hash'];
+        } else {
+            /** @var \Composer\Autoload\ClassLoader $composer */
+            $composer->register();
         }
 
         return $composer;
