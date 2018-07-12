@@ -16,7 +16,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_current_version(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        self::assertSame(\exec('git rev-parse --abbrev-ref HEAD'), $webVersions->getCurrentVersion());
+        self::assertSame($this->executeCommand('git rev-parse --abbrev-ref HEAD'), $webVersions->getCurrentVersion());
     }
 
     /**
@@ -59,6 +59,22 @@ class WebVersionsTest extends AbstractContentTest
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
         self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $webVersions->getLastUnstableVersion());
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_get_all_stable_versions(): void
+    {
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        $allVersions = $webVersions->getAllVersions();
+        $expectedStableVersions = [];
+        foreach ($allVersions as $version) {
+            if ($version !== $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
+                $expectedStableVersions[] = $version;
+            }
+        }
+        self::assertSame($expectedStableVersions, $webVersions->getAllStableVersions());
     }
 
     /**
@@ -108,7 +124,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_all_web_versions(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        $allWebVersions = $webVersions->getAllWebVersions();
+        $allWebVersions = $webVersions->getAllVersions();
         self::assertNotEmpty($allWebVersions, 'At least single web version (from GIT) expected');
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertSame([$this->getTestsConfiguration()->getExpectedLastUnstableVersion()], $allWebVersions);
@@ -119,10 +135,6 @@ class WebVersionsTest extends AbstractContentTest
 
     private function getBranchesFromFileSystem(): array
     {
-        $command = 'ls -1 .git/logs/refs/heads/ | sort --version-sort --reverse'; // from latest to oldest
-        \exec($command, $output, $returnCode);
-        self::assertSame(0, $returnCode, "Failed command $command");
-
-        return $output;
+        return $this->runCommand('ls -1 .git/logs/refs/heads/ | sort --version-sort --reverse'); // from latest to oldest
     }
 }
