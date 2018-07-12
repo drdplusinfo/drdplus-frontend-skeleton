@@ -257,6 +257,6 @@ abstract class AbstractContentTest extends SkeletonTestCase
     {
         $output = $this->runCommand($command);
 
-        return \end($output) ?? '';
+        return \end($output) ?: '';
     }
 }

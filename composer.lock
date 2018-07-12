@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3a549b4677a723f75e000f404f7959fb",
-    "content-hash": "437020b92435f7cc9b117fae2fd8dda1",
+    "hash": "9802a32ffa7d80ae09e69078301eaf3f",
+    "content-hash": "5203c214be7b3e8bb0959d5c3d7edf6b",
     "packages": [
         {
             "name": "granam/exceptions-hierarchy",
-            "version": "dev-master",
+            "version": "4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaroslavtyc/granam-exceptions-hierarchy.git",
-                "reference": "a90ec9df0bdb91e41dd85ed42cf6d5eed0444c22"
+                "reference": "846b8592c8b673818569bbb103016723130bbf98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaroslavtyc/granam-exceptions-hierarchy/zipball/a90ec9df0bdb91e41dd85ed42cf6d5eed0444c22",
-                "reference": "a90ec9df0bdb91e41dd85ed42cf6d5eed0444c22",
+                "url": "https://api.github.com/repos/jaroslavtyc/granam-exceptions-hierarchy/zipball/846b8592c8b673818569bbb103016723130bbf98",
+                "reference": "846b8592c8b673818569bbb103016723130bbf98",
                 "shasum": ""
             },
             "require": {
@@ -46,31 +46,31 @@
                 "php",
                 "runtime"
             ],
-            "time": "2017-02-19 12:25:09"
+            "time": "2017-02-19 12:25:30"
         },
         {
             "name": "granam/scalar",
-            "version": "dev-master",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaroslavtyc/granam-scalar.git",
-                "reference": "a6c242cd56834f32cdc08fe6572ee8a782b69ddd"
+                "reference": "e31a7ef14a25f9fb7a3e926773b1571c8dd35fb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaroslavtyc/granam-scalar/zipball/a6c242cd56834f32cdc08fe6572ee8a782b69ddd",
-                "reference": "a6c242cd56834f32cdc08fe6572ee8a782b69ddd",
+                "url": "https://api.github.com/repos/jaroslavtyc/granam-scalar/zipball/e31a7ef14a25f9fb7a3e926773b1571c8dd35fb1",
+                "reference": "e31a7ef14a25f9fb7a3e926773b1571c8dd35fb1",
                 "shasum": ""
             },
             "require": {
-                "granam/strict-object": "dev-master",
-                "granam/tools": "dev-master",
+                "granam/strict-object": "^3.0",
+                "granam/tools": "^3.0",
                 "php": ">=7.1"
             },
             "require-dev": {
                 "granam/exceptions-hierarchy": "~4.0",
                 "mockery/mockery": "~1.0",
-                "phpunit/phpunit": "~6.0"
+                "phpunit/phpunit": "~7.0"
             },
             "type": "project",
             "autoload": {
@@ -95,20 +95,20 @@
                 "php",
                 "scalar"
             ],
-            "time": "2018-04-21 14:32:17"
+            "time": "2018-07-10 11:55:50"
         },
         {
             "name": "granam/strict-object",
-            "version": "dev-master",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaroslavtyc/granam-strict-object.git",
-                "reference": "b18f36c2b6a26ff6d7d6d190de7e5b3b8dc09858"
+                "reference": "58456d294ac6671316f0a688a682f85467c7a37b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaroslavtyc/granam-strict-object/zipball/b18f36c2b6a26ff6d7d6d190de7e5b3b8dc09858",
-                "reference": "b18f36c2b6a26ff6d7d6d190de7e5b3b8dc09858",
+                "url": "https://api.github.com/repos/jaroslavtyc/granam-strict-object/zipball/58456d294ac6671316f0a688a682f85467c7a37b",
+                "reference": "58456d294ac6671316f0a688a682f85467c7a37b",
                 "shasum": ""
             },
             "require": {
@@ -146,32 +146,32 @@
                 "strict",
                 "write"
             ],
-            "time": "2018-04-21 14:37:08"
+            "time": "2017-02-19 12:21:14"
         },
         {
             "name": "granam/string",
-            "version": "dev-master",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaroslavtyc/granam-string.git",
-                "reference": "663e994e68fef4980a0ff7c6f3ef9bc8e9844b4f"
+                "reference": "dd856dd14a2216f07adbcfdbb66935f995b1aef4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaroslavtyc/granam-string/zipball/663e994e68fef4980a0ff7c6f3ef9bc8e9844b4f",
-                "reference": "663e994e68fef4980a0ff7c6f3ef9bc8e9844b4f",
+                "url": "https://api.github.com/repos/jaroslavtyc/granam-string/zipball/dd856dd14a2216f07adbcfdbb66935f995b1aef4",
+                "reference": "dd856dd14a2216f07adbcfdbb66935f995b1aef4",
                 "shasum": ""
             },
             "require": {
-                "granam/scalar": "dev-master",
-                "granam/strict-object": "dev-master",
-                "php": ">=7.0"
+                "granam/scalar": "^4.0",
+                "granam/strict-object": "^3.0",
+                "php": ">=7.1"
             },
             "require-dev": {
                 "ext-mbstring": "*",
-                "granam/exceptions-hierarchy": "~4.0",
+                "granam/exceptions-hierarchy": ">=4.0",
                 "mockery/mockery": "~1.0",
-                "phpunit/phpunit": "~6.0"
+                "phpunit/phpunit": "~7.0"
             },
             "suggest": {
                 "ext-intl": "*"
@@ -200,24 +200,24 @@
                 "php",
                 "string"
             ],
-            "time": "2018-05-24 05:52:48"
+            "time": "2018-07-10 14:17:18"
         },
         {
             "name": "granam/tools",
-            "version": "dev-master",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jaroslavtyc/granam-tools.git",
-                "reference": "d0e8759aedd1c26c117616102941d38e49ccd1a6"
+                "reference": "c354dcf83c460a013c9a7c9e2713ab71e4962d24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jaroslavtyc/granam-tools/zipball/d0e8759aedd1c26c117616102941d38e49ccd1a6",
-                "reference": "d0e8759aedd1c26c117616102941d38e49ccd1a6",
+                "url": "https://api.github.com/repos/jaroslavtyc/granam-tools/zipball/c354dcf83c460a013c9a7c9e2713ab71e4962d24",
+                "reference": "c354dcf83c460a013c9a7c9e2713ab71e4962d24",
                 "shasum": ""
             },
             "require": {
-                "granam/strict-object": "dev-master",
+                "granam/strict-object": "^3.0",
                 "php": ">=7.1"
             },
             "require-dev": {
@@ -251,7 +251,7 @@
                 "php",
                 "string"
             ],
-            "time": "2018-05-08 13:20:02"
+            "time": "2018-05-08 13:14:29"
         },
         {
             "name": "mustangostang/spyc",
@@ -1496,7 +1496,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/0e4ea9f9e1fd3c6a563524f8f399696d98c7c85a",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/731d60f7fc78a8816dae7049df255cd55e30c313",
                 "reference": "0e4ea9f9e1fd3c6a563524f8f399696d98c7c85a",
                 "shasum": ""
             },
@@ -2310,8 +2310,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "granam/string": 20,
-        "granam/exceptions-hierarchy": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,

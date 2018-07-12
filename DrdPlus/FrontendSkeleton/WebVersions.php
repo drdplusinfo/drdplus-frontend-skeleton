@@ -122,7 +122,7 @@ class WebVersions extends StrictObject
      */
     public function getCurrentVersion(): string
     {
-        return $this->execute('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
+        return $this->executeCommand('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
     }
 
     /**
@@ -130,7 +130,7 @@ class WebVersions extends StrictObject
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    private function execute(string $command): string
+    private function executeCommand(string $command): string
     {
         $returnCode = 0;
         $output = [];
@@ -151,6 +151,40 @@ class WebVersions extends StrictObject
      */
     public function getCurrentCommitHash(): string
     {
-        return $this->execute('git log --max-count=1 --format=%H --no-abbrev-commit');
+        return $this->executeCommand('git log --max-count=1 --format=%H --no-abbrev-commit');
+    }
+
+    /**
+     * @param string $superiorVersion
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\NoPatchVersionsMatch
+     */
+    public function getLastPatchVersionOf(string $superiorVersion): string
+    {
+        if ($superiorVersion === static::LATEST_VERSION) {
+            return self::LATEST_VERSION;
+        }
+        $patchVersions = $this->getPatchVersions();
+        $matchingPatchVersions = [];
+        foreach ($patchVersions as $patchVersion) {
+            if (\strpos($patchVersion, $superiorVersion) === 0) {
+                $matchingPatchVersions[] = $patchVersion;
+            }
+        }
+        if (!$matchingPatchVersions) {
+            throw new Exceptions\NoPatchVersionsMatch("No patch version matches to given superior version $superiorVersion");
+        }
+        \usort($matchingPatchVersions, 'version_compare');
+
+        return \end($matchingPatchVersions);
+    }
+
+    /**
+     * @return array
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     */
+    public function getPatchVersions(): array
+    {
+        return $this->executeArray('git tag | grep -E "[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+" --only-matching | sort --version-sort --reverse');
     }
 }
