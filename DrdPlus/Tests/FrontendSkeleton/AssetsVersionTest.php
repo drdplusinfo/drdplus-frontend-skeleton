@@ -49,9 +49,8 @@ class AssetsVersionTest extends AbstractContentTest
      */
     public function I_can_use_helper_script(): void
     {
-        $binAssets = $this->getBinAssetsFile();
-        \exec("php $binAssets", $output, $result);
-        self::assertSame(0, $result, 'Can not call ' . $binAssets);
+        $binAssetsEscaped = \escapeshellarg($this->getBinAssetsFile());
+        $output = $this->runCommand("php $binAssetsEscaped");
         self::assertNotEmpty($output);
         self::assertStringStartsWith('Options are', $output[0]);
     }

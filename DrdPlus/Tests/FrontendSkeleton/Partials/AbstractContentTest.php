@@ -244,4 +244,19 @@ abstract class AbstractContentTest extends SkeletonTestCase
             'error' => $curlError,
         ];
     }
+
+    protected function runCommand(string $command): array
+    {
+        \exec("$command 2>&1", $output, $returnCode);
+        self::assertSame(0, $returnCode, "Failed command $command, got output " . \var_export($output, true));
+
+        return $output;
+    }
+
+    protected function executeCommand(string $command): string
+    {
+        $output = $this->runCommand($command);
+
+        return \end($output) ?? '';
+    }
 }

@@ -46,7 +46,7 @@ class VersionTest extends AbstractContentTest
     public function I_can_switch_to_every_version(string $source): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        foreach ($webVersions->getAllWebVersions() as $webVersion) {
+        foreach ($webVersions->getAllVersions() as $webVersion) {
             $post = [];
             $cookies = [];
             $url = $this->getTestsConfiguration()->getLocalUrl();
@@ -73,5 +73,33 @@ class VersionTest extends AbstractContentTest
             ['post'],
             ['cookies'],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function Every_version_like_branch_has_detailed_version_tags(): void
+    {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
+            self::assertFalse(false, 'Nothing to test here');
+
+            return;
+        }
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        $tags = $this->runCommand('git tag');
+        self::assertNotEmpty(
+            $tags,
+            'Some tags expected as we have some stable version-like branches: '
+            . \implode(',', $webVersions->getAllStableVersions())
+        );
+        foreach ($webVersions->getAllStableVersions() as $stableVersion) {
+            $stableVersionTags = [];
+            foreach ($tags as $tag) {
+                if (\strpos($tag, $stableVersion) === 0) {
+                    $stableVersionTags[] = $tag;
+                }
+            }
+            self::assertNotEmpty($stableVersionTags, "No tags found for $stableVersion, got only " . \print_r($tags, true));
+        }
     }
 }

@@ -26,7 +26,7 @@ class WebVersions extends StrictObject
      * @return array|string[]
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    public function getAllWebVersions(): array
+    public function getAllVersions(): array
     {
         $branches = $this->executeArray(
             'cd ' . \escapeshellarg($this->documentRoot) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
@@ -58,10 +58,10 @@ class WebVersions extends StrictObject
      */
     public function getLastStableVersion(): string
     {
-        $versions = $this->getAllWebVersions();
+        $versions = $this->getAllVersions();
         $lastVersion = \array_pop($versions);
         // last version is not a master (strange but...) or it is the only version we got
-        if ($lastVersion !== 'master' || \count($versions) === 0) {
+        if ($lastVersion !== self::LATEST_VERSION || \count($versions) === 0) {
             return $lastVersion;
         }
 
@@ -74,9 +74,16 @@ class WebVersions extends StrictObject
      */
     public function getLastUnstableVersion(): string
     {
-        $versions = $this->getAllWebVersions();
+        $versions = $this->getAllVersions();
 
         return \reset($versions);
+    }
+
+    public function getAllStableVersions(): array
+    {
+        return \array_values( // reset indexes
+            \array_diff($this->getAllVersions(), [$this->getLastUnstableVersion()])
+        );
     }
 
     /**
@@ -105,7 +112,7 @@ class WebVersions extends StrictObject
      */
     public function hasVersion(string $version): bool
     {
-        return \in_array($version, $this->getAllWebVersions(), true);
+        return \in_array($version, $this->getAllVersions(), true);
     }
 
     /**
