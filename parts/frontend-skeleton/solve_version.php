@@ -1,7 +1,7 @@
 <?php
 $vendorRoot = $documentRoot . '/vendor';
 /** @noinspection PhpIncludeInspection */
-$autoLoader = require __DIR__ . '/../../safe_autoload.php';
+$autoLoader = require __DIR__ . '/safe_autoload.php';
 
 $currentIndexFile = $documentRoot . '/index.php';
 $version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? $latestVersion ?? null;

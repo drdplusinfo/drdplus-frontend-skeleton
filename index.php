@@ -11,7 +11,7 @@ $latestVersion = $latestVersion ?? '1.0';
 
 if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') { // returns true if version has been switched and solved
     /** @noinspection PhpIncludeInspection */
-    require_once __DIR__ . '/safe_autoload.php';
+    require_once __DIR__ . '/parts/frontend-skeleton/safe_autoload.php';
     $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
     \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
 
