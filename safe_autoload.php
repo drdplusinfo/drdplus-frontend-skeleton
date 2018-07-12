@@ -7,6 +7,7 @@ $requireAutoloadIfUnique = $requireAutoloadIfUnique
         if ($composerHash === null || $composerHash !== $matches['hash']) {
             /** @noinspection PhpIncludeInspection */
             $composer = require $vendorRoot . '/autoload.php';
+            $composerHash = $matches['hash'];
         }
 
         return $composer;
