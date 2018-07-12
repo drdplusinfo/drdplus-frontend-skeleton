@@ -137,4 +137,82 @@ class WebVersionsTest extends AbstractContentTest
     {
         return $this->runCommand('ls -1 .git/logs/refs/heads/ | sort --version-sort --reverse'); // from latest to oldest
     }
+
+    /**
+     * @test
+     */
+    public function I_can_get_minor_versions(): void
+    {
+        $tags = $this->runCommand('ls ' . \escapeshellarg($this->getDocumentRoot()) . '/.git/refs/tags');
+        $expectedVersionTags = [];
+        foreach ($tags as $tag) {
+            if (\preg_match('~^(\d+[.]){2}\d+$~', $tag)) {
+                $expectedVersionTags[] = $tag;
+            }
+        }
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
+            self::assertCount(0, $expectedVersionTags, 'No version tags expected as there are no versions');
+
+            return;
+        }
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        self::assertNotEmpty(
+            $expectedVersionTags,
+            'Some version tags expected as we have versions ' . \implode(',', $webVersions->getAllStableVersions())
+        );
+        $sortedExpectedVersionTags = $this->sortVersionsFromLatest($expectedVersionTags);
+        self::assertSame($sortedExpectedVersionTags, $webVersions->getMinorVersions());
+        $this->I_can_get_last_minor_version_for_every_stable_version($sortedExpectedVersionTags, $webVersions);
+    }
+
+    private function sortVersionsFromLatest(array $versions): array
+    {
+        \usort($versions, 'version_compare');
+
+        return \array_reverse($versions);
+    }
+
+    private function I_can_get_last_minor_version_for_every_stable_version(array $expectedVersionTags, WebVersions $webVersions): void
+    {
+        foreach ($webVersions->getAllStableVersions() as $stableVersion) {
+            $matchingMinorVersionTags = [];
+            foreach ($expectedVersionTags as $expectedVersionTag) {
+                if (\strpos($expectedVersionTag, $stableVersion) === 0) {
+                    $matchingMinorVersionTags[] = $expectedVersionTag;
+                }
+            }
+            self::assertNotEmpty($matchingMinorVersionTags, "Missing minor version tags for version $stableVersion");
+            $sortedMatchingVersionTags = $this->sortVersionsFromLatest($matchingMinorVersionTags);
+            self::assertSame(
+                \end($sortedMatchingVersionTags),
+                $webVersions->getLastMinorVersionOf($stableVersion),
+                "Expected different minor version tag for $stableVersion"
+            );
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function I_will_get_last_unstable_version_as_minor_version(): void
+    {
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        self::assertSame($webVersions->getLastUnstableVersion(), $webVersions->getLastMinorVersionOf($webVersions->getLastUnstableVersion()));
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\NoMinorVersionsMatch
+     */
+    public function I_can_not_get_last_minor_version_for_non_existing_version(): void
+    {
+        $nonExistingVersion = '-999.999';
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        try {
+            self::assertNotContains($nonExistingVersion, $webVersions->getAllVersions(), 'This version really exists?');
+        } catch (\Exception $exception) {
+            self::fail('No exception expected so far: ' . $exception->getMessage());
+        }
+        $webVersions->getLastMinorVersionOf($nonExistingVersion);
+    }
 }

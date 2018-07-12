@@ -86,10 +86,10 @@ class VersionTest extends AbstractContentTest
             return;
         }
         $webVersions = new WebVersions($this->getDocumentRoot());
-        $tags = $this->runCommand('git tag');
+        $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:digit:]]+" --only-matching');
         self::assertNotEmpty(
             $tags,
-            'Some tags expected as we have some stable version-like branches: '
+            'Some patch-version tags expected for versions: '
             . \implode(',', $webVersions->getAllStableVersions())
         );
         foreach ($webVersions->getAllStableVersions() as $stableVersion) {

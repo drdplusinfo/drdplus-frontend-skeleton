@@ -122,7 +122,7 @@ class WebVersions extends StrictObject
      */
     public function getCurrentVersion(): string
     {
-        return $this->execute('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
+        return $this->executeCommand('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
     }
 
     /**
@@ -130,7 +130,7 @@ class WebVersions extends StrictObject
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    private function execute(string $command): string
+    private function executeCommand(string $command): string
     {
         $returnCode = 0;
         $output = [];
@@ -151,6 +151,40 @@ class WebVersions extends StrictObject
      */
     public function getCurrentCommitHash(): string
     {
-        return $this->execute('git log --max-count=1 --format=%H --no-abbrev-commit');
+        return $this->executeCommand('git log --max-count=1 --format=%H --no-abbrev-commit');
+    }
+
+    /**
+     * @param string $superiorVersion
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\NoMinorVersionsMatch
+     */
+    public function getLastMinorVersionOf(string $superiorVersion): string
+    {
+        if ($superiorVersion === static::LATEST_VERSION) {
+            return self::LATEST_VERSION;
+        }
+        $minorVersions = $this->getMinorVersions();
+        $matchingMinorVersions = [];
+        foreach ($minorVersions as $minorVersion) {
+            if (\strpos($minorVersion, $superiorVersion) === 0) {
+                $matchingMinorVersions[] = $minorVersion;
+            }
+        }
+        if (!$matchingMinorVersions) {
+            throw new Exceptions\NoMinorVersionsMatch("No minor version matches to given superior version $superiorVersion");
+        }
+        \usort($matchingMinorVersions, 'version_compare');
+
+        return \end($matchingMinorVersions);
+    }
+
+    /**
+     * @return array
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     */
+    public function getMinorVersions(): array
+    {
+        return $this->executeArray('git tag | grep -E "[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+" --only-matching | sort --version-sort --reverse');
     }
 }
