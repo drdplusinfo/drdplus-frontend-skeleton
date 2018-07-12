@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton\Exceptions;
 
-class NoMinorVersionsMatch extends \RuntimeException implements Runtime
+class NoPatchVersionsMatch extends \RuntimeException implements Runtime
 {
 
 }

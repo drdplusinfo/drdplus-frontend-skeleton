@@ -157,33 +157,33 @@ class WebVersions extends StrictObject
     /**
      * @param string $superiorVersion
      * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\NoMinorVersionsMatch
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\NoPatchVersionsMatch
      */
-    public function getLastMinorVersionOf(string $superiorVersion): string
+    public function getLastPatchVersionOf(string $superiorVersion): string
     {
         if ($superiorVersion === static::LATEST_VERSION) {
             return self::LATEST_VERSION;
         }
-        $minorVersions = $this->getMinorVersions();
-        $matchingMinorVersions = [];
-        foreach ($minorVersions as $minorVersion) {
-            if (\strpos($minorVersion, $superiorVersion) === 0) {
-                $matchingMinorVersions[] = $minorVersion;
+        $patchVersions = $this->getPatchVersions();
+        $matchingPatchVersions = [];
+        foreach ($patchVersions as $patchVersion) {
+            if (\strpos($patchVersion, $superiorVersion) === 0) {
+                $matchingPatchVersions[] = $patchVersion;
             }
         }
-        if (!$matchingMinorVersions) {
-            throw new Exceptions\NoMinorVersionsMatch("No minor version matches to given superior version $superiorVersion");
+        if (!$matchingPatchVersions) {
+            throw new Exceptions\NoPatchVersionsMatch("No patch version matches to given superior version $superiorVersion");
         }
-        \usort($matchingMinorVersions, 'version_compare');
+        \usort($matchingPatchVersions, 'version_compare');
 
-        return \end($matchingMinorVersions);
+        return \end($matchingPatchVersions);
     }
 
     /**
      * @return array
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    public function getMinorVersions(): array
+    public function getPatchVersions(): array
     {
         return $this->executeArray('git tag | grep -E "[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+" --only-matching | sort --version-sort --reverse');
     }

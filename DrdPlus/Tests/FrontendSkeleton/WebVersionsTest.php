@@ -141,7 +141,7 @@ class WebVersionsTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_can_get_minor_versions(): void
+    public function I_can_get_patch_versions(): void
     {
         $tags = $this->runCommand('ls ' . \escapeshellarg($this->getDocumentRoot()) . '/.git/refs/tags');
         $expectedVersionTags = [];
@@ -161,8 +161,8 @@ class WebVersionsTest extends AbstractContentTest
             'Some version tags expected as we have versions ' . \implode(',', $webVersions->getAllStableVersions())
         );
         $sortedExpectedVersionTags = $this->sortVersionsFromLatest($expectedVersionTags);
-        self::assertSame($sortedExpectedVersionTags, $webVersions->getMinorVersions());
-        $this->I_can_get_last_minor_version_for_every_stable_version($sortedExpectedVersionTags, $webVersions);
+        self::assertSame($sortedExpectedVersionTags, $webVersions->getPatchVersions());
+        $this->I_can_get_last_patch_version_for_every_stable_version($sortedExpectedVersionTags, $webVersions);
     }
 
     private function sortVersionsFromLatest(array $versions): array
@@ -172,21 +172,21 @@ class WebVersionsTest extends AbstractContentTest
         return \array_reverse($versions);
     }
 
-    private function I_can_get_last_minor_version_for_every_stable_version(array $expectedVersionTags, WebVersions $webVersions): void
+    private function I_can_get_last_patch_version_for_every_stable_version(array $expectedVersionTags, WebVersions $webVersions): void
     {
         foreach ($webVersions->getAllStableVersions() as $stableVersion) {
-            $matchingMinorVersionTags = [];
+            $matchingPatchVersionTags = [];
             foreach ($expectedVersionTags as $expectedVersionTag) {
                 if (\strpos($expectedVersionTag, $stableVersion) === 0) {
-                    $matchingMinorVersionTags[] = $expectedVersionTag;
+                    $matchingPatchVersionTags[] = $expectedVersionTag;
                 }
             }
-            self::assertNotEmpty($matchingMinorVersionTags, "Missing minor version tags for version $stableVersion");
-            $sortedMatchingVersionTags = $this->sortVersionsFromLatest($matchingMinorVersionTags);
+            self::assertNotEmpty($matchingPatchVersionTags, "Missing patch version tags for version $stableVersion");
+            $sortedMatchingVersionTags = $this->sortVersionsFromLatest($matchingPatchVersionTags);
             self::assertSame(
                 \end($sortedMatchingVersionTags),
-                $webVersions->getLastMinorVersionOf($stableVersion),
-                "Expected different minor version tag for $stableVersion"
+                $webVersions->getLastPatchVersionOf($stableVersion),
+                "Expected different patch version tag for $stableVersion"
             );
         }
     }
@@ -194,17 +194,17 @@ class WebVersionsTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_will_get_last_unstable_version_as_minor_version(): void
+    public function I_will_get_last_unstable_version_as_patch_version(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
-        self::assertSame($webVersions->getLastUnstableVersion(), $webVersions->getLastMinorVersionOf($webVersions->getLastUnstableVersion()));
+        self::assertSame($webVersions->getLastUnstableVersion(), $webVersions->getLastPatchVersionOf($webVersions->getLastUnstableVersion()));
     }
 
     /**
      * @test
-     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\NoMinorVersionsMatch
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\NoPatchVersionsMatch
      */
-    public function I_can_not_get_last_minor_version_for_non_existing_version(): void
+    public function I_can_not_get_last_patch_version_for_non_existing_version(): void
     {
         $nonExistingVersion = '-999.999';
         $webVersions = new WebVersions($this->getDocumentRoot());
@@ -213,6 +213,6 @@ class WebVersionsTest extends AbstractContentTest
         } catch (\Exception $exception) {
             self::fail('No exception expected so far: ' . $exception->getMessage());
         }
-        $webVersions->getLastMinorVersionOf($nonExistingVersion);
+        $webVersions->getLastPatchVersionOf($nonExistingVersion);
     }
 }

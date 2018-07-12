@@ -61,13 +61,13 @@ class WebVersionSwitcher extends StrictObject
         if (!$this->webVersions->hasVersion($toVersion)) {
             throw new Exceptions\UnknownVersionToSwitchInto("Required version {$toVersion} does not exist");
         }
-        $lastMinorVersion = $this->webVersions->getLastMinorVersionOf($toVersion);
+        $lastPatchVersion = $this->webVersions->getLastPatchVersionOf($toVersion);
         $toVersionDir = $this->dirForVersions . '/' . $toVersion;
         if (!\file_exists($toVersionDir)) {
             $toVersionEscaped = \escapeshellarg($toVersion);
-            $toLastMinorVersionEscaped = \escapeshellarg($lastMinorVersion);
+            $toLastPatchVersionEscaped = \escapeshellarg($lastPatchVersion);
             $toVersionDirEscaped = \escapeshellarg($toVersionDir);
-            $command = "git clone --branch $toVersionEscaped $toVersionDirEscaped 2>&1 && git -D $toVersionDirEscaped checkout $toLastMinorVersionEscaped";
+            $command = "git clone --branch $toVersionEscaped $toVersionDirEscaped 2>&1 && git -D $toVersionDirEscaped checkout $toLastPatchVersionEscaped";
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
                 throw new Exceptions\CanNotLocallyCloneGitVersion(
