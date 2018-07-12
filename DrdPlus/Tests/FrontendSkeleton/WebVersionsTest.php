@@ -22,6 +22,25 @@ class WebVersionsTest extends AbstractContentTest
     /**
      * @test
      */
+    public function I_can_get_current_patch_version(): void
+    {
+        $webVersions = new WebVersions($this->getDocumentRoot());
+        if ($webVersions->getCurrentVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
+            self::assertSame(
+                $this->getTestsConfiguration()->getExpectedLastUnstableVersion(),
+                $webVersions->getCurrentPatchVersion()
+            );
+        } else {
+            self::assertRegExp(
+                '~^' . \preg_quote($webVersions->getCurrentVersion(), '~') . '[.]\d+$~',
+                $webVersions->getCurrentPatchVersion()
+            );
+        }
+    }
+
+    /**
+     * @test
+     */
     public function I_can_ask_it_if_code_has_specific_version(): void
     {
         $webVersions = new WebVersions($this->getDocumentRoot());
@@ -184,7 +203,7 @@ class WebVersionsTest extends AbstractContentTest
             self::assertNotEmpty($matchingPatchVersionTags, "Missing patch version tags for version $stableVersion");
             $sortedMatchingVersionTags = $this->sortVersionsFromLatest($matchingPatchVersionTags);
             self::assertSame(
-                \end($sortedMatchingVersionTags),
+                \reset($sortedMatchingVersionTags),
                 $webVersions->getLastPatchVersionOf($stableVersion),
                 "Expected different patch version tag for $stableVersion"
             );

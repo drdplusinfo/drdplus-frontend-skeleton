@@ -16,8 +16,6 @@ class WebVersionSwitcherTest extends AbstractContentTest
      */
     public function I_can_get_index_of_another_version(): void
     {
-        $escapedDocumentRoot = \escapeshellarg($this->getDocumentRoot());
-        $this->executeCommand("rm -fr $escapedDocumentRoot/versions");
         $webVersions = new WebVersions($this->getDocumentRoot());
         $versions = $webVersions->getAllVersions();
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
