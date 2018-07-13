@@ -14,7 +14,9 @@ class AssetsVersionTest extends AbstractContentTest
      */
     public function All_css_files_have_versioned_assets(): void
     {
-        $assetsVersion = new AssetsVersion(true /* scan for CSS */);
+        $assetsVersionClass = self::getSutClass();
+        /** @var AssetsVersion $assetsVersion */
+        $assetsVersion = new $assetsVersionClass(true /* scan for CSS */);
         $changedFiles = $assetsVersion->addVersionsToAssetLinks(
             $this->getDocumentRoot(),
             [$this->getDocumentRoot() . '/css'],

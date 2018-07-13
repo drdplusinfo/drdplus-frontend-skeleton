@@ -18,7 +18,9 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function I_can_find_out_if_I_am_in_production(): void
     {
-        self::assertFalse(HtmlHelper::createFromGlobals($this->getDocumentRoot())->isInProduction());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        self::assertFalse($htmlHelperClass::createFromGlobals($this->getDocumentRoot())->isInProduction());
         // there is no way how to change PHP_SAPI constant value
     }
 
@@ -27,7 +29,9 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function I_can_get_filtered_tables_from_content(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
 
         $allTables = $htmlHelper->findTablesWithIds($this->getHtmlDocument());
         if (!$this->getTestsConfiguration()->hasTables()) {
@@ -70,7 +74,9 @@ class HtmlHelperTest extends AbstractContentTest
 
             return;
         }
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $someExpectedTableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
         self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected according to tests config');
         $tableId = \current($someExpectedTableIds);
@@ -85,7 +91,9 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function I_can_not_request_tables_with_ids_with_same_ids_after_their_unification(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
     }
 
@@ -94,7 +102,9 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function It_will_not_add_anchor_into_anchor_with_id(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $content = '<!DOCTYPE html>
 <html><body><a href="" id="someId">Foo</a></body></html>';
         $htmlDocument = new HtmlDocument($content);
@@ -107,7 +117,9 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function Ids_are_turned_to_constant_like_diacritics_free_format(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $originalId = 'Příliš # žluťoučký # kůň # úpěl # ďábelské # ódy';
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
@@ -155,7 +167,9 @@ HTML
      */
     public function I_can_turn_public_drd_plus_links_to_locals(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
 <html lang="cs-CZ">
@@ -181,7 +195,9 @@ HTML
      */
     public function I_can_inject_iframes_with_remote_tables(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
 <html lang="cs-CZ">
@@ -216,7 +232,9 @@ HTML
      */
     public function I_can_not_inject_iframe_with_remote_tables_without_previous_mark_of_external_urls(): void
     {
-        $htmlHelper = HtmlHelper::createFromGlobals($this->getDocumentRoot());
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = self::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->getDocumentRoot());
         $htmlHelper->injectIframesWithRemoteTables(new HtmlDocument());
     }
 }
