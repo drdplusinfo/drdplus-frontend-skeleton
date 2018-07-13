@@ -14,7 +14,7 @@ class CookiesServiceTest extends TestWithMockery
      */
     public function I_can_set_get_and_delete_cookie(): void
     {
-        $cookiesServiceClass = self::getSutClass();
+        $cookiesServiceClass = static::getSutClass();
         /** @var CookiesService $cookiesService */
         $cookiesService = new $cookiesServiceClass();
         self::assertNull($cookiesService->getCookie('foo'));

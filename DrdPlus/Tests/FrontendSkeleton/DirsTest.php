@@ -14,7 +14,7 @@ class DirsTest extends TestWithMockery
      */
     public function I_can_use_it(): void
     {
-        $dirsClass = self::getSutClass();
+        $dirsClass = static::getSutClass();
         /** @var Dirs $dirs */
         $dirs = new $dirsClass(
             'some document root',
@@ -38,11 +38,11 @@ class DirsTest extends TestWithMockery
      */
     public function I_can_rewrite_every_dir_in_child_class(): void
     {
-        $reflection = new \ReflectionClass(self::getSutClass());
+        $reflection = new \ReflectionClass(static::getSutClass());
         foreach ($reflection->getProperties() as $property) {
             self::assertTrue(
                 $property->isProtected(),
-                self::getSutClass() . '::' . $property->getName() . ' should be protected'
+                static::getSutClass() . '::' . $property->getName() . ' should be protected'
             );
         }
     }

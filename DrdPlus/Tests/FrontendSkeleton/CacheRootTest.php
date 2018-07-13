@@ -14,7 +14,7 @@ class CacheRootTest extends TestWithMockery
      */
     public function _I_can_get_cache_root_dir(): void
     {
-        $cacheRootClass = self::getSutClass();
+        $cacheRootClass = static::getSutClass();
         /** @var CacheRoot $cacheRoot */
         $cacheRoot = new $cacheRootClass(\sys_get_temp_dir());
         self::assertSame(\sys_get_temp_dir() . '/cache/' . \PHP_SAPI, $cacheRoot->getCacheRootDir());
