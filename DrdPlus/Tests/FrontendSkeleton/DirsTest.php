@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Dirs;
-use PHPUnit\Framework\TestCase;
+use Granam\Tests\Tools\TestWithMockery;
 
-class DirsTest extends TestCase
+class DirsTest extends TestWithMockery
 {
     /**
      * @test
      */
     public function I_can_use_it(): void
     {
-        $dirs = new Dirs(
+        $dirsClass = self::getSutClass();
+        /** @var Dirs $dirs */
+        $dirs = new $dirsClass(
             'some document root',
             'some web root',
             'some vendor root',
@@ -28,5 +30,20 @@ class DirsTest extends TestCase
         self::assertSame('some parts root', $dirs->getPartsRoot());
         self::assertSame('some generic parts root', $dirs->getGenericPartsRoot());
         self::assertSame('some dir for versions', $dirs->getDirForVersions());
+    }
+
+    /**
+     * @test
+     * @throws \ReflectionException
+     */
+    public function I_can_rewrite_every_dir_in_child_class(): void
+    {
+        $reflection = new \ReflectionClass(self::getSutClass());
+        foreach ($reflection->getProperties() as $property) {
+            self::assertTrue(
+                $property->isProtected(),
+                self::getSutClass() . '::' . $property->getName() . ' should be protected'
+            );
+        }
     }
 }

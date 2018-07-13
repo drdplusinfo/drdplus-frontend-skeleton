@@ -9,21 +9,21 @@ use Granam\Strict\Object\StrictObject;
 class Dirs extends StrictObject
 {
     /** @var string */
-    private $documentRoot;
+    protected $documentRoot;
     /** @var string */
-    private $webRoot;
+    protected $webRoot;
     /** @var string */
-    private $vendorRoot;
+    protected $vendorRoot;
     /** @var string */
-    private $partsRoot;
+    protected $partsRoot;
     /** @var string */
-    private $genericPartsRoot;
+    protected $genericPartsRoot;
     /** @var string */
-    private $cssRoot;
+    protected $cssRoot;
     /** @var string */
-    private $jsRoot;
+    protected $jsRoot;
     /** @var string */
-    private $dirForVersions;
+    protected $dirForVersions;
 
     public function __construct(
         string $documentRoot,
