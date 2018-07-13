@@ -117,6 +117,7 @@ class VersionTest extends AbstractContentTest
     {
         unset($_COOKIE['version']);
         $this->fetchNonCachedContent();
+        self::assertArrayHasKey('version', $_COOKIE, "Missing 'version' in cookie");
         // unstable version is forced by test, it should be stable version by default
         self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $_COOKIE['version']);
     }
