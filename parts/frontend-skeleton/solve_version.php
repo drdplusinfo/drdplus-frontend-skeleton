@@ -12,7 +12,7 @@ if (PHP_SAPI !== 'cli') {
 }
 $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
     new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
-    new \DrdPlus\FrontendSkeleton\Dirs($documentRoot),
+    $dirs ?? new \DrdPlus\FrontendSkeleton\Dirs($documentRoot),
     new \DrdPlus\FrontendSkeleton\CookiesService()
 );
 $webVersionSwitcher->persistCurrentVersion($version); // saves required version into cookie

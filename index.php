@@ -16,7 +16,7 @@ if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') { // return
         \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
     }
 
-    $dirs = new \DrdPlus\FrontendSkeleton\Dirs($documentRoot);
+    $dirs = $dirs ?? new \DrdPlus\FrontendSkeleton\Dirs($documentRoot);
     $controller = $controller
         ?? new \DrdPlus\FrontendSkeleton\FrontendController('UA-121206931-1', $htmlHelper, $dirs);
 
