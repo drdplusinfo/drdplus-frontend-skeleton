@@ -12,6 +12,8 @@ use Gt\Dom\HTMLDocument;
 
 abstract class AbstractContentTest extends SkeletonTestCase
 {
+    use DirsForTestsTrait;
+
     private static $contents = [];
     private static $htmlDocuments = [];
     protected $needPassIn = true;
@@ -139,31 +141,6 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $titles->rewind();
 
         return $titles->current()->nodeValue;
-    }
-
-    protected function getDocumentRoot(): string
-    {
-        static $documentRoot;
-        if ($documentRoot === null) {
-            $documentRoot = \dirname(\DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
-        }
-
-        return $documentRoot;
-    }
-
-    protected function getDirForVersions(): string
-    {
-        return $this->getDocumentRoot() . '/versions';
-    }
-
-    protected function getVendorRoot(): string
-    {
-        return $this->getDocumentRoot() . '/vendor';
-    }
-
-    protected function getWebFilesRoot(): string
-    {
-        return $this->getDocumentRoot() . '/web';
     }
 
     protected function getDefinedPageTitle(): string
