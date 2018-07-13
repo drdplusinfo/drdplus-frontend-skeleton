@@ -25,23 +25,21 @@ class Dirs extends StrictObject
     /** @var string */
     protected $dirForVersions;
 
-    public function __construct(
-        string $documentRoot,
-        string $webRoot = null,
-        string $vendorRoot = null,
-        string $partsRoot = null,
-        string $genericPartsRoot = null,
-        string $dirForVersions = null
-    )
+    public function __construct(string $documentRoot = null)
     {
-        $this->documentRoot = $documentRoot;
-        $this->webRoot = $webRoot ?? ($documentRoot . '/web');
-        $this->vendorRoot = $vendorRoot ?? ($documentRoot . '/vendor');
-        $this->partsRoot = $partsRoot ?? ($documentRoot . '/parts');
-        $this->genericPartsRoot = $genericPartsRoot ?? (__DIR__ . '/../../parts/frontend-skeleton');
+        $this->documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
+        $this->populateSubRoots($this->documentRoot);
+    }
+
+    protected function populateSubRoots(string $documentRoot): void
+    {
+        $this->webRoot = $documentRoot . '/web';
+        $this->vendorRoot = $documentRoot . '/vendor';
+        $this->partsRoot = $documentRoot . '/parts';
+        $this->genericPartsRoot = __DIR__ . '/../../parts/frontend-skeleton';
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
-        $this->dirForVersions = $dirForVersions ?? ($documentRoot . '/versions');
+        $this->dirForVersions = $documentRoot . '/versions';
     }
 
     /**

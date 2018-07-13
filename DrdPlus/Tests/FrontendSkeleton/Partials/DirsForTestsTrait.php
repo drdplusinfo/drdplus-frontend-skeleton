@@ -27,9 +27,19 @@ trait DirsForTestsTrait
         return $this->getDocumentRoot() . '/vendor';
     }
 
-    protected function getWebFilesRoot(): string
+    protected function getWebRoot(): string
     {
         return $this->getDocumentRoot() . '/web';
+    }
+
+    protected function getPartsRoot(): string
+    {
+        return $this->getDocumentRoot() . '/parts';
+    }
+
+    protected function getGenericPartsRoot(): string
+    {
+        return __DIR__ . '/../../../../parts/frontend-skeleton';
     }
 
 }

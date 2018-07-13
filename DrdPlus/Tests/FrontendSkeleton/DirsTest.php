@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Dirs;
-use Granam\Tests\Tools\TestWithMockery;
+use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
-class DirsTest extends TestWithMockery
+class DirsTest extends AbstractContentTest
 {
     /**
      * @test
@@ -16,20 +16,13 @@ class DirsTest extends TestWithMockery
     {
         $dirsClass = static::getSutClass();
         /** @var Dirs $dirs */
-        $dirs = new $dirsClass(
-            'some document root',
-            'some web root',
-            'some vendor root',
-            'some parts root',
-            'some generic parts root',
-            'some dir for versions'
-        );
-        self::assertSame('some document root', $dirs->getDocumentRoot());
-        self::assertSame('some web root', $dirs->getWebRoot());
-        self::assertSame('some vendor root', $dirs->getVendorRoot());
-        self::assertSame('some parts root', $dirs->getPartsRoot());
-        self::assertSame('some generic parts root', $dirs->getGenericPartsRoot());
-        self::assertSame('some dir for versions', $dirs->getDirForVersions());
+        $dirs = new $dirsClass();
+        self::assertSame(\realpath($this->getDocumentRoot()), \realpath($dirs->getDocumentRoot()));
+        self::assertSame(\realpath($this->getWebRoot()), \realpath($dirs->getWebRoot()));
+        self::assertSame(\realpath($this->getVendorRoot()), \realpath($dirs->getVendorRoot()));
+        self::assertSame(\realpath($this->getPartsRoot()), \realpath($dirs->getPartsRoot()));
+        self::assertSame(\realpath($this->getGenericPartsRoot()), \realpath($dirs->getGenericPartsRoot()));
+        self::assertSame(\realpath($this->getDirForVersions()), \realpath($dirs->getDirForVersions()));
     }
 
     /**
@@ -45,5 +38,18 @@ class DirsTest extends TestWithMockery
                 static::getSutClass() . '::' . $property->getName() . ' should be protected'
             );
         }
+    }
+
+    public function I_can_create_it_with_custom_document_root(): void
+    {
+        $dirsClass = static::getSutClass();
+        /** @var Dirs $dirs */
+        $dirs = new $dirsClass('foo');
+        self::assertSame('foo', $dirs->getDocumentRoot());
+        self::assertSame('foo/web', $dirs->getWebRoot());
+        self::assertSame('foo/vendor', $dirs->getVendorRoot());
+        self::assertSame('foo/parts', $dirs->getPartsRoot());
+        self::assertSame($this->getGenericPartsRoot(), $dirs->getGenericPartsRoot());
+        self::assertSame('foo/versions', $dirs->getDirForVersions());
     }
 }
