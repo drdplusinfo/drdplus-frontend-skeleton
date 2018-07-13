@@ -4,7 +4,7 @@ $autoLoader = require __DIR__ . '/safe_autoload.php';
 
 $currentIndexFile = $documentRoot . '/index.php';
 $version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? $latestVersion ?? null;
-if (!$version || (\defined('VERSION_SWITCHED') && VERSION_SWITCHED)) {
+if (!$version || !empty($versionSwitched)) {
     return false;
 }
 if (PHP_SAPI !== 'cli') {
@@ -21,7 +21,7 @@ if ($versionIndexFile === $currentIndexFile || \realpath($versionIndexFile) === 
     return false;
 }
 $documentRoot = $webVersionSwitcher->getVersionDocumentRoot($version);
-\define('VERSION_SWITCHED', true);
+$versionSwitched = $version;
 $webVersionSwitcher->persistCurrentVersion($version); // saves required version into cookie
 /** @var \Composer\Autoload\ClassLoader $autoLoader */
 $autoLoader->unregister(); // as version index will use its own
