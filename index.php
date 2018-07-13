@@ -12,7 +12,9 @@ if (!require __DIR__ . '/parts/frontend-skeleton/solve_version.php') { // return
     /** @noinspection PhpIncludeInspection */
     require_once __DIR__ . '/parts/frontend-skeleton/safe_autoload.php';
     $htmlHelper = $htmlHelper ?? \DrdPlus\FrontendSkeleton\HtmlHelper::createFromGlobals($documentRoot);
-    \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
+    if (PHP_SAPI !== 'cli') {
+        \DrdPlus\FrontendSkeleton\TracyDebugger::enable($htmlHelper->isInProduction());
+    }
 
     $dirs = new \DrdPlus\FrontendSkeleton\Dirs($documentRoot);
     $controller = $controller

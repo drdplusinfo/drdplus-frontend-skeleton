@@ -7,7 +7,9 @@ $version = $_GET['version'] ?? $_POST['version'] ?? $_COOKIE['version'] ?? $late
 if (!$version || (\defined('VERSION_SWITCHED') && VERSION_SWITCHED)) {
     return false;
 }
-\DrdPlus\FrontendSkeleton\TracyDebugger::enable();
+if (PHP_SAPI !== 'cli') {
+    \DrdPlus\FrontendSkeleton\TracyDebugger::enable();
+}
 $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
     new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
     new \DrdPlus\FrontendSkeleton\Dirs($documentRoot),

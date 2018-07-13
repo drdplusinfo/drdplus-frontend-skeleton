@@ -5,27 +5,15 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
-use Tracy\Debugger;
 
 class TracyTest extends AbstractContentTest
 {
     /**
      * @test
-     * @throws \ReflectionException
      */
     public function Tracy_watch_it(): void
     {
-        $debuggerReflection = new \ReflectionClass(Debugger::class);
-        $enabled = $debuggerReflection->getProperty('enabled');
-        $enabled->setAccessible(true);
-        $enabled->setValue(null, false);
-        self::assertFalse(Debugger::isEnabled(), 'Tracy debugger is not expected to be enabled before index call');
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $latestVersion = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
-        \ob_start();
-        /** @noinspection PhpIncludeInspection */
-        include $this->getDocumentRoot() . '/index.php';
-        \ob_end_clean();
-        self::assertTrue(Debugger::isEnabled(), 'Tracy debugger is not enabled');
+        $content = $this->fetchContentFromLink($this->getTestsConfiguration()->getLocalUrl(), true)['content'];
+        self::assertRegExp('~<script>\nTracy[.]Debug[.]init\([^\n]+\n</script>~', $content, 'Tracy debugger is not enabled');
     }
 }
