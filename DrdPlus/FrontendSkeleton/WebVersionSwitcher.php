@@ -130,7 +130,7 @@ class WebVersionSwitcher extends StrictObject
         $documentRootEscaped = \escapeshellarg($documentRoot);
         $command = "git -C $documentRootEscaped check-ignore vendor 2>&1";
         \exec($command, $rows, $returnCode);
-        if ($returnCode !== 0) {
+        if ($returnCode > 1) {
             throw new Exceptions\ExecutingCommandFailed(
                 "Can not find out if is vendor dir versioned or not by command '{$command}'"
                 . ", got return code '{$returnCode}' and output\n"
