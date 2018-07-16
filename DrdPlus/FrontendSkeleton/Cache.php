@@ -12,7 +12,9 @@ abstract class Cache extends StrictObject
     public const DISABLE = 'disable';
 
     /** @var string */
-    private $cacheRoot;
+    private $cacheRootDir;
+    /** @var array|string[] */
+    private $cacheRoots;
     /** @var WebVersions */
     private $webVersions;
     /** @var string */
@@ -27,23 +29,9 @@ abstract class Cache extends StrictObject
      * @param string $cachePrefix
      * @throws \RuntimeException
      */
-    public function __construct(
-        CacheRoot $cacheRoot,
-        WebVersions $webVersions,
-        bool $isInProduction,
-        string $cachePrefix
-    )
+    public function __construct(CacheRoot $cacheRoot, WebVersions $webVersions, bool $isInProduction, string $cachePrefix)
     {
-        $this->cacheRoot = $cacheRoot->getCacheRootDir() . '/' . $webVersions->getCurrentVersion();
-        if (!\file_exists($this->cacheRoot)) {
-            if (!@\mkdir($this->cacheRoot, 0775, true /* with parents */) && !\is_dir($this->cacheRoot)) {
-                throw new \RuntimeException('Can not create directory for page cache ' . $this->cacheRoot);
-            }
-            if (PHP_SAPI === 'cli') {
-                \chgrp($this->cacheRoot, 'www-data');
-            }
-            \chmod($this->cacheRoot, 0775); // because umask could suppress it
-        }
+        $this->cacheRootDir = $cacheRoot->getCacheRootDir();
         $this->webVersions = $webVersions;
         $this->isInProduction = $isInProduction;
         $this->cachePrefix = $cachePrefix;
@@ -54,7 +42,22 @@ abstract class Cache extends StrictObject
      */
     public function getCacheRoot(): string
     {
-        return $this->cacheRoot;
+        $currentVersion = $this->webVersions->getCurrentVersion();
+        if (($this->cacheRoots[$currentVersion] ?? null) === null) {
+            $cacheRoot = $this->cacheRootDir . '/' . $currentVersion;
+            if (!\file_exists($cacheRoot)) {
+                if (!@\mkdir($cacheRoot, 0775, true /* with parents */) && !\is_dir($cacheRoot)) {
+                    throw new \RuntimeException('Can not create directory for page cache ' . $cacheRoot);
+                }
+                if (PHP_SAPI === 'cli') {
+                    \chgrp($cacheRoot, 'www-data');
+                }
+                \chmod($cacheRoot, 0775); // because umask could suppress it
+            }
+            $this->cacheRoots[$currentVersion] = $cacheRoot;
+        }
+
+        return $this->cacheRoots[$currentVersion];
     }
 
     public function isInProduction(): bool
@@ -83,7 +86,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileName(): string
     {
-        return $this->cacheRoot . "/{$this->getCacheFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheRoot() . "/{$this->getCacheFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
     }
 
     /**
@@ -157,7 +160,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheDebugFileName(): string
     {
-        return $this->cacheRoot . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheRoot() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
     }
 
     /**
@@ -189,7 +192,8 @@ abstract class Cache extends StrictObject
         $foldersToSkip = ['.', '..', '.gitignore'];
         $currentCacheStamp = $this->webVersions->getCurrentCommitHash();
         $currentVersion = $this->webVersions->getCurrentVersion();
-        foreach (\scandir($this->cacheRoot, SCANDIR_SORT_NONE) as $folder) {
+        $cacheRoot = $this->cacheRoots[$currentVersion];
+        foreach (\scandir($cacheRoot, \SCANDIR_SORT_NONE) as $folder) {
             if (\in_array($folder, $foldersToSkip, true)) {
                 continue;
             }
@@ -199,7 +203,7 @@ abstract class Cache extends StrictObject
             if (\strpos($folder, $currentCacheStamp) !== false) { // that file is valid
                 continue;
             }
-            \unlink($this->cacheRoot . '/' . $folder);
+            \unlink($cacheRoot . '/' . $folder);
         }
     }
 }
