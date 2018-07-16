@@ -165,7 +165,7 @@ class WebVersionsTest extends AbstractContentTest
         $tags = $this->runCommand('git -C ' . \escapeshellarg($this->getDocumentRoot()) . ' tag');
         $expectedVersionTags = [];
         foreach ($tags as $tag) {
-            if (\preg_match('~^(\d+[.]){2}\d+$~', $tag)) {
+            if (\preg_match('~^(\d+[.]){2}[[:alnum:]]+([.]\d+)?$~', $tag)) {
                 $expectedVersionTags[] = $tag;
             }
         }
