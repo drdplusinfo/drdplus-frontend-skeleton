@@ -93,7 +93,7 @@ class VersionTest extends AbstractContentTest
             return;
         }
         $webVersions = new WebVersions($this->getDocumentRoot());
-        $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:alnum:]]+" --only-matching');
+        $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching');
         self::assertNotEmpty(
             $tags,
             'Some patch-version tags expected for versions: '

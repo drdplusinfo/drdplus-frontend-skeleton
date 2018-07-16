@@ -195,6 +195,6 @@ class WebVersions extends StrictObject
      */
     public function getPatchVersions(): array
     {
-        return $this->executeArray('git tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+" --only-matching | sort --version-sort --reverse');
+        return $this->executeArray('git tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse');
     }
 }
