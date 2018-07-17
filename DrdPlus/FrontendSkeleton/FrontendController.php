@@ -32,7 +32,7 @@ class FrontendController extends StrictObject
     /** @var bool */
     private $showHomeButton = true;
     /** @var PageCache */
-    private $pageCache;
+    protected $pageCache;
     /** @var Redirect|null */
     private $redirect;
 
