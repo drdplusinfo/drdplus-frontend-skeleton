@@ -65,7 +65,7 @@ abstract class Cache extends StrictObject
         return $this->isInProduction;
     }
 
-    private function getCurrentGetHash(): string
+    protected function getCurrentRequestHash(): string
     {
         return \md5(\serialize($_GET));
     }
@@ -86,7 +86,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileName(): string
     {
-        return $this->getCacheDir() . "/{$this->getCacheFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheDir() . "/{$this->getCacheFileBaseNamePartWithoutRequest()}_{$this->getCurrentRequestHash()}.html";
     }
 
     /**
@@ -94,7 +94,7 @@ abstract class Cache extends StrictObject
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    private function getCacheFileBaseNamePartWithoutGet(): string
+    private function getCacheFileBaseNamePartWithoutRequest(): string
     {
         $prefix = \md5($this->getCachePrefix() . $this->getGitStamp());
 
@@ -160,7 +160,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheDebugFileName(): string
     {
-        return $this->getCacheDir() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheDir() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentRequestHash()}.html";
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class Cache extends StrictObject
      */
     private function geCacheDebugFileBaseNamePartWithoutGet(): string
     {
-        return 'debug_' . $this->getCacheFileBaseNamePartWithoutGet();
+        return 'debug_' . $this->getCacheFileBaseNamePartWithoutRequest();
     }
 
     /**
