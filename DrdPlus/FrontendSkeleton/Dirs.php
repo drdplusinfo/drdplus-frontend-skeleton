@@ -24,10 +24,12 @@ class Dirs extends StrictObject
     protected $jsRoot;
     /** @var string */
     protected $dirForVersions;
+    /** @var string */
+    protected $cacheRoot;
 
     public function __construct(string $documentRoot = null)
     {
-        $this->documentRoot = $documentRoot ?? (PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
+        $this->documentRoot = $documentRoot ?? (\PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
         $this->populateSubRoots($this->documentRoot);
     }
 
@@ -40,6 +42,7 @@ class Dirs extends StrictObject
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
         $this->dirForVersions = $documentRoot . '/versions';
+        $this->cacheRoot = $documentRoot . '/cache/' . \PHP_SAPI;
     }
 
     /**
@@ -104,5 +107,13 @@ class Dirs extends StrictObject
     public function getDirForVersions(): string
     {
         return $this->dirForVersions;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheRoot(): string
+    {
+        return $this->cacheRoot;
     }
 }

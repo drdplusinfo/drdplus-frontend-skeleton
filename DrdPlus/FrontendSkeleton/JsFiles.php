@@ -13,7 +13,7 @@ class JsFiles extends AbstractPublicFiles
 
     public function __construct(string $dirWithJs)
     {
-        $this->dirWithJs = rtrim($dirWithJs, '\/');
+        $this->dirWithJs = \rtrim($dirWithJs, '\/');
     }
 
     /**
@@ -31,7 +31,7 @@ class JsFiles extends AbstractPublicFiles
      */
     private function scanForJsFiles(string $directory, string $jsRelativeRoot = ''): array
     {
-        if (!is_dir($directory)) {
+        if (!\is_dir($directory)) {
             return [];
         }
         $genericJsFiles = [];

@@ -31,8 +31,6 @@ class FrontendController extends StrictObject
     private $contactsFixed = false;
     /** @var bool */
     private $showHomeButton = true;
-    /** @var CacheRoot */
-    private $cacheRoot;
     /** @var PageCache */
     private $pageCache;
     /** @var Redirect|null */
@@ -179,7 +177,7 @@ class FrontendController extends StrictObject
     public function getWebVersions(): WebVersions
     {
         if ($this->webVersions === null) {
-            $this->webVersions = new WebVersions($this->dirs->getDocumentRoot());
+            $this->webVersions = new WebVersions($this->dirs);
         }
 
         return $this->webVersions;
@@ -231,24 +229,10 @@ class FrontendController extends StrictObject
         return $this->showHomeButton;
     }
 
-    public function getCacheRoot(): CacheRoot
-    {
-        if ($this->cacheRoot === null) {
-            $this->cacheRoot = new CacheRoot($this->dirs->getDocumentRoot());
-        }
-
-        return $this->cacheRoot;
-    }
-
     public function getPageCache(): PageCache
     {
         if ($this->pageCache === null) {
-            $this->pageCache = new PageCache(
-                $this->getCacheRoot(),
-                $this->getWebVersions(),
-                $this->htmlHelper->isInProduction(),
-                $this->dirs->getWebRoot()
-            );
+            $this->pageCache = new PageCache($this->getWebVersions(), $this->dirs, $this->htmlHelper->isInProduction());
         }
 
         return $this->pageCache;

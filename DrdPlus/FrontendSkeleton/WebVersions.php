@@ -11,14 +11,12 @@ class WebVersions extends StrictObject
 
     public const LATEST_VERSION = 'master';
 
-    /**
-     * @var string
-     */
-    private $documentRoot;
+    /** @var Dirs */
+    private $dirs;
 
-    public function __construct(string $documentRoot)
+    public function __construct(Dirs $dirs)
     {
-        $this->documentRoot = $documentRoot;
+        $this->dirs = $dirs;
     }
 
     /**
@@ -29,7 +27,7 @@ class WebVersions extends StrictObject
     public function getAllVersions(): array
     {
         $branches = $this->executeArray(
-            'cd ' . \escapeshellarg($this->documentRoot) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
+            'cd ' . \escapeshellarg($this->dirs->getDocumentRoot()) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
         );
         \array_unshift($branches, self::LATEST_VERSION);
 
@@ -122,12 +120,12 @@ class WebVersions extends StrictObject
      */
     public function getCurrentVersion(): string
     {
-        $possibleDirVersion = \basename($this->documentRoot);
+        $possibleDirVersion = \basename($this->dirs->getDocumentRoot());
         if ($this->hasVersion($possibleDirVersion)) {
             return $possibleDirVersion;
         }
 
-        return $this->executeCommand('cd ' . \escapeshellarg($this->documentRoot) . ' && git rev-parse --abbrev-ref HEAD');
+        return $this->executeCommand('cd ' . \escapeshellarg($this->dirs->getDocumentRoot()) . ' && git rev-parse --abbrev-ref HEAD');
     }
 
     public function getCurrentPatchVersion(): string
@@ -196,5 +194,19 @@ class WebVersions extends StrictObject
     public function getPatchVersions(): array
     {
         return $this->executeArray('git tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse');
+    }
+
+    public function isCurrentVersionStable(): bool
+    {
+        return $this->getCurrentVersion() !== $this->getLastUnstableVersion();
+    }
+
+    public function getVersionDocumentRoot(string $forVersion): string
+    {
+        if ($forVersion === $this->getCurrentVersion()) {
+            return $this->dirs->getDocumentRoot(); // current version to use
+        }
+
+        return $this->dirs->getDirForVersions() . '/' . $forVersion;
     }
 }

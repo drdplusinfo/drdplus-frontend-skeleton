@@ -11,8 +11,9 @@ if (PHP_SAPI !== 'cli') {
     \DrdPlus\FrontendSkeleton\TracyDebugger::enable();
 }
 $dirs = $dirs ?? new \DrdPlus\FrontendSkeleton\Dirs($documentRoot);
+$webVersions = new \DrdPlus\FrontendSkeleton\WebVersions($dirs);
 $webVersionSwitcher = new \DrdPlus\FrontendSkeleton\WebVersionSwitcher(
-    new \DrdPlus\FrontendSkeleton\WebVersions($documentRoot),
+    $webVersions,
     $dirs,
     new \DrdPlus\FrontendSkeleton\CookiesService()
 );
@@ -21,7 +22,7 @@ $versionIndexFile = $webVersionSwitcher->getVersionIndexFile($version);
 if ($versionIndexFile === $currentIndexFile || \realpath($versionIndexFile) === \realpath($currentIndexFile)) {
     return false;
 }
-$documentRoot = $webVersionSwitcher->getVersionDocumentRoot($version);
+$documentRoot = $webVersions->getVersionDocumentRoot($version);
 $dirsClass = \get_class($dirs);
 $dirs = new $dirsClass($documentRoot); // as $dirs object will be used in included version-specific index
 $versionSwitched = $version;

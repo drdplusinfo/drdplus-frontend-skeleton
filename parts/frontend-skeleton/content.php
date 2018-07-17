@@ -23,15 +23,15 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
       async src="https://www.googletagmanager.com/gtag/js?id=<?= $controller->getGoogleAnalyticsId() ?>"></script>
         <?php
         foreach ($controller->getJsFiles() as $jsFile) { ?>
-          <script type="text/javascript" src="js/<?= $jsFile ?>"></script>
+          <script type="text/javascript" src="/js/<?= $jsFile ?>"></script>
         <?php }
         foreach ($controller->getCssFiles() as $cssFile) {
             if (\strpos($cssFile, 'no-script.css') !== false) { ?>
               <noscript>
-                <link rel="stylesheet" type="text/css" href="css/<?= $cssFile ?>">
+                <link rel="stylesheet" type="text/css" href="/css/<?= $cssFile ?>">
               </noscript>
             <?php } else { ?>
-              <link rel="stylesheet" type="text/css" href="css/<?= $cssFile ?>">
+              <link rel="stylesheet" type="text/css" href="/css/<?= $cssFile ?>">
             <?php }
         } ?>
     </head>
@@ -62,6 +62,7 @@ $htmlHelper->resolveDisplayMode($htmlDocument);
 $htmlHelper->markExternalLinksByClass($htmlDocument);
 $htmlHelper->externalLinksTargetToBlank($htmlDocument);
 $htmlHelper->injectIframesWithRemoteTables($htmlDocument);
+$htmlHelper->updateAssetLinksToCurrentVersion($htmlDocument, $controller->getWebVersions());
 $htmlHelper->addVersionHashToAssets($htmlDocument);
 if (!$htmlHelper->isInProduction()) {
     $htmlHelper->makeExternalDrdPlusLinksLocal($htmlDocument);

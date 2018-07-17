@@ -16,11 +16,7 @@ class WebVersionSwitcher extends StrictObject
     /** @var CookiesService */
     private $cookiesService;
 
-    public function __construct(
-        WebVersions $webVersions,
-        Dirs $dirs,
-        CookiesService $cookiesService
-    )
+    public function __construct(WebVersions $webVersions, Dirs $dirs, CookiesService $cookiesService)
     {
         $this->webVersions = $webVersions;
         $this->dirs = $dirs;
@@ -38,16 +34,7 @@ class WebVersionSwitcher extends StrictObject
     {
         $this->ensureVersionExists($toVersion);
 
-        return $this->getVersionDocumentRoot($toVersion) . '/index.php';
-    }
-
-    public function getVersionDocumentRoot(string $version): string
-    {
-        if ($version === $this->webVersions->getCurrentVersion()) {
-            return $this->dirs->getDocumentRoot(); // current version to use
-        }
-
-        return $this->dirs->getDirForVersions() . '/' . $version;
+        return $this->webVersions->getVersionDocumentRoot($toVersion) . '/index.php';
     }
 
     /**

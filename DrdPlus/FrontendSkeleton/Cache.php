@@ -23,15 +23,15 @@ abstract class Cache extends StrictObject
     private $isInProduction;
 
     /**
-     * @param CacheRoot $cacheRoot
      * @param WebVersions $webVersions
+     * @param Dirs $dirs
      * @param bool $isInProduction
      * @param string $cachePrefix
      * @throws \RuntimeException
      */
-    public function __construct(CacheRoot $cacheRoot, WebVersions $webVersions, bool $isInProduction, string $cachePrefix)
+    public function __construct(WebVersions $webVersions, Dirs $dirs, bool $isInProduction, string $cachePrefix)
     {
-        $this->cacheRootDir = $cacheRoot->getCacheRootDir();
+        $this->cacheRootDir = $dirs->getCacheRoot();
         $this->webVersions = $webVersions;
         $this->isInProduction = $isInProduction;
         $this->cachePrefix = $cachePrefix;

@@ -24,7 +24,7 @@ class HtmlHelper extends StrictObject
     /** @var bool */
     private $showIntroductionOnly;
     /** @var string */
-    private $rootDir;
+    private $documentRoot;
 
     public static function createFromGlobals(string $documentRootDir): HtmlHelper
     {
@@ -38,14 +38,14 @@ class HtmlHelper extends StrictObject
     }
 
     public function __construct(
-        string $rootDir,
+        string $documentRoot,
         bool $inDevMode,
         bool $inForcedProductionMode,
         bool $shouldHideCovered,
         bool $showIntroductionOnly
     )
     {
-        $this->rootDir = $this->unifyPath($rootDir);
+        $this->documentRoot = $this->unifyPath($documentRoot);
         $this->inDevMode = $inDevMode;
         $this->inForcedProductionMode = $inForcedProductionMode;
         $this->shouldHideCovered = $shouldHideCovered;
@@ -514,15 +514,35 @@ class HtmlHelper extends StrictObject
         );
     }
 
-    public function addVersionHashToAssets(HtmlDocument $html): void
+    public function updateAssetLinksToCurrentVersion(HtmlDocument $htmlDocument, WebVersions $webVersions): void
     {
-        foreach ($html->getElementsByTagName('img') as $image) {
+        if (!$webVersions->isCurrentVersionStable()) {
+            return;
+        }
+        $currentVersionDocumentRoot = $webVersions->getVersionDocumentRoot($webVersions->getCurrentVersion());
+        $unstableVersionDocumentRoot = \dirname($currentVersionDocumentRoot, 2);
+        $relativeVersionDocumentRoot = \str_replace($unstableVersionDocumentRoot, '', $unstableVersionDocumentRoot);
+
+        foreach ($htmlDocument->getElementsByTagName('img') as $image) {
+            $image->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim('/', $image->getAttribute('src')));
+        }
+        foreach ($htmlDocument->getElementsByTagName('link') as $link) {
+            $link->setAttribute('href', $relativeVersionDocumentRoot . '/' . \ltrim('/', $link->getAttribute('href')));
+        }
+        foreach ($htmlDocument->getElementsByTagName('script') as $script) {
+            $script->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim('/', $script->getAttribute('src')));
+        }
+    }
+
+    public function addVersionHashToAssets(HtmlDocument $htmlDocument): void
+    {
+        foreach ($htmlDocument->getElementsByTagName('img') as $image) {
             $this->addVersionToAsset($image, 'src');
         }
-        foreach ($html->getElementsByTagName('link') as $link) {
+        foreach ($htmlDocument->getElementsByTagName('link') as $link) {
             $this->addVersionToAsset($link, 'href');
         }
-        foreach ($html->getElementsByTagName('script') as $script) {
+        foreach ($htmlDocument->getElementsByTagName('script') as $script) {
             $this->addVersionToAsset($script, 'src');
         }
     }
@@ -530,10 +550,10 @@ class HtmlHelper extends StrictObject
     private function addVersionToAsset(Element $element, string $attributeName): void
     {
         $source = $element->getAttribute($attributeName);
-        if (!$source || \strpos($source, 'https://') === 0 || \strpos($source, 'http://') === 0) {
+        if (!$source || \strpos($source, 'https://') === 0 || \strpos($source, 'http://') === 0 || \strpos($source, '//') === 0) {
             return;
         }
-        $absolutePath = $this->getAbsolutePath($source, $this->rootDir);
+        $absolutePath = $this->getAbsolutePath($source, $this->documentRoot);
         $hash = $this->getFileHash($absolutePath);
         $element->setAttribute($attributeName, $source . '?version=' . \urlencode($hash));
     }
