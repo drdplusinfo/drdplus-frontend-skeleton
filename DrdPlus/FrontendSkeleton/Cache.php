@@ -40,7 +40,7 @@ abstract class Cache extends StrictObject
     /**
      * @return string
      */
-    public function getCacheRoot(): string
+    public function getCacheDir(): string
     {
         $currentVersion = $this->webVersions->getCurrentVersion();
         if (($this->cacheRoots[$currentVersion] ?? null) === null) {
@@ -86,7 +86,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileName(): string
     {
-        return $this->getCacheRoot() . "/{$this->getCacheFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheDir() . "/{$this->getCacheFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
     }
 
     /**
@@ -160,7 +160,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheDebugFileName(): string
     {
-        return $this->getCacheRoot() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheDir() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
     }
 
     /**

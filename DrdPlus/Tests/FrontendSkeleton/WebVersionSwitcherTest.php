@@ -18,7 +18,7 @@ class WebVersionSwitcherTest extends AbstractContentTest
      */
     public function I_can_get_index_of_another_version(): void
     {
-        $webVersions = new WebVersions($this->getDocumentRoot());
+        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
         $versions = $webVersions->getAllVersions();
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');

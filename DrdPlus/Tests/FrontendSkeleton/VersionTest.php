@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
@@ -48,7 +49,7 @@ class VersionTest extends AbstractContentTest
      */
     public function I_can_switch_to_every_version(string $source): void
     {
-        $webVersions = new WebVersions($this->getDocumentRoot());
+        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
         foreach ($webVersions->getAllVersions() as $webVersion) {
             $post = [];
             $cookies = [];
@@ -92,7 +93,7 @@ class VersionTest extends AbstractContentTest
 
             return;
         }
-        $webVersions = new WebVersions($this->getDocumentRoot());
+        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
         $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching');
         self::assertNotEmpty(
             $tags,

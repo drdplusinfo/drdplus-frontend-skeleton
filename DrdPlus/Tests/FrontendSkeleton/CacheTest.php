@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Cache;
-use DrdPlus\FrontendSkeleton\CacheRoot;
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\DirsForTestsTrait;
 use Granam\Tests\Tools\TestWithMockery;
@@ -19,30 +19,30 @@ class CacheTest extends TestWithMockery
      * @test
      * @throws \ReflectionException
      */
-    public function I_will_get_cache_root_depending_on_current_version(): void
+    public function I_will_get_cache_dir_depending_on_current_version(): void
     {
         $webVersions = $this->mockery(WebVersions::class);
         $webVersions->shouldReceive('getCurrentVersion')
             ->andReturnValues(['master', '9.8.7']); // sequential, returns different value for first and second call
-        $cacheRoot = new CacheRoot($this->getDocumentRoot());
+        $dirs = new Dirs($this->getDocumentRoot());
         /** @var WebVersions $webVersions */
-        $cache = $this->createSut($cacheRoot, $webVersions);
-        self::assertSame($cacheRoot->getCacheRootDir(). '/master', $cache->getCacheRoot());
-        self::assertSame($cacheRoot->getCacheRootDir() . '/9.8.7', $cache->getCacheRoot());
+        $cache = $this->createSut($webVersions, $dirs);
+        self::assertSame($dirs->getCacheRoot() . '/master', $cache->getCacheDir());
+        self::assertSame($dirs->getCacheRoot() . '/9.8.7', $cache->getCacheDir());
     }
 
     /**
-     * @param CacheRoot $cacheRoot
      * @param WebVersions $webVersions
+     * @param Dirs $dirs
      * @return Cache|MockInterface
      * @throws \ReflectionException
      */
-    private function createSut(CacheRoot $cacheRoot, WebVersions $webVersions): Cache
+    private function createSut(WebVersions $webVersions, Dirs $dirs): Cache
     {
         $cache = $this->mockery(static::getSutClass());
         $cacheReflection = new \ReflectionClass(static::getSutClass());
         $constructor = $cacheReflection->getMethod('__construct');
-        $constructor->invoke($cache, $cacheRoot, $webVersions, false, 'foo');
+        $constructor->invoke($cache, $webVersions, $dirs, false, 'foo');
         $cache->makePartial();
 
         return $cache;

@@ -52,4 +52,15 @@ class DirsTest extends AbstractContentTest
         self::assertSame($this->getGenericPartsRoot(), $dirs->getGenericPartsRoot());
         self::assertSame('foo/versions', $dirs->getDirForVersions());
     }
+
+    /**
+     * @test
+     */
+    public function _I_can_get_cache_root(): void
+    {
+        $dirsClass = static::getSutClass();
+        /** @var Dirs $dirs */
+        $dirs = new $dirsClass('foo');
+        self::assertSame('foo/cache/' . \PHP_SAPI, $dirs->getCacheRoot());
+    }
 }
