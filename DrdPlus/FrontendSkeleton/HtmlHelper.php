@@ -530,13 +530,13 @@ class HtmlHelper extends StrictObject
         $relativeVersionDocumentRoot = \str_replace($unstableVersionDocumentRoot, '', $currentVersionDocumentRoot);
 
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-            $image->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim('/', $image->getAttribute('src')));
+            $image->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim($image->getAttribute('src'), '/'));
         }
         foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-            $link->setAttribute('href', $relativeVersionDocumentRoot . '/' . \ltrim('/', $link->getAttribute('href')));
+            $link->setAttribute('href', $relativeVersionDocumentRoot . '/' . \ltrim($link->getAttribute('href'), '/'));
         }
         foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-            $script->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim('/', $script->getAttribute('src')));
+            $script->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim($script->getAttribute('src'), '/'));
         }
     }
 
