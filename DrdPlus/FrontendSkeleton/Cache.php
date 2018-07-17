@@ -12,15 +12,15 @@ abstract class Cache extends StrictObject
     public const DISABLE = 'disable';
 
     /** @var string */
-    private $cacheRootDir;
+    protected $cacheRootDir;
     /** @var array|string[] */
-    private $cacheRoots;
+    protected $cacheRoots;
     /** @var WebVersions */
-    private $webVersions;
+    protected $webVersions;
     /** @var string */
-    private $cachePrefix;
+    protected $cachePrefix;
     /** @var bool */
-    private $isInProduction;
+    protected $isInProduction;
 
     /**
      * @param WebVersions $webVersions
