@@ -8,6 +8,7 @@ use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
+use Gt\Dom\Element;
 
 class VersionTest extends AbstractContentTest
 {
@@ -134,12 +135,31 @@ class VersionTest extends AbstractContentTest
             return;
         }
         $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
+        $masterDocumentRoot = $webVersions->getVersionDocumentRoot($webVersions->getLastUnstableVersion());
+        $checked = 0;
         foreach ($webVersions->getAllStableVersions() as $stableVersion) {
-            $versionDocumentRoot = $webVersions->getVersionDocumentRoot($stableVersion);
             $htmlDocument = $this->getHtmlDocument(['version' => $stableVersion]);
             foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-                self::assertFileExists($versionDocumentRoot . '/' . $image->getAttribute('src'), $image->outerHTML);
+                $checked += $this->Asset_file_exists($image, 'src', $masterDocumentRoot);
+            }
+            foreach ($htmlDocument->getElementsByTagName('link') as $link) {
+                $checked += $this->Asset_file_exists($link, 'href', $masterDocumentRoot);
+            }
+            foreach ($htmlDocument->getElementsByTagName('script') as $script) {
+                $checked += $this->Asset_file_exists($script, 'src', $masterDocumentRoot);
             }
         }
+    }
+
+    private function Asset_file_exists(Element $element, string $parameterName, string $masterDocumentRoot): int
+    {
+        $urlParts = \parse_url($element->getAttribute($parameterName));
+        if (!empty($urlParts['host'])) {
+            return 0;
+        }
+        $path = $urlParts['path'];
+        self::assertFileExists($masterDocumentRoot . '/' . \ltrim($path, '/'), $element->outerHTML);
+
+        return 1;
     }
 }
