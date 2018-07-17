@@ -69,6 +69,14 @@ class FrontendController extends StrictObject
     }
 
     /**
+     * @return HtmlHelper
+     */
+    public function getHtmlHelper(): HtmlHelper
+    {
+        return $this->htmlHelper;
+    }
+
+    /**
      * @return string
      */
     public function getGoogleAnalyticsId(): string
