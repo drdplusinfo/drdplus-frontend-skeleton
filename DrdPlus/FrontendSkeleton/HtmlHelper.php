@@ -527,7 +527,7 @@ class HtmlHelper extends StrictObject
         }
         $currentVersionDocumentRoot = $webVersions->getVersionDocumentRoot($webVersions->getCurrentVersion());
         $unstableVersionDocumentRoot = \dirname($currentVersionDocumentRoot, 2);
-        $relativeVersionDocumentRoot = \str_replace($unstableVersionDocumentRoot, '', $unstableVersionDocumentRoot);
+        $relativeVersionDocumentRoot = \str_replace($unstableVersionDocumentRoot, '', $currentVersionDocumentRoot);
 
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
             $image->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim('/', $image->getAttribute('src')));
