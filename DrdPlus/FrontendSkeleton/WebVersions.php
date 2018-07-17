@@ -209,4 +209,15 @@ class WebVersions extends StrictObject
 
         return $this->dirs->getDirForVersions() . '/' . $forVersion;
     }
+
+    public function getRelativeVersionDocumentRoot(string $forVersion): string
+    {
+        // /foo/bar/versions/1.0
+        $currentVersionDocumentRoot = $this->getVersionDocumentRoot($forVersion);
+        // /foo/bar
+        $unstableVersionDocumentRoot = \dirname($currentVersionDocumentRoot, 2);
+
+        // /versions/1.0
+        return \str_replace($unstableVersionDocumentRoot, '', $currentVersionDocumentRoot);
+    }
 }
