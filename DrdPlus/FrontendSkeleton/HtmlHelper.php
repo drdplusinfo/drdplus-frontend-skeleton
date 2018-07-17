@@ -519,14 +519,30 @@ class HtmlHelper extends StrictObject
         }
         $relativeVersionDocumentRoot = $webVersions->getRelativeVersionDocumentRoot($webVersions->getCurrentVersion());
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-            $image->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim($image->getAttribute('src'), '/'));
+            $this->updateAssetLinkToCurrentVersion($image, 'src', $relativeVersionDocumentRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-            $link->setAttribute('href', $relativeVersionDocumentRoot . '/' . \ltrim($link->getAttribute('href'), '/'));
+            $this->updateAssetLinkToCurrentVersion($link, 'href', $relativeVersionDocumentRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-            $script->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim($script->getAttribute('src'), '/'));
+            $this->updateAssetLinkToCurrentVersion($script, 'src', $relativeVersionDocumentRoot);
         }
+    }
+
+    private function updateAssetLinkToCurrentVersion(Element $element, string $attributeName, string $relativeVersionDocumentRoot): void
+    {
+        $link = $element->getAttribute($attributeName);
+        if ($this->isLinkExternal($link)) {
+            return;
+        }
+        $element->setAttribute($attributeName, $relativeVersionDocumentRoot . '/' . \ltrim($link, '/'));
+    }
+
+    private function isLinkExternal(string $link): bool
+    {
+        $urlParts = \parse_url($link);
+
+        return !empty($urlParts['host']);
     }
 
     private function addVersionHashToAssets(HtmlDocument $htmlDocument): void
@@ -545,13 +561,13 @@ class HtmlHelper extends StrictObject
 
     private function addVersionToAsset(Element $element, string $attributeName, string $masterDocumentRoot): void
     {
-        $source = $element->getAttribute($attributeName);
-        if (!$source || \strpos($source, 'https://') === 0 || \strpos($source, 'http://') === 0 || \strpos($source, '//') === 0) {
+        $link = $element->getAttribute($attributeName);
+        if ($this->isLinkExternal($link)) {
             return;
         }
-        $absolutePath = $this->getAbsolutePath($source, $masterDocumentRoot);
+        $absolutePath = $this->getAbsolutePath($link, $masterDocumentRoot);
         $hash = $this->getFileHash($absolutePath);
-        $element->setAttribute($attributeName, $source . '?version=' . \urlencode($hash));
+        $element->setAttribute($attributeName, $link . '?version=' . \urlencode($hash));
     }
 
     private function getAbsolutePath(string $relativePath, string $masterDocumentRoot): string
