@@ -38,7 +38,9 @@ class Dirs extends StrictObject
         $this->webRoot = $documentRoot . '/web';
         $this->vendorRoot = $documentRoot . '/vendor';
         $this->partsRoot = $documentRoot . '/parts';
-        $this->genericPartsRoot = __DIR__ . '/../../parts/frontend-skeleton';
+        $this->genericPartsRoot = \file_exists($documentRoot . '/vendor/frontend-skeleton/parts/frontend-skeleton')
+            ? $documentRoot . '/vendor/frontend-skeleton/parts/frontend-skeleton'
+            : $documentRoot . '/parts/frontend-skeleton';
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
         $this->dirForVersions = $documentRoot . '/versions';

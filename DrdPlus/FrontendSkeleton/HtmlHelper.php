@@ -514,7 +514,13 @@ class HtmlHelper extends StrictObject
         );
     }
 
-    public function updateAssetLinksToCurrentVersion(HtmlDocument $htmlDocument, WebVersions $webVersions): void
+    public function updateAssetLinks(HtmlDocument $htmlDocument, WebVersions $webVersions): void
+    {
+        $this->updateAssetLinksToCurrentVersion($htmlDocument, $webVersions);
+        $this->addVersionHashToAssets($htmlDocument);
+    }
+
+    private function updateAssetLinksToCurrentVersion(HtmlDocument $htmlDocument, WebVersions $webVersions): void
     {
         if (!$webVersions->isCurrentVersionStable()) {
             return;
@@ -534,7 +540,7 @@ class HtmlHelper extends StrictObject
         }
     }
 
-    public function addVersionHashToAssets(HtmlDocument $htmlDocument): void
+    private function addVersionHashToAssets(HtmlDocument $htmlDocument): void
     {
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
             $this->addVersionToAsset($image, 'src');

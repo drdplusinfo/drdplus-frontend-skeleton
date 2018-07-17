@@ -194,7 +194,7 @@ class AssetsVersion extends StrictObject
     private function appendVersionHashToLink(string $link, string $version): string
     {
         $parsed = \parse_url($link);
-        $queryString = \urldecode((string)($parsed['query'] ?? ''));
+        $queryString = \urldecode($parsed['query'] ?? '');
         $queryChunks = explode('&', $queryString);
         $queryParts = [];
         foreach ($queryChunks as $queryChunk) {
@@ -214,7 +214,7 @@ class AssetsVersion extends StrictObject
         }
         $versionedQuery = \implode('&', $newQueryChunks);
         $fragment = '';
-        if ((string)($parsed['fragment'] ?? '') !== '') {
+        if (($parsed['fragment'] ?? '') !== '') {
             $fragment .= '#' . $parsed['fragment'];
         }
         if ($fragment !== '') {

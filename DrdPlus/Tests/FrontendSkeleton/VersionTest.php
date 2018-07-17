@@ -122,4 +122,24 @@ class VersionTest extends AbstractContentTest
         // unstable version is forced by test, it should be stable version by default
         self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $_COOKIE['version']);
     }
+
+    /**
+     * @test
+     */
+    public function Stable_versions_have_valid_asset_links(): void
+    {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
+            self::assertFalse(false, 'Nothing to test here');
+
+            return;
+        }
+        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
+        foreach ($webVersions->getAllStableVersions() as $stableVersion) {
+            $versionDocumentRoot = $webVersions->getVersionDocumentRoot($stableVersion);
+            $htmlDocument = $this->getHtmlDocument(['version' => $stableVersion]);
+            foreach ($htmlDocument->getElementsByTagName('img') as $image) {
+                self::assertFileExists($versionDocumentRoot . '/' . $image->getAttribute('src'), $image->outerHTML);
+            }
+        }
+    }
 }
