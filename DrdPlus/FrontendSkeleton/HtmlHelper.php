@@ -15,6 +15,8 @@ class HtmlHelper extends StrictObject
     public const CALCULATION_CLASS = 'calculation';
     public const DATA_ORIGINAL_ID = 'data-original-id';
 
+    /** @var Dirs */
+    private $dirs;
     /** @var bool */
     private $inDevMode;
     /** @var bool */
@@ -23,13 +25,11 @@ class HtmlHelper extends StrictObject
     private $shouldHideCovered;
     /** @var bool */
     private $showIntroductionOnly;
-    /** @var string */
-    private $documentRoot;
 
-    public static function createFromGlobals(string $documentRootDir): HtmlHelper
+    public static function createFromGlobals(Dirs $dirs): HtmlHelper
     {
         return new static(
-            $documentRootDir,
+            $dirs,
             !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'dev') === 0,
             !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'prod') === 0,
             !empty($_GET['hide']) && \strpos(\trim($_GET['hide']), 'cover') === 0,
@@ -38,25 +38,18 @@ class HtmlHelper extends StrictObject
     }
 
     public function __construct(
-        string $documentRoot,
+        Dirs $dirs,
         bool $inDevMode,
         bool $inForcedProductionMode,
         bool $shouldHideCovered,
         bool $showIntroductionOnly
     )
     {
-        $this->documentRoot = $this->unifyPath($documentRoot);
+        $this->dirs = $dirs;
         $this->inDevMode = $inDevMode;
         $this->inForcedProductionMode = $inForcedProductionMode;
         $this->shouldHideCovered = $shouldHideCovered;
         $this->showIntroductionOnly = $showIntroductionOnly;
-    }
-
-    private function unifyPath(string $path): string
-    {
-        $path = \str_replace('\\', '/', $path);
-
-        return \rtrim($path, '/');
     }
 
     /**
@@ -170,7 +163,6 @@ class HtmlHelper extends StrictObject
             if ($hash === '') {
                 continue;
             }
-            /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
             $hashWithoutDiacritics = $this->unifyId($hash);
             if ($hashWithoutDiacritics === $hash) {
                 continue;
@@ -525,10 +517,7 @@ class HtmlHelper extends StrictObject
         if (!$webVersions->isCurrentVersionStable()) {
             return;
         }
-        $currentVersionDocumentRoot = $webVersions->getVersionDocumentRoot($webVersions->getCurrentVersion());
-        $unstableVersionDocumentRoot = \dirname($currentVersionDocumentRoot, 2);
-        $relativeVersionDocumentRoot = \str_replace($unstableVersionDocumentRoot, '', $currentVersionDocumentRoot);
-
+        $relativeVersionDocumentRoot = $webVersions->getRelativeVersionDocumentRoot($webVersions->getCurrentVersion());
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
             $image->setAttribute('src', $relativeVersionDocumentRoot . '/' . \ltrim($image->getAttribute('src'), '/'));
         }
@@ -542,38 +531,39 @@ class HtmlHelper extends StrictObject
 
     private function addVersionHashToAssets(HtmlDocument $htmlDocument): void
     {
+        $masterDocumentRoot = $this->dirs->getMasterDocumentRoot();
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-            $this->addVersionToAsset($image, 'src');
+            $this->addVersionToAsset($image, 'src', $masterDocumentRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-            $this->addVersionToAsset($link, 'href');
+            $this->addVersionToAsset($link, 'href', $masterDocumentRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-            $this->addVersionToAsset($script, 'src');
+            $this->addVersionToAsset($script, 'src', $masterDocumentRoot);
         }
     }
 
-    private function addVersionToAsset(Element $element, string $attributeName): void
+    private function addVersionToAsset(Element $element, string $attributeName, string $masterDocumentRoot): void
     {
         $source = $element->getAttribute($attributeName);
         if (!$source || \strpos($source, 'https://') === 0 || \strpos($source, 'http://') === 0 || \strpos($source, '//') === 0) {
             return;
         }
-        $absolutePath = $this->getAbsolutePath($source, $this->documentRoot);
+        $absolutePath = $this->getAbsolutePath($source, $masterDocumentRoot);
         $hash = $this->getFileHash($absolutePath);
         $element->setAttribute($attributeName, $source . '?version=' . \urlencode($hash));
     }
 
-    private function getAbsolutePath(string $relativePath, string $root): string
+    private function getAbsolutePath(string $relativePath, string $masterDocumentRoot): string
     {
-        $relativePath = \ltrim($this->unifyPath($relativePath), '/');
+        $relativePath = \ltrim($relativePath, '\\/');
 
-        return $root . '/' . $relativePath;
+        return $masterDocumentRoot . '/' . $relativePath;
     }
 
     private function getFileHash(string $fileName): string
     {
-        return \md5_file($fileName) ?: (string)\time(); // time is fallback
+        return \md5_file($fileName) ?: (string)\time(); // time is a fallback
     }
 
     public function isInProduction(): bool

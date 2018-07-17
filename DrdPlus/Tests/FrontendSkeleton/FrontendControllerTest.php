@@ -33,7 +33,7 @@ class FrontendControllerTest extends AbstractContentTest
 
     protected function createDirs(string $documentRoot = null): Dirs
     {
-        return new Dirs($documentRoot ?? $this->getDocumentRoot());
+        return new Dirs($this->getMasterDocumentRoot(), $documentRoot ?? $this->getDocumentRoot());
     }
 
     /**

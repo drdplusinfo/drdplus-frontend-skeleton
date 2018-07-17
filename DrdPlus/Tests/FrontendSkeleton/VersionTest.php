@@ -50,7 +50,8 @@ class VersionTest extends AbstractContentTest
      */
     public function I_can_switch_to_every_version(string $source): void
     {
-        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
+        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
+        $webVersions = new WebVersions($dirs);
         foreach ($webVersions->getAllVersions() as $webVersion) {
             $post = [];
             $cookies = [];
@@ -94,7 +95,8 @@ class VersionTest extends AbstractContentTest
 
             return;
         }
-        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
+        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
+        $webVersions = new WebVersions($dirs);
         $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching');
         self::assertNotEmpty(
             $tags,
@@ -134,8 +136,9 @@ class VersionTest extends AbstractContentTest
 
             return;
         }
-        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
-        $masterDocumentRoot = $webVersions->getVersionDocumentRoot($webVersions->getLastUnstableVersion());
+        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
+        $webVersions = new WebVersions($dirs);
+        $masterDocumentRoot = $dirs->getMasterDocumentRoot();
         $checked = 0;
         foreach ($webVersions->getAllStableVersions() as $stableVersion) {
             $htmlDocument = $this->getHtmlDocument(['version' => $stableVersion]);

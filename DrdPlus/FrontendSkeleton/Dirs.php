@@ -9,6 +9,8 @@ use Granam\Strict\Object\StrictObject;
 class Dirs extends StrictObject
 {
     /** @var string */
+    protected $masterDocumentRoot;
+    /** @var string */
     protected $documentRoot;
     /** @var string */
     protected $webRoot;
@@ -27,13 +29,19 @@ class Dirs extends StrictObject
     /** @var string */
     protected $cacheRoot;
 
-    public function __construct(string $documentRoot = null)
+    public function __construct(string $masterDocumentRoot, ?string $documentRoot)
     {
-        $this->documentRoot = $documentRoot ?? (\PHP_SAPI !== 'cli' ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/') : \getcwd());
-        $this->populateSubRoots($this->documentRoot);
+        $this->masterDocumentRoot = $this->unifyPath($masterDocumentRoot);
+        $this->documentRoot = $this->unifyPath($documentRoot
+            ?? (\PHP_SAPI !== 'cli'
+                ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/')
+                : \getcwd()
+            )
+        );
+        $this->populateSubRoots($this->masterDocumentRoot, $this->documentRoot);
     }
 
-    protected function populateSubRoots(string $documentRoot): void
+    protected function populateSubRoots(string $masterDocumentRoot, string $documentRoot): void
     {
         $this->webRoot = $documentRoot . '/web';
         $this->vendorRoot = $documentRoot . '/vendor';
@@ -43,8 +51,23 @@ class Dirs extends StrictObject
             : $documentRoot . '/parts/frontend-skeleton';
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
-        $this->dirForVersions = $documentRoot . '/versions';
+        $this->dirForVersions = $masterDocumentRoot . '/versions';
         $this->cacheRoot = $documentRoot . '/cache/' . \PHP_SAPI;
+    }
+
+    protected function unifyPath(string $path): string
+    {
+        $path = \str_replace('\\', '/', $path);
+
+        return \rtrim($path, '/');
+    }
+
+    /**
+     * @return string
+     */
+    public function getMasterDocumentRoot(): string
+    {
+        return $this->masterDocumentRoot;
     }
 
     /**
