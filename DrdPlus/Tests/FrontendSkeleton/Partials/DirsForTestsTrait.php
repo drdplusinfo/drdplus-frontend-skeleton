@@ -7,14 +7,19 @@ namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 trait DirsForTestsTrait
 {
 
-    protected function getDocumentRoot(): string
+    protected function getMasterDocumentRoot(): string
     {
-        static $documentRoot;
-        if ($documentRoot === null) {
-            $documentRoot = \dirname(\DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
+        static $masterDocumentRoot;
+        if ($masterDocumentRoot === null) {
+            $masterDocumentRoot = \dirname(\DRD_PLUS_INDEX_FILE_NAME_TO_TEST);
         }
 
-        return $documentRoot;
+        return $masterDocumentRoot;
+    }
+
+    protected function getDocumentRoot(): string
+    {
+        return $this->getMasterDocumentRoot();
     }
 
     protected function getDirForVersions(): string

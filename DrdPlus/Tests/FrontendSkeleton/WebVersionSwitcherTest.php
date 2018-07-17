@@ -18,7 +18,7 @@ class WebVersionSwitcherTest extends AbstractContentTest
      */
     public function I_can_get_index_of_another_version(): void
     {
-        $webVersions = new WebVersions(new Dirs($this->getDocumentRoot()));
+        $webVersions = new WebVersions(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
         $versions = $webVersions->getAllVersions();
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');
@@ -31,7 +31,7 @@ class WebVersionSwitcherTest extends AbstractContentTest
             'Expected at least two versions to test, got only ' . \implode(',', $versions)
         );
         $currentWebVersion = $webVersions->getCurrentVersion();
-        $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, new Dirs($this->getDocumentRoot()), new CookiesService());
+        $rulesVersionSwitcher = new WebVersionSwitcher($webVersions, new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()), new CookiesService());
         $currentIndexFile = $this->getDocumentRoot() . '/index.php';
         self::assertSame(
             $currentIndexFile,

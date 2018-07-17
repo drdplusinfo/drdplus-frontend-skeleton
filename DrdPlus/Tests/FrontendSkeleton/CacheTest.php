@@ -24,7 +24,7 @@ class CacheTest extends TestWithMockery
         $webVersions = $this->mockery(WebVersions::class);
         $webVersions->shouldReceive('getCurrentVersion')
             ->andReturnValues(['master', '9.8.7']); // sequential, returns different value for first and second call
-        $dirs = new Dirs($this->getDocumentRoot());
+        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
         /** @var WebVersions $webVersions */
         $cache = $this->createSut($webVersions, $dirs);
         self::assertSame($dirs->getCacheRoot() . '/master', $cache->getCacheDir());

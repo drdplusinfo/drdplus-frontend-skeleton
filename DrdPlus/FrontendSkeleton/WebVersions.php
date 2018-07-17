@@ -214,10 +214,8 @@ class WebVersions extends StrictObject
     {
         // /foo/bar/versions/1.0
         $currentVersionDocumentRoot = $this->getVersionDocumentRoot($forVersion);
-        // /foo/bar
-        $unstableVersionDocumentRoot = \dirname($currentVersionDocumentRoot, 2);
 
-        // /versions/1.0
-        return \str_replace($unstableVersionDocumentRoot, '', $currentVersionDocumentRoot);
+        // /versions/1.0 or empty string for master
+        return \str_replace($this->dirs->getMasterDocumentRoot(), '', $currentVersionDocumentRoot);
     }
 }
