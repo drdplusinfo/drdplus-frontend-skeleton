@@ -188,11 +188,11 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(true /* in production */), $this->createDirs());
+        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(null, true /* in production */), $this->createDirs());
         self::assertTrue($controller->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(false /* not in production */), $this->createDirs());
+        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(null, false /* not in production */), $this->createDirs());
         self::assertFalse($controller->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
     }
 
@@ -236,7 +236,7 @@ class FrontendControllerTest extends AbstractContentTest
 
         return new $controllerClass(
             $googleAnalyticsId,
-            $htmlHelper ?? new HtmlHelper($dirs, false, false, false, false),
+            $htmlHelper ?? $this->createHtmlHelper($dirs, false, false, false, false),
             $dirs
         );
     }

@@ -148,22 +148,31 @@ abstract class AbstractContentTest extends SkeletonTestCase
     {
         $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
 
-        return (new FrontendController('Google Foo', $this->createHtmlHelper(), $dirs))->getPageTitle();
+        return (new FrontendController('Google Foo', $this->createHtmlHelper($dirs), $dirs))->getPageTitle();
     }
 
     /**
-     * @param bool|null $inProductionMode
+     * @param Dirs $dirs
+     * @param bool $inDevMode
+     * @param bool $inForcedProductionMode
+     * @param bool $shouldHideCovered
+     * @param bool $showIntroductionOnly
      * @return HtmlHelper|\Mockery\MockInterface
      */
-    protected function createHtmlHelper(bool $inProductionMode = null): HtmlHelper
+    protected function createHtmlHelper(
+        Dirs $dirs = null,
+        bool $inForcedProductionMode = false,
+        bool $inDevMode = false,
+        bool $shouldHideCovered = false,
+        bool $showIntroductionOnly = false
+    ): HtmlHelper
     {
-        $htmlHelper = $this->mockery(HtmlHelper::class);
-        if ($inProductionMode !== null) {
-            $htmlHelper->shouldReceive('isInProduction')
-                ->andReturn($inProductionMode);
-        }
+        return new HtmlHelper($dirs ?? $this->createDirs(), $inDevMode, $inForcedProductionMode, $shouldHideCovered, $showIntroductionOnly);
+    }
 
-        return $htmlHelper;
+    protected function createDirs(string $documentRoot = null): Dirs
+    {
+        return new Dirs($this->getMasterDocumentRoot(), $documentRoot ?? $this->getDocumentRoot());
     }
 
     protected function fetchNonCachedContent(FrontendController $controller = null): string
