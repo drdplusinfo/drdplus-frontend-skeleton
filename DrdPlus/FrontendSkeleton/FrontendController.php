@@ -264,4 +264,24 @@ class FrontendController extends StrictObject
     {
         return $this->getWebVersions()->getCurrentPatchVersion();
     }
+
+    public function injectCacheId(HtmlDocument $htmlDocument)
+    {
+        $htmlDocument->documentElement->setAttribute('data-cache-stamp', $this->getPageCache()->getCacheId());
+    }
+
+    public function injectRedirectIfAny(string $content): string
+    {
+        if (!$this->getRedirect()) {
+            return $content;
+        }
+        $cachedDocument = new HtmlDocument($content);
+        $meta = $cachedDocument->createElement('meta');
+        $meta->setAttribute('http-equiv', 'Refresh');
+        $meta->setAttribute('content', $this->getRedirect()->getAfterSeconds() . '; url=' . $this->getRedirect()->getTarget());
+        $meta->setAttribute('id', 'meta_redirect');
+        $cachedDocument->head->appendChild($meta);
+
+        return $cachedDocument->saveHTML();
+    }
 }

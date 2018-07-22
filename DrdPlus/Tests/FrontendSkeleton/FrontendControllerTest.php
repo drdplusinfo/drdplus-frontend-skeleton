@@ -232,29 +232,13 @@ class FrontendControllerTest extends AbstractContentTest
     ): FrontendController
     {
         $controllerClass = static::getSutClass();
+        $dirs = $this->createDirs($documentRoot);
 
         return new $controllerClass(
             $googleAnalyticsId,
-            $htmlHelper ?? $this->createHtmlHelper(false /* not in production */),
-            $this->createDirs($documentRoot)
+            $htmlHelper ?? new HtmlHelper($dirs, false, false, false, false),
+            $dirs
         );
-    }
-
-    /**
-     * @param HtmlDocument $document
-     * @return array|Element[]
-     */
-    protected function getMetaRefreshes(HtmlDocument $document): array
-    {
-        $metaElements = $document->head->getElementsByTagName('meta');
-        $metaRefreshes = [];
-        foreach ($metaElements as $metaElement) {
-            if ($metaElement->getAttribute('http-equiv') === 'Refresh') {
-                $metaRefreshes[] = $metaElement;
-            }
-        }
-
-        return $metaRefreshes;
     }
 
     /**

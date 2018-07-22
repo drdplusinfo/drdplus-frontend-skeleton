@@ -8,6 +8,7 @@ use DrdPlus\FrontendSkeleton\Cache;
 use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
 
 abstract class AbstractContentTest extends SkeletonTestCase
@@ -239,4 +240,22 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
         return \end($output) ?: '';
     }
+
+    /**
+     * @param HtmlDocument $document
+     * @return array|Element[]
+     */
+    protected function getMetaRefreshes(HtmlDocument $document): array
+    {
+        $metaElements = $document->head->getElementsByTagName('meta');
+        $metaRefreshes = [];
+        foreach ($metaElements as $metaElement) {
+            if ($metaElement->getAttribute('http-equiv') === 'Refresh') {
+                $metaRefreshes[] = $metaElement;
+            }
+        }
+
+        return $metaRefreshes;
+    }
+
 }
