@@ -3,7 +3,7 @@
 
 $cachedContent = $controller->getCachedContent();
 if ($cachedContent !== '') {
-    return $cachedContent;
+    return $controller->injectRedirectIfAny($cachedContent); // redirect is NOT cached and has to be injected again and again
 }
 
 $previousMemoryLimit = \ini_set('memory_limit', '1G');
@@ -16,10 +16,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
       <link rel="shortcut icon" href="/favicon.ico">
       <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
-        <?php if ($controller->getRedirect()) { ?>
-          <meta http-equiv="Refresh" content="<?= $controller->getRedirect()->getAfterSeconds() ?>; url=<?= $controller->getRedirect()->getTarget() ?>">
-        <?php } ?>
-      <script id="googleAnalyticsId" data-google-analytics-id=<?= json_encode($controller->getGoogleAnalyticsId()) ?>
+      <script id="googleAnalyticsId" data-google-analytics-id=<?= \json_encode($controller->getGoogleAnalyticsId()) ?>
       async src="https://www.googletagmanager.com/gtag/js?id=<?= $controller->getGoogleAnalyticsId() ?>"></script>
         <?php
         foreach ($controller->getJsFiles() as $jsFile) { ?>
@@ -52,7 +49,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
 $content .= \ob_get_clean();
 $controller->getPageCache()->saveContentForDebug($content); // for debugging purpose
 $htmlDocument = new \DrdPlus\FrontendSkeleton\HtmlDocument($content);
-/** @var \DrdPlus\FrontendSkeleton\HtmlHelper $htmlHelper */
+$htmlHelper = $controller->getHtmlHelper();
 $htmlHelper->prepareSourceCodeLinks($htmlDocument);
 $htmlHelper->addIdsToTablesAndHeadings($htmlDocument);
 $htmlHelper->replaceDiacriticsFromIds($htmlDocument);
@@ -66,8 +63,12 @@ $htmlHelper->updateAssetLinks($htmlDocument, $controller->getWebVersions());
 if (!$htmlHelper->isInProduction()) {
     $htmlHelper->makeExternalDrdPlusLinksLocal($htmlDocument);
 }
+$controller->injectCacheId($htmlDocument);
 $updatedContent = $htmlDocument->saveHTML();
 $controller->getPageCache()->cacheContent($updatedContent);
+
+// has to be AFTER cache as we do not want to cache it
+$updatedContent = $controller->injectRedirectIfAny($updatedContent);
 
 if ($previousMemoryLimit !== false) {
     \ini_set('memory_limit', $previousMemoryLimit);

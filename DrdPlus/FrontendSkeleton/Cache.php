@@ -12,15 +12,15 @@ abstract class Cache extends StrictObject
     public const DISABLE = 'disable';
 
     /** @var string */
-    private $cacheRootDir;
+    protected $cacheRootDir;
     /** @var array|string[] */
-    private $cacheRoots;
+    protected $cacheRoots;
     /** @var WebVersions */
-    private $webVersions;
+    protected $webVersions;
     /** @var string */
-    private $cachePrefix;
+    protected $cachePrefix;
     /** @var bool */
-    private $isInProduction;
+    protected $isInProduction;
 
     /**
      * @param WebVersions $webVersions
@@ -65,7 +65,7 @@ abstract class Cache extends StrictObject
         return $this->isInProduction;
     }
 
-    private function getCurrentGetHash(): string
+    protected function getCurrentRequestHash(): string
     {
         return \md5(\serialize($_GET));
     }
@@ -79,14 +79,9 @@ abstract class Cache extends StrictObject
         return ($_GET[static::CACHE] ?? '') !== static::DISABLE && \is_readable($this->getCacheFileName());
     }
 
-    /**
-     * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     */
-    private function getCacheFileName(): string
+    public function getCacheId(): string
     {
-        return $this->getCacheDir() . "/{$this->getCacheFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheFileBaseNamePartWithoutRequest() . '_' . $this->getCurrentRequestHash();
     }
 
     /**
@@ -94,7 +89,17 @@ abstract class Cache extends StrictObject
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    private function getCacheFileBaseNamePartWithoutGet(): string
+    private function getCacheFileName(): string
+    {
+        return $this->getCacheDir() . "/{$this->getCacheId()}.html";
+    }
+
+    /**
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
+     */
+    private function getCacheFileBaseNamePartWithoutRequest(): string
     {
         $prefix = \md5($this->getCachePrefix() . $this->getGitStamp());
 
@@ -160,7 +165,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheDebugFileName(): string
     {
-        return $this->getCacheDir() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentGetHash()}.html";
+        return $this->getCacheDir() . "/{$this->geCacheDebugFileBaseNamePartWithoutGet()}_{$this->getCurrentRequestHash()}.html";
     }
 
     /**
@@ -170,7 +175,7 @@ abstract class Cache extends StrictObject
      */
     private function geCacheDebugFileBaseNamePartWithoutGet(): string
     {
-        return 'debug_' . $this->getCacheFileBaseNamePartWithoutGet();
+        return 'debug_' . $this->getCacheFileBaseNamePartWithoutRequest();
     }
 
     /**
