@@ -79,6 +79,11 @@ abstract class Cache extends StrictObject
         return ($_GET[static::CACHE] ?? '') !== static::DISABLE && \is_readable($this->getCacheFileName());
     }
 
+    public function getCacheId(): string
+    {
+        return $this->getCacheFileBaseNamePartWithoutRequest() . '_' . $this->getCurrentRequestHash();
+    }
+
     /**
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotGetGitStatus
@@ -86,7 +91,7 @@ abstract class Cache extends StrictObject
      */
     private function getCacheFileName(): string
     {
-        return $this->getCacheDir() . "/{$this->getCacheFileBaseNamePartWithoutRequest()}_{$this->getCurrentRequestHash()}.html";
+        return $this->getCacheDir() . "/{$this->getCacheId()}.html";
     }
 
     /**
