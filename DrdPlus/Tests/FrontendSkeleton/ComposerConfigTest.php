@@ -79,7 +79,7 @@ class ComposerConfigTest extends AbstractContentTest
         }
         foreach (['css', 'js', 'images'] as $assets) {
             self::assertContains(
-                "m -fr ./$assets/generic && cp -r ./vendor/drd-plus/frontend-skeleton/$assets/generic ./$assets/",
+                "rm -fr ./$assets/generic && cp -r ./vendor/drd-plus/frontend-skeleton/$assets/generic ./$assets/",
                 $preAutoloadDump,
                 "Missing script to copy $assets assets, there are only scripts "
                 . \preg_replace('~^Array\n\((.+)\)~', '$1', \var_export($preAutoloadDump, true))
