@@ -20,6 +20,8 @@ class VersionTest extends AbstractContentTest
     {
         if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertFalse(false, 'Nothing to test, there is just a single version');
+
+            return;
         }
         self::assertNotSame(
             $this->getTestsConfiguration()->getExpectedLastUnstableVersion(),
