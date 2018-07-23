@@ -11,11 +11,21 @@ class GitTest extends AbstractContentTest
     /**
      * @test
      */
+    public function Generic_assets_are_versioned(): void
+    {
+        foreach (['css/generic', 'images/generic', 'js/generic'] as $assetsDir) {
+            ['output' => $output, 'result' => $result] = $this->getDirVersioning($assetsDir);
+            self::assertLessThanOrEqual(1, $result); // GIT results into 1 if dir is not ignored
+            self::assertSame([], $output, "The $assetsDir dir should be versioned, but is ignored");
+        }
+    }
+
+    /**
+     * @test
+     */
     public function Vendor_dir_is_versioned_as_well(): void
     {
-        $documentRootEscaped = \escapeshellarg($this->getDocumentRoot());
-        $vendorRootEscaped = \escapeshellarg($this->getVendorRoot());
-        \exec("git -C $documentRootEscaped check-ignore $vendorRootEscaped 2>&1", $output, $result);
+        ['output' => $output, 'result' => $result] = $this->getDirVersioning($this->getVendorRoot());
         if ($this->isSkeletonChecked()) {
             self::assertSame(0, $result);
             self::assertSame([$this->getVendorRoot()], $output, 'The vendor dir should be ignored for skeleton');

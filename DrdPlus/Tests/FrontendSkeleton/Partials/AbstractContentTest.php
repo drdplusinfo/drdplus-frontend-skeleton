@@ -267,4 +267,20 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $metaRefreshes;
     }
 
+    protected function getDirVersioning(string $dirToCheck): array
+    {
+        $documentRootEscaped = \escapeshellarg($this->getDocumentRoot());
+        $dirToCheckEscaped = \escapeshellarg($dirToCheck);
+        $command = "git -C $documentRootEscaped check-ignore $dirToCheckEscaped 2>&1";
+        \exec($command, $output, $result);
+        if ($result > 1) { // both 0 and 1 are valid success return codes
+            throw new \RuntimeException(
+                "Can not find out if is vendor dir versioned or not by command '{$command}'"
+                . ", got return code '{$result}' and output\n"
+                . \implode("\n", $output)
+            );
+        }
+
+        return ['output' => $output, 'result' => $result];
+    }
 }
