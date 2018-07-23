@@ -29,7 +29,7 @@ class ComposerConfigTest extends AbstractContentTest
     /**
      * @test
      */
-    public function Project_is_using_php_with_nullable_type_hints(): void
+    public function Project_is_using_php_of_version_with_nullable_type_hints(): void
     {
         $requiredPhpVersion = static::$composerConfig['require']['php'];
         self::assertGreaterThan(0, \preg_match('~(?<version>\d.+)$~', $requiredPhpVersion, $matches));
@@ -59,8 +59,30 @@ class ComposerConfigTest extends AbstractContentTest
             self::assertContains(
                 'php ./vendor/bin/assets --css --dir=css',
                 $postChangeScripts,
-                'Missing script to compile assets, there are configs '
+                'Missing script to compile assets, there are only scripts '
                 . \preg_replace('~^Array\n\((.+)\)~', '$1', \var_export($postChangeScripts, true))
+            );
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function Generic_assets_are_hard_copied_from_libraries(): void
+    {
+        $preAutoloadDump = static::$composerConfig['scripts']['pre-autoload-dump'] ?? [];
+        self::assertNotEmpty($preAutoloadDump, 'Missing pre-autoload-dump scripts');
+        if ($this->isSkeletonChecked()) {
+            self::assertFalse(false, 'Skeleton does not have assets hard copied as it is their creator');
+
+            return;
+        }
+        foreach (['css', 'js', 'images'] as $assets) {
+            self::assertContains(
+                "rm -fr ./$assets/generic && cp -r ./vendor/drd-plus/frontend-skeleton/$assets/generic ./$assets/",
+                $preAutoloadDump,
+                "Missing script to copy $assets assets, there are only scripts "
+                . \preg_replace('~^Array\n\((.+)\)~', '$1', \var_export($preAutoloadDump, true))
             );
         }
     }

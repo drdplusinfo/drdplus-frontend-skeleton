@@ -40,16 +40,16 @@ class GoogleTest extends AbstractContentTest
                 $googleAnalyticsScript = $script;
             }
         }
-        $expectedGoogleAnalyticsId = $this->getTestsConfiguration()->getExpectedGoogleAnalyticsId();
-        $expectedGoogleAnalyticsScriptLink = 'https://www.googletagmanager.com/gtag/js?id=' . $expectedGoogleAnalyticsId;
-        $googleTagManagerScript = $sourcesToScripts[$expectedGoogleAnalyticsScriptLink] ?? null;
-        if (!$googleTagManagerScript) {
-            self::fail("Google tag manager script is missing, was looking for '$expectedGoogleAnalyticsScriptLink', available are only "
-                . \print_r(\array_keys($sourcesToScripts), true)
-            );
-        }
         if (!$googleAnalyticsScript) {
             self::fail('Google analytics script is missing, available are only ' . \print_r(\array_keys($sourcesToScripts), true));
+        }
+        $expectedGoogleAnalyticsId = $this->getTestsConfiguration()->getExpectedGoogleAnalyticsId();
+        $expectedGoogleTagManagerScriptLink = 'https://www.googletagmanager.com/gtag/js?id=' . $expectedGoogleAnalyticsId;
+        $googleTagManagerScript = $sourcesToScripts[$expectedGoogleTagManagerScriptLink] ?? null;
+        if (!$googleTagManagerScript) {
+            self::fail("Google tag manager script is missing, was looking for '$expectedGoogleTagManagerScriptLink', available are only "
+                . \print_r(\array_keys($sourcesToScripts), true)
+            );
         }
         $googleAnalyticsScriptRelativeFile = \parse_url($googleAnalyticsScript->getAttribute('src'), \PHP_URL_PATH);
         $googleAnalyticsScriptFile = $this->getDocumentRoot() . '/' . \ltrim($googleAnalyticsScriptRelativeFile, '/');

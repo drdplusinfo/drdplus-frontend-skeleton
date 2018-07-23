@@ -20,6 +20,8 @@ class VersionTest extends AbstractContentTest
     {
         if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertFalse(false, 'Nothing to test, there is just a single version');
+
+            return;
         }
         self::assertNotSame(
             $this->getTestsConfiguration()->getExpectedLastUnstableVersion(),
@@ -29,9 +31,17 @@ class VersionTest extends AbstractContentTest
         $version = $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version');
         self::assertNotEmpty($version, 'No version get from document data-version attribute');
         if ($this->getTestsConfiguration()->getExpectedLastVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
-            self::assertSame($this->getTestsConfiguration()->getExpectedLastVersion(), $version);
+            self::assertSame(
+                $this->getTestsConfiguration()->getExpectedLastUnstableVersion(),
+                $version,
+                'Expected different version due to tests config'
+            );
         } else {
-            self::assertStringStartsWith($this->getTestsConfiguration()->getExpectedLastVersion() . '.', $version);
+            self::assertStringStartsWith(
+                $this->getTestsConfiguration()->getExpectedLastVersion() . '.',
+                $version,
+                'Expected different version due to tests config'
+            );
         }
     }
 
