@@ -86,12 +86,17 @@ class FrontendController extends StrictObject
 
     public function getCssFiles(): CssFiles
     {
-        return new CssFiles($this->dirs->getCssRoot());
+        return new CssFiles(!$this->isLocalInstance(), $this->dirs);
+    }
+
+    protected function isLocalInstance(): bool
+    {
+        return \PHP_SAPI === 'cli' || \strpos(__DIR__, '/home/jaroslav/') === 0;
     }
 
     public function getJsFiles(): JsFiles
     {
-        return new JsFiles($this->dirs->getJsRoot());
+        return new JsFiles(!$this->isLocalInstance(), $this->dirs);
     }
 
     public function getWebName(): string

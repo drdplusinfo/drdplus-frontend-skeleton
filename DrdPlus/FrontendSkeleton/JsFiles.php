@@ -9,11 +9,12 @@ class JsFiles extends AbstractPublicFiles
     /**
      * @var string
      */
-    private $dirWithJs;
+    private $jsRoot;
 
-    public function __construct(string $dirWithJs)
+    public function __construct(bool $preferMinified, Dirs $dirs)
     {
-        $this->dirWithJs = \rtrim($dirWithJs, '\/');
+        parent::__construct($preferMinified);
+        $this->jsRoot = \rtrim($dirs->getJsRoot(), '\/');
     }
 
     /**
@@ -21,7 +22,7 @@ class JsFiles extends AbstractPublicFiles
      */
     public function getIterator(): \Iterator
     {
-        return new \ArrayIterator($this->scanForJsFiles($this->dirWithJs));
+        return new \ArrayIterator($this->scanForJsFiles($this->jsRoot));
     }
 
     /**
@@ -65,6 +66,8 @@ class JsFiles extends AbstractPublicFiles
                 $jsFiles[] = ($jsRelativeRoot !== '' ? ($jsRelativeRoot . '/') : '') . $folder; // intentionally relative path
             }
         }
+        $jsFiles = $this->removeMapFiles($jsFiles);
+        $jsFiles = $this->filterUniqueFiles($jsFiles);
 
         \usort($vendorJsFiles, function (string $someJs, string $anotherJs) {
             if (\strpos($someJs, 'jquery') !== false) {
