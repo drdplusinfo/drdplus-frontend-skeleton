@@ -103,7 +103,7 @@ abstract class Cache extends StrictObject
     {
         $prefix = \md5($this->getCachePrefix() . $this->getGitStamp());
 
-        return "{$this->webVersions->getCurrentVersion()}_{$prefix}_{$this->webVersions->getCurrentCommitHash()}";
+        return "{$this->webVersions->getCurrentPatchVersion()}_{$prefix}_{$this->webVersions->getCurrentCommitHash()}";
     }
 
     protected function getCachePrefix(): string
