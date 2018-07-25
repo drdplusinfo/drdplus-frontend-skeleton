@@ -238,4 +238,32 @@ HTML
         $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
         $htmlHelper->injectIframesWithRemoteTables(new HtmlDocument());
     }
+
+    /**
+     * @test
+     */
+    public function I_can_mark_external_links_by_class(): void
+    {
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = static::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlDocument = new HtmlDocument(<<<HTML
+        <!DOCTYPE html>
+<html lang="cs-CZ">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <a id="link_without_anchor">Link without anchor</a>
+</body>
+</htm>
+HTML
+        );
+        self::assertNull($htmlDocument->body->getAttribute('data-has-marked-external-urls'));
+        $htmlHelper->markExternalLinksByClass($htmlDocument);
+        self::assertSame('1', $htmlDocument->body->getAttribute('data-has-marked-external-urls'));
+        /** @var Element $linkWithoutAnchor */
+        $linkWithoutAnchor = $htmlDocument->getElementById('link_without_anchor');
+        self::assertFalse($linkWithoutAnchor->classList->contains(HtmlHelper::EXTERNAL_URL));
+    }
 }
