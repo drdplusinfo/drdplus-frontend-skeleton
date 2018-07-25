@@ -123,12 +123,14 @@ abstract class Cache extends StrictObject
         // GIT status is same for any working dir, if it is a sub-dir of wanted GIT project root
         \exec('git status', $statusRows, $return);
         if ($return !== 0) {
-            throw new Exceptions\CanNotGetGitStatus(
-                'Can not run `git status`, got result code ' . $return
-            );
+            throw new Exceptions\CanNotGetGitStatus('Can not run `git status`, got result code ' . $return);
+        }
+        \exec('git diff', $diffRows, $return);
+        if ($return !== 0) {
+            throw new Exceptions\CanNotGetGitDiff('Can not run `git diff`, got result code ' . $return);
         }
 
-        return \md5(\implode($statusRows));
+        return \md5(\implode(\array_merge($statusRows, $diffRows)));
     }
 
     /**
