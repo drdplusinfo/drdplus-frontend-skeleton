@@ -56,7 +56,7 @@ class GoogleTest extends AbstractContentTest
         self::assertFileExists($googleAnalyticsScriptFile, 'Can not find Google analytics script on expected path');
         $googleAnalyticsScriptContent = \file_get_contents($googleAnalyticsScriptFile);
         self::assertNotEmpty($googleAnalyticsScriptContent, "Google analytics script file is empty: $googleAnalyticsScriptFile");
-        $expectedGoogleAnalyticsScriptContent = \file_get_contents(__DIR__ . '/../../../js/generic/skeleton/vendor/google-analytics.js');
+        $expectedGoogleAnalyticsScriptContent = \file_get_contents(__DIR__ . '/../../../js/generic/skeleton/vendor/frontend/google-analytics.js');
         self::assertSame(
             $expectedGoogleAnalyticsScriptContent,
             $googleAnalyticsScriptContent,
