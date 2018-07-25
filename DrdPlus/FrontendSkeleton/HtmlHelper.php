@@ -14,6 +14,7 @@ class HtmlHelper extends StrictObject
     public const INVISIBLE_ID_CLASS = 'invisible-id';
     public const CALCULATION_CLASS = 'calculation';
     public const DATA_ORIGINAL_ID = 'data-original-id';
+    public const EXTERNAL_URL = 'external-url';
 
     /** @var Dirs */
     private $dirs;
@@ -401,9 +402,9 @@ class HtmlHelper extends StrictObject
         /** @var Element $anchor */
         foreach ($htmlDocument->getElementsByTagName('a') as $anchor) {
             if (!$anchor->classList->contains('internal')
-                && \preg_match('~^(https?:)?//[^#]~', $anchor->getAttribute('href'))
+                && \preg_match('~^(https?:)?//[^#]~', $anchor->getAttribute('href') ?? '')
             ) {
-                $anchor->classList->add('external-url');
+                $anchor->classList->add(self::EXTERNAL_URL);
             }
         }
         $htmlDocument->body->setAttribute('data-has-marked-external-urls', '1');
@@ -423,7 +424,7 @@ class HtmlHelper extends StrictObject
             );
         }
         /** @var Element $anchor */
-        foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
             if (!$anchor->getAttribute('target')) {
                 $anchor->setAttribute('target', '_blank');
             }
@@ -444,7 +445,7 @@ class HtmlHelper extends StrictObject
         }
         $remoteDrdPlusLinks = [];
         /** @var Element $anchor */
-        foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
             if (!\preg_match('~(?:https?:)?//(?<host>[[:alpha:]]+\.drdplus\.info)/[^#]*#(?<tableId>tabulka_\w+)~', $anchor->getAttribute('href'), $matches)) {
                 continue;
             }
@@ -485,7 +486,7 @@ class HtmlHelper extends StrictObject
                 'External links have to be marked first, use markExternalLinksByClass method for that'
             );
         }
-        foreach ($htmlDocument->getElementsByClassName('external-url') as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
             $anchor->setAttribute('href', $this->makeDrdPlusHostLocal($anchor->getAttribute('href')));
         }
         /** @var Element $iFrame */
