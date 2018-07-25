@@ -86,17 +86,12 @@ class FrontendController extends StrictObject
 
     public function getCssFiles(): CssFiles
     {
-        return new CssFiles(!$this->isLocalInstance(), $this->dirs);
-    }
-
-    protected function isLocalInstance(): bool
-    {
-        return \PHP_SAPI === 'cli' || \strpos(__DIR__, '/home/jaroslav/') === 0;
+        return new CssFiles($this->getHtmlHelper()->isInProduction(), $this->dirs);
     }
 
     public function getJsFiles(): JsFiles
     {
-        return new JsFiles(!$this->isLocalInstance(), $this->dirs);
+        return new JsFiles($this->getHtmlHelper()->isInProduction(), $this->dirs);
     }
 
     public function getWebName(): string
@@ -270,7 +265,7 @@ class FrontendController extends StrictObject
         return $this->getWebVersions()->getCurrentPatchVersion();
     }
 
-    public function injectCacheId(HtmlDocument $htmlDocument)
+    public function injectCacheId(HtmlDocument $htmlDocument): void
     {
         $htmlDocument->documentElement->setAttribute('data-cache-stamp', $this->getPageCache()->getCacheId());
     }
