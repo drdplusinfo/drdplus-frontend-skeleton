@@ -69,6 +69,8 @@ class CssFiles extends AbstractPublicFiles
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $flattenedCss = \array_merge($flattenedCss, $sameLevelCssFiles); // deeper files can be overloaded by shallow ones
         }
+        $flattenedCss = $this->removeMapFiles($flattenedCss);
+        $flattenedCss = $this->filterUniqueFiles($flattenedCss);
 
         return $flattenedCss;
     }
