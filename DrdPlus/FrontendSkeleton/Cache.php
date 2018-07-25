@@ -120,18 +120,15 @@ abstract class Cache extends StrictObject
         if ($this->isInProduction()) {
             return 'production';
         }
-        // GIT status is same for any working dir, if it sub-dir of GIT project root
-        \exec('git diff', $changedRows, $return);
+        // GIT status is same for any working dir, if it is a sub-dir of wanted GIT project root
+        \exec('git status', $statusRows, $return);
         if ($return !== 0) {
             throw new Exceptions\CanNotGetGitStatus(
-                'Can not run `git diff`, got result code ' . $return
+                'Can not run `git status`, got result code ' . $return
             );
         }
-        if (\count($changedRows) === 0) {
-            return 'unchanged';
-        }
 
-        return \md5(\implode($changedRows));
+        return \md5(\implode($statusRows));
     }
 
     /**
