@@ -5,7 +5,11 @@
     ?>
 </div>
 <div>
-  Stabilní verze <strong>1.0</strong>
+    <?php if ($controller->getWebVersions()->isCurrentVersionStable()) { ?>
+      Stabilní verze <strong><?= $controller->getCurrentVersion() ?></strong>
+    <?php } else { ?>
+      Vývojová verze <strong><?= $controller->getCurrentVersion() ?></strong>
+    <?php } ?>
 </div>
 <div>
   <div class="modal fade" id="confirmOwnership" tabindex="-1" role="dialog" aria-labelledby="confirmOwnershipModalLabel" aria-hidden="true">
