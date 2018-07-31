@@ -7,6 +7,7 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
+use Gt\Dom\Node;
 
 class ContentTest extends AbstractContentTest
 {
@@ -96,8 +97,35 @@ class ContentTest extends AbstractContentTest
         self::assertNotEmpty($customBodyContent->innerHTML, "Content of '$customBodyContentId' is empty");
     }
 
-    protected function getPartsRoot(): string
+    /**
+     * @test
+     */
+    public function I_can_navigate_to_every_heading_by_expected_anchor(): void
     {
-        return $this->getDocumentRoot() . '/parts';
+        $htmlDocument = $this->getHtmlDocument();
+        for ($tagLevel = 1; $tagLevel <= 6; $tagLevel++) {
+            $headings = $htmlDocument->getElementsByTagName('h' . $tagLevel);
+            foreach ($headings as $heading) {
+                $id = $heading->id;
+                self::assertNotEmpty($id, 'Expected some ID for ' . $heading->outerHTML);
+                $anchors = $heading->getElementsByTagName('a');
+                self::assertCount(1, $anchors, 'Expected single anchor in ' . $heading->outerHTML);
+                $anchor = $anchors->current();
+                $href = $anchor->getAttribute('href');
+                self::assertNotEmpty($href, 'Expected some href of anchor in ' . $heading->outerHTML);
+                self::assertSame('#' . $id, $href, 'Expected anchor pointing to the heading ID');
+                $headingText = '';
+                foreach ($anchor->childNodes as $childNode) {
+                    /** @var Node $childNode */
+                    if ($childNode->nodeType === \XML_TEXT_NODE) {
+                        $headingText = $childNode->textContent;
+                        break;
+                    }
+                }
+                self::assertNotEmpty($headingText, 'Expected some human name for heading ' . $heading->outerHTML);
+                $idFromText = StringTools::toSnakeCaseId($headingText);
+                self::assertSame($id, $idFromText, "Expected different ID as created from '$headingText' heading");
+            }
+        }
     }
 }

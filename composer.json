@@ -23,6 +23,7 @@
   "require": {
     "php": ">=7.1",
     "ext-mbstring": "*",
+    "ext-dom": "*",
     "phpgt/dom": "~1.0",
     "piwik/device-detector": "^3.9",
     "tracy/tracy": "^2.4",
