@@ -235,4 +235,14 @@ class WebVersionsTest extends AbstractContentTest
         }
         $webVersions->getLastPatchVersionOf($nonExistingVersion);
     }
+
+    /**
+     * @test
+     */
+    public function I_can_get_version_document_root(): void
+    {
+        $webVersions = new WebVersions($dirs = $this->createDirs());
+        self::assertSame($dirs->getDirForVersions() . '/bar', $webVersions->getVersionDocumentRoot('bar'));
+        self::assertSame($dirs->getMasterDocumentRoot(), $webVersions->getVersionDocumentRoot(WebVersions::LATEST_VERSION));
+    }
 }
