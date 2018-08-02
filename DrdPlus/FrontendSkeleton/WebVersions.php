@@ -238,6 +238,9 @@ class WebVersions extends StrictObject
 
     public function getVersionDocumentRoot(string $forVersion): string
     {
+        if ($forVersion === static::LATEST_VERSION) {
+            return $this->dirs->getMasterDocumentRoot();
+        }
         if ($forVersion === $this->getCurrentVersion()) {
             return $this->dirs->getDocumentRoot(); // current version to use
         }
