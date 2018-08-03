@@ -53,8 +53,18 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
      */
     public function __construct(string $localUrl)
     {
+        $localUrl = $this->addPortToLocalUrl($localUrl);
         $this->guardValidUrl($localUrl);
         $this->localUrl = $localUrl;
+    }
+
+    protected function addPortToLocalUrl(string $localUrl)
+    {
+        if (\preg_match('~:\d+$~', $localUrl)) {
+            return $localUrl; // already with port
+        }
+
+        return $localUrl . ':88';
     }
 
     /**
