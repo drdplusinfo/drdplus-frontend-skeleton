@@ -13,6 +13,13 @@ class WebVersions extends StrictObject
 
     /** @var Dirs */
     private $dirs;
+    private $allVersions;
+    private $lastStableVersion;
+    private $lastUnstableVersion;
+    private $allStableVersions;
+    private $currentVersion;
+    private $currentCommitHash;
+    private $patchVersions;
 
     public function __construct(Dirs $dirs)
     {
@@ -26,12 +33,16 @@ class WebVersions extends StrictObject
      */
     public function getAllVersions(): array
     {
-        $branches = $this->executeArray(
-            'cd ' . \escapeshellarg($this->dirs->getDocumentRoot()) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
-        );
-        \array_unshift($branches, self::LATEST_VERSION);
+        if ($this->allVersions === null) {
+            $branches = $this->executeArray(
+                'cd ' . \escapeshellarg($this->dirs->getDocumentRoot()) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
+            );
+            \array_unshift($branches, self::LATEST_VERSION);
 
-        return $branches;
+            $this->allVersions = $branches;
+        }
+
+        return $this->allVersions;
     }
 
     /**
@@ -50,20 +61,24 @@ class WebVersions extends StrictObject
     }
 
     /**
-     * Gives last STABLE version, if any, or master of not
+     * Gives last STABLE version, if any, or master if not
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
     public function getLastStableVersion(): string
     {
-        $versions = $this->getAllVersions();
-        $lastVersion = \array_pop($versions);
-        // last version is not a master (strange but...) or it is the only version we got
-        if ($lastVersion !== self::LATEST_VERSION || \count($versions) === 0) {
-            return $lastVersion;
+        if ($this->lastStableVersion === null) {
+            $versions = $this->getAllVersions();
+            $lastVersion = \array_pop($versions);
+            // last version is not a master (strange but...) or it is the only version we got
+            if ($lastVersion !== self::LATEST_VERSION || \count($versions) === 0) {
+                return $lastVersion;
+            }
+
+            $this->lastStableVersion = \reset($versions); // next last version
         }
 
-        return \reset($versions); // next last version
+        return $this->lastStableVersion;
     }
 
     /**
@@ -72,16 +87,24 @@ class WebVersions extends StrictObject
      */
     public function getLastUnstableVersion(): string
     {
-        $versions = $this->getAllVersions();
+        if ($this->lastUnstableVersion === null) {
+            $versions = $this->getAllVersions();
 
-        return \reset($versions);
+            $this->lastUnstableVersion = \reset($versions);
+        }
+
+        return $this->lastUnstableVersion;
     }
 
     public function getAllStableVersions(): array
     {
-        return \array_values( // reset indexes
-            \array_diff($this->getAllVersions(), [$this->getLastUnstableVersion()])
-        );
+        if ($this->allStableVersions === null) {
+            $this->allStableVersions = \array_values( // reset indexes
+                \array_diff($this->getAllVersions(), [$this->getLastUnstableVersion()])
+            );
+        }
+
+        return $this->allStableVersions;
     }
 
     /**
@@ -125,7 +148,11 @@ class WebVersions extends StrictObject
             return $possibleDirVersion;
         }
 
-        return $this->executeCommand('cd ' . \escapeshellarg($this->dirs->getDocumentRoot()) . ' && git rev-parse --abbrev-ref HEAD');
+        if ($this->currentVersion === null) {
+            $this->currentVersion = $this->executeCommand('cd ' . \escapeshellarg($this->dirs->getDocumentRoot()) . ' && git rev-parse --abbrev-ref HEAD');
+        }
+
+        return $this->currentVersion;
     }
 
     public function getCurrentPatchVersion(): string
@@ -159,7 +186,11 @@ class WebVersions extends StrictObject
      */
     public function getCurrentCommitHash(): string
     {
-        return $this->executeCommand('git log --max-count=1 --format=%H --no-abbrev-commit');
+        if ($this->currentCommitHash === null) {
+            $this->currentCommitHash = $this->executeCommand('git log --max-count=1 --format=%H --no-abbrev-commit');
+        }
+
+        return $this->currentCommitHash;
     }
 
     /**
@@ -193,7 +224,11 @@ class WebVersions extends StrictObject
      */
     public function getPatchVersions(): array
     {
-        return $this->executeArray('git tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse');
+        if ($this->patchVersions === null) {
+            $this->patchVersions = $this->executeArray('git tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse');
+        }
+
+        return $this->patchVersions;
     }
 
     public function isCurrentVersionStable(): bool
