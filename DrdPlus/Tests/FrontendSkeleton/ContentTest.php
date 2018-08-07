@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Granam\String\StringTools;
 use Gt\Dom\Element;
@@ -123,7 +124,7 @@ class ContentTest extends AbstractContentTest
                     }
                 }
                 self::assertNotEmpty($headingText, 'Expected some human name for heading ' . $heading->outerHTML);
-                $idFromText = StringTools::toSnakeCaseId($headingText);
+                $idFromText = HtmlHelper::toId($headingText);
                 self::assertSame($id, $idFromText, "Expected different ID as created from '$headingText' heading");
             }
         }
