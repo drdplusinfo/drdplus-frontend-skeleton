@@ -38,6 +38,21 @@ class HtmlHelper extends StrictObject
         );
     }
 
+    /**
+     * Turn link into local version
+     * @param string $name
+     * @return string
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\NameToCreateHtmlIdFromIsEmpty
+     */
+    public static function toId(string $name): string
+    {
+        if ($name === '') {
+            throw new Exceptions\NameToCreateHtmlIdFromIsEmpty('Expected some name to create HTML ID from');
+        }
+
+        return StringTools::toSnakeCaseId($name);
+    }
+
     public function __construct(
         Dirs $dirs,
         bool $inDevMode,

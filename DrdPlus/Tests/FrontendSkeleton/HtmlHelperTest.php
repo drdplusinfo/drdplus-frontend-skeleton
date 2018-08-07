@@ -17,6 +17,24 @@ class HtmlHelperTest extends AbstractContentTest
     /**
      * @test
      */
+    public function I_can_create_id_from_any_name(): void
+    {
+        self::assertSame('kuala_lumpur', HtmlHelper::toId('Kuala lumpur'));
+        self::assertSame('krizaly_s_mrkvi', HtmlHelper::toId('Křížaly s mrkví'));
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\NameToCreateHtmlIdFromIsEmpty
+     */
+    public function I_can_not_create_id_from_empty_name(): void
+    {
+        HtmlHelper::toId('');
+    }
+
+    /**
+     * @test
+     */
     public function I_can_find_out_if_I_am_in_production(): void
     {
         /** @var HtmlHelper $htmlHelperClass */
