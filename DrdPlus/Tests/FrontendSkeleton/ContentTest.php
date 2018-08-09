@@ -104,8 +104,10 @@ class ContentTest extends AbstractContentTest
     public function I_can_navigate_to_every_heading_by_expected_anchor(): void
     {
         $htmlDocument = $this->getHtmlDocument();
+        $totalHeadingsCount = 0;
         for ($tagLevel = 1; $tagLevel <= 6; $tagLevel++) {
             $headings = $htmlDocument->getElementsByTagName('h' . $tagLevel);
+            $totalHeadingsCount += \count($headings);
             foreach ($headings as $heading) {
                 $id = $heading->id;
                 self::assertNotEmpty($id, 'Expected some ID for ' . $heading->outerHTML);
@@ -128,5 +130,6 @@ class ContentTest extends AbstractContentTest
                 self::assertSame($id, $idFromText, "Expected different ID as created from '$headingText' heading");
             }
         }
+        self::assertGreaterThan(0, $totalHeadingsCount, 'Expected some headings');
     }
 }
