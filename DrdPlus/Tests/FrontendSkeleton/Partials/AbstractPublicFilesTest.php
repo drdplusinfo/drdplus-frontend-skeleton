@@ -1,7 +1,7 @@
 <?php
-namespace DrdPlus\Tests\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
-use DrdPlus\FrontendSkeleton\AbstractPublicFiles;
+use DrdPlus\FrontendSkeleton\Partials\AbstractPublicFiles;
 use Granam\Tests\Tools\TestWithMockery;
 use Mockery\MockInterface;
 
