@@ -19,8 +19,10 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function I_can_create_id_from_any_name(): void
     {
-        self::assertSame('kuala_lumpur', HtmlHelper::toId('Kuala lumpur'));
-        self::assertSame('krizaly_s_mrkvi', HtmlHelper::toId('Křížaly s mrkví'));
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = static::getSutClass();
+        self::assertSame('kuala_lumpur', $htmlHelperClass::toId('Kuala lumpur'));
+        self::assertSame('krizaly_s_mrkvi', $htmlHelperClass::toId('Křížaly s mrkví'));
     }
 
     /**
@@ -29,7 +31,9 @@ class HtmlHelperTest extends AbstractContentTest
      */
     public function I_can_not_create_id_from_empty_name(): void
     {
-        HtmlHelper::toId('');
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = static::getSutClass();
+        $htmlHelperClass::toId('');
     }
 
     /**

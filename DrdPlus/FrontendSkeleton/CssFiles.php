@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\Partials\AbstractPublicFiles;
+
 class CssFiles extends AbstractPublicFiles
 {
     /**
