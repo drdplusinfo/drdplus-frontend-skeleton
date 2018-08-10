@@ -34,7 +34,7 @@ class VersionTest extends AbstractContentTest
             self::assertSame(
                 $this->getTestsConfiguration()->getExpectedLastUnstableVersion(),
                 $version,
-                'Expected different version due to tests config'
+                'Expected different unstable version due to tests config'
             );
         } else {
             self::assertStringStartsWith(

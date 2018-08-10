@@ -59,7 +59,7 @@ class WebVersionSwitcher extends StrictObject
         $toVersionEscaped = \escapeshellarg($toVersion);
         $toLastPatchVersionEscaped = \escapeshellarg($lastPatchVersion);
         if (!\file_exists($toVersionDir)) {
-            $command = "git clone --branch $toVersionEscaped . $toVersionDirEscaped 2>&1 && git -C $toVersionDirEscaped checkout $toLastPatchVersionEscaped";
+            $command = "git clone --branch $toVersionEscaped . $toVersionDirEscaped 2>&1 && git -C $toVersionDirEscaped checkout $toLastPatchVersionEscaped 2>&1";
             \exec($command, $rows, $returnCode);
             if ($returnCode !== 0) {
                 throw new Exceptions\CanNotLocallyCloneGitVersion(
