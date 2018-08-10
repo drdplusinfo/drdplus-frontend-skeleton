@@ -97,8 +97,7 @@ class WebVersionSwitcher extends StrictObject
     private function installComposerLibraries(string $documentRoot): void
     {
         $documentRootEscaped = \escapeshellarg($documentRoot);
-        $vendorDirEscaped = \escapeshellarg($documentRoot . '/vendor');
-        $command = "cd $documentRootEscaped 2>&1 && export COMPOSER_HOME=. && composer --working-dir=$documentRootEscaped install 2>&1 && if [ whoami = 'www-data' ]; then chmod g+rw -R $vendorDirEscaped; fi";
+        $command = "cd $documentRootEscaped 2>&1 && export COMPOSER_HOME=. && composer --working-dir=$documentRootEscaped install 2>&1";
         \exec($command, $rows, $returnCode);
         if ($returnCode !== 0) {
             throw new Exceptions\ExecutingCommandFailed(
