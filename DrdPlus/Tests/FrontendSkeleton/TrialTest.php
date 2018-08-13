@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
@@ -54,8 +53,8 @@ class TrialTest extends AbstractContentTest
 
     protected function createController(): FrontendController
     {
-        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
+        $dirs = $this->createDirs();
 
-        return new FrontendController('Google analytics ID foo', new HtmlHelper($dirs, true, false, false, false), $dirs);
+        return new FrontendController($this->createConfiguration($dirs), new HtmlHelper($dirs, true, false, false, false));
     }
 }

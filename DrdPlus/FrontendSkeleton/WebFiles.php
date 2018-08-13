@@ -1,19 +1,21 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
+/**
+ * Gives files to serve on frontend (html, php or md)
+ */
 class WebFiles extends StrictObject implements \IteratorAggregate
 {
-    /** @var string */
-    private $webFilesDir;
+    /** @var Dirs */
+    private $dirs;
 
-    public function __construct(string $webFilesDir)
+    public function __construct(Dirs $dirs)
     {
-        $this->webFilesDir = \rtrim($webFilesDir, '\/');
+        $this->dirs = $dirs;
     }
 
     /**
@@ -39,12 +41,12 @@ class WebFiles extends StrictObject implements \IteratorAggregate
      */
     private function getUnsortedWebFileNames(): array
     {
-        if (!\is_dir($this->webFilesDir)) {
-            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->webFilesDir}' for web files");
+        if (!\is_dir($this->dirs->getWebRoot())) {
+            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->dirs->getWebRoot()}' for web files");
         }
 
-        return \array_filter(\scandir($this->webFilesDir, SCANDIR_SORT_NONE), function ($file) {
-            return $file !== '.' && $file !== '..' && \preg_match('~\.(html|php)$~', $file);
+        return \array_filter(\scandir($this->dirs->getWebRoot(), SCANDIR_SORT_NONE), function ($file) {
+            return $file !== '.' && $file !== '..' && \preg_match('~\.(html|php|md)$~', $file);
         });
     }
 
@@ -112,7 +114,7 @@ class WebFiles extends StrictObject implements \IteratorAggregate
     {
         return \array_map(
             function ($htmlFile) {
-                return $this->webFilesDir . '/' . $htmlFile;
+                return $this->dirs->getWebRoot() . '/' . $htmlFile;
             },
             $relativeFileNames
         );

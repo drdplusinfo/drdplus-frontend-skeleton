@@ -1,6 +1,7 @@
 <?php
-namespace DrdPlus\FrontendSkeleton;
+namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\Redirect;
 use PHPUnit\Framework\TestCase;
 
 class RedirectTest extends TestCase

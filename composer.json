@@ -24,15 +24,20 @@
     "php": ">=7.1",
     "ext-mbstring": "*",
     "ext-dom": "*",
+    "ext-yaml": "*",
+    "ext-posix": "*",
+    "ext-zlib": "*",
+    "ext-curl": "*",
+    "ext-json": "*",
     "phpgt/dom": "~1.0",
     "piwik/device-detector": "^3.9",
     "tracy/tracy": "^2.4",
     "phpmailer/phpmailer": "^6.0",
-    "granam/string": "^3.0",
-    "granam/exceptions-hierarchy": "^4.0"
+    "granam/string": ">=4.1",
+    "granam/exceptions-hierarchy": "^4.0",
+    "erusev/parsedown": "^1.7"
   },
   "require-dev": {
-    "ext-curl": "*",
     "phpunit/phpunit": "~7.0",
     "mockery/mockery": "~1.0",
     "roave/security-advisories": "dev-master"

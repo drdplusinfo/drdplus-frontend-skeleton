@@ -1,13 +1,25 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\FrontendSkeleton;
 
+use Granam\Scalar\Tools\ToString;
 use Granam\Strict\Object\StrictObject;
 
 class CookiesService extends StrictObject
 {
+    public const VERSION = 'version';
+
+    public function setVersionCookie(string $version): bool
+    {
+        return $this->setCookie(static::VERSION, $version, true /* not accessible from JS */, new \DateTime('+ 1 year'));
+    }
+
+    public function getVersionCookie(string $version): ?string
+    {
+        return ToString::toStringOrNull($this->getCookie($version));
+    }
+
     /**
      * @param string $cookieName
      * @param $value

@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 trait DirsForTestsTrait
 {
-
-    protected function getMasterDocumentRoot(): string
+    protected function getDocumentRoot(): string
     {
         static $masterDocumentRoot;
         if ($masterDocumentRoot === null) {
@@ -15,11 +13,6 @@ trait DirsForTestsTrait
         }
 
         return $masterDocumentRoot;
-    }
-
-    protected function getDocumentRoot(): string
-    {
-        return $this->getMasterDocumentRoot();
     }
 
     protected function getDirForVersions(): string

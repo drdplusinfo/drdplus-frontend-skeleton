@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\FrontendSkeleton;
 
@@ -133,7 +132,6 @@ class HtmlHelper extends StrictObject
             if (!$id) {
                 continue;
             }
-            /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
             $idWithoutDiacritics = $this->unifyId($id);
             if ($idWithoutDiacritics === $id) {
                 continue;
@@ -205,8 +203,8 @@ class HtmlHelper extends StrictObject
         foreach ($children as $child) {
             if (!\in_array($child->nodeName, ['a', 'button'], true)
                 && $child->getAttribute('id')
-                && !$child->prop_get_classList()->contains(self::INVISIBLE_ID_CLASS)
                 && $child->getElementsByTagName('a')->length === 0 // already have some anchors, skipp it to avoid wrapping them by another one
+                && !$child->prop_get_classList()->contains(self::INVISIBLE_ID_CLASS)
             ) {
                 $toMove = [];
                 /** @var \DOMElement $grandChildNode */
@@ -563,15 +561,15 @@ class HtmlHelper extends StrictObject
 
     private function addVersionHashToAssets(HtmlDocument $htmlDocument): void
     {
-        $masterDocumentRoot = $this->dirs->getMasterDocumentRoot();
+        $documentRoot = $this->dirs->getDocumentRoot();
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-            $this->addVersionToAsset($image, 'src', $masterDocumentRoot);
+            $this->addVersionToAsset($image, 'src', $documentRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-            $this->addVersionToAsset($link, 'href', $masterDocumentRoot);
+            $this->addVersionToAsset($link, 'href', $documentRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-            $this->addVersionToAsset($script, 'src', $masterDocumentRoot);
+            $this->addVersionToAsset($script, 'src', $documentRoot);
         }
     }
 

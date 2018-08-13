@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\FrontendSkeleton;
 
@@ -8,8 +7,6 @@ use Granam\Strict\Object\StrictObject;
 
 class Dirs extends StrictObject
 {
-    /** @var string */
-    protected $masterDocumentRoot;
     /** @var string */
     protected $documentRoot;
     /** @var string */
@@ -29,19 +26,13 @@ class Dirs extends StrictObject
     /** @var string */
     protected $cacheRoot;
 
-    public function __construct(string $masterDocumentRoot, ?string $documentRoot)
+    public function __construct(string $documentRoot)
     {
-        $this->masterDocumentRoot = $this->unifyPath($masterDocumentRoot);
-        $this->documentRoot = $this->unifyPath($documentRoot
-            ?? (\PHP_SAPI !== 'cli'
-                ? \rtrim(\dirname($_SERVER['SCRIPT_FILENAME']), '\/')
-                : \getcwd()
-            )
-        );
-        $this->populateSubRoots($this->masterDocumentRoot, $this->documentRoot);
+        $this->documentRoot = $documentRoot;
+        $this->populateSubRoots($documentRoot);
     }
 
-    protected function populateSubRoots(string $masterDocumentRoot, string $documentRoot): void
+    protected function populateSubRoots(string $documentRoot): void
     {
         $this->webRoot = $documentRoot . '/web';
         $this->vendorRoot = $documentRoot . '/vendor';
@@ -51,7 +42,7 @@ class Dirs extends StrictObject
             : $documentRoot . '/parts/frontend-skeleton';
         $this->cssRoot = $documentRoot . '/css';
         $this->jsRoot = $documentRoot . '/js';
-        $this->dirForVersions = $masterDocumentRoot . '/versions';
+        $this->dirForVersions = $documentRoot . '/versions';
         $this->cacheRoot = $documentRoot . '/cache/' . \PHP_SAPI;
     }
 
@@ -60,14 +51,6 @@ class Dirs extends StrictObject
         $path = \str_replace('\\', '/', $path);
 
         return \rtrim($path, '/');
-    }
-
-    /**
-     * @return string
-     */
-    public function getMasterDocumentRoot(): string
-    {
-        return $this->masterDocumentRoot;
     }
 
     /**
@@ -140,5 +123,19 @@ class Dirs extends StrictObject
     public function getCacheRoot(): string
     {
         return $this->cacheRoot;
+    }
+
+    public function getVersionDocumentRoot(string $forVersion): string
+    {
+        return $this->getDirForVersions() . '/' . $forVersion;
+    }
+
+    public function getRelativeVersionDocumentRoot(string $forVersion): string
+    {
+        // /foo/bar/versions/1.0
+        $currentVersionDocumentRoot = $this->getVersionDocumentRoot($forVersion);
+
+        // /versions/1.0
+        return \str_replace($this->getDocumentRoot(), '', $currentVersionDocumentRoot);
     }
 }

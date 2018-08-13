@@ -14,7 +14,7 @@
           $allVersions = $webVersions->getAllVersions();
           if (\count($allVersions) > 1) {
               $currentVersion = $webVersions->getCurrentVersion(); ?>
-            <span class="current-version"><?= $webVersions->getVersionName($currentVersion) ?></span>
+            <span class="current-version"><?= $webVersions->getVersionHumanName($currentVersion) ?></span>
             <ul class="other-versions">
                 <?php
                 $request = $controller->getRequest();
@@ -24,7 +24,7 @@
                     } ?>
                   <li>
                     <a href="<?= $request->getCurrentUrl(['version' => $webVersion]) ?>">
-                        <?= $webVersions->getVersionName($webVersion) ?>
+                        <?= $webVersions->getVersionHumanName($webVersion) ?>
                     </a>
                   </li>
                 <?php } ?>

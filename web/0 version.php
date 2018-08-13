@@ -1,7 +1,7 @@
 <div class="keyword">
     <?php
     /** @var \DrdPlus\FrontendSkeleton\FrontendController $controller */
-    echo $controller->getDirs()->getDocumentRoot();
+    echo $controller->getConfiguration()->getDirs()->getDocumentRoot();
     ?>
 </div>
 <div>

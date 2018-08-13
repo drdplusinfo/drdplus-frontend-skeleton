@@ -1,20 +1,18 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\FrontendSkeleton;
 
 use DeviceDetector\Parser\Bot;
+use DrdPlus\FrontendSkeleton\Partials\CurrentVersionProvider;
 use Granam\Strict\Object\StrictObject;
 
-class FrontendController extends StrictObject
+class FrontendController extends StrictObject implements CurrentVersionProvider
 {
-    /** @var string */
-    private $googleAnalyticsId;
+    /** @var Configuration */
+    private $configuration;
     /** @var HtmlHelper */
     private $htmlHelper;
-    /** @var Dirs */
-    private $dirs;
     /** @var string */
     private $webName;
     /** @var string */
@@ -35,13 +33,14 @@ class FrontendController extends StrictObject
     protected $pageCache;
     /** @var Redirect|null */
     private $redirect;
+    /** @var CookiesService */
+    private $cookiesService;
 
-    public function __construct(string $googleAnalyticsId, HtmlHelper $htmlHelper, Dirs $dirs, array $bodyClasses = [])
+    public function __construct(Configuration $configuration, HtmlHelper $htmlHelper, array $bodyClasses = [])
     {
-        $this->googleAnalyticsId = $googleAnalyticsId;
-        $this->dirs = $dirs;
-        $this->bodyClasses = $bodyClasses;
+        $this->configuration = $configuration;
         $this->htmlHelper = $htmlHelper;
+        $this->bodyClasses = $bodyClasses;
     }
 
     /**
@@ -61,11 +60,11 @@ class FrontendController extends StrictObject
     }
 
     /**
-     * @return Dirs
+     * @return Configuration
      */
-    public function getDirs(): Dirs
+    public function getConfiguration(): Configuration
     {
-        return $this->dirs;
+        return $this->configuration;
     }
 
     /**
@@ -81,28 +80,28 @@ class FrontendController extends StrictObject
      */
     public function getGoogleAnalyticsId(): string
     {
-        return $this->googleAnalyticsId;
+        return $this->configuration->getGoogleAnalyticsId();
     }
 
     public function getCssFiles(): CssFiles
     {
-        return new CssFiles($this->getHtmlHelper()->isInProduction(), $this->dirs);
+        return new CssFiles($this->getHtmlHelper()->isInProduction(), $this->getConfiguration()->getDirs());
     }
 
     public function getJsFiles(): JsFiles
     {
-        return new JsFiles($this->getHtmlHelper()->isInProduction(), $this->dirs);
+        return new JsFiles($this->getHtmlHelper()->isInProduction(), $this->getConfiguration()->getDirs());
     }
 
     public function getWebName(): string
     {
         if ($this->webName === null) {
-            if (!\file_exists($this->dirs->getDocumentRoot() . '/name.txt')) {
-                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->dirs->getDocumentRoot()}/name.txt'");
+            if (!\file_exists($this->getConfiguration()->getDirs()->getDocumentRoot() . '/name.txt')) {
+                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->getConfiguration()->getDirs()->getDocumentRoot()}/name.txt'");
             }
-            $webName = \trim((string)\file_get_contents($this->dirs->getDocumentRoot() . '/name.txt'));
+            $webName = \trim((string)\file_get_contents($this->getConfiguration()->getDirs()->getDocumentRoot() . '/name.txt'));
             if ($webName === '') {
-                throw new Exceptions\FileWithPageNameIsEmpty("File '{$this->dirs->getDocumentRoot()}/name.txt' is empty");
+                throw new Exceptions\FileWithPageNameIsEmpty("File '{$this->getConfiguration()->getDirs()->getDocumentRoot()}/name.txt' is empty");
             }
             $this->webName = $webName;
         }
@@ -114,8 +113,8 @@ class FrontendController extends StrictObject
     {
         if ($this->pageTitle === null) {
             $name = $this->getWebName();
-            $smiley = \file_exists($this->dirs->getDocumentRoot() . '/title_smiley.txt')
-                ? \trim(\file_get_contents($this->dirs->getDocumentRoot() . '/title_smiley.txt'))
+            $smiley = \file_exists($this->getConfiguration()->getDirs()->getDocumentRoot() . '/title_smiley.txt')
+                ? \trim(\file_get_contents($this->getConfiguration()->getDirs()->getDocumentRoot() . '/title_smiley.txt'))
                 : '';
 
             $this->pageTitle = ($smiley !== '')
@@ -132,14 +131,14 @@ class FrontendController extends StrictObject
         $controller = $this;
         \ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $this->dirs->getGenericPartsRoot() . '/contacts.php';
+        include $this->getConfiguration()->getDirs()->getGenericPartsRoot() . '/contacts.php';
 
         return \ob_get_clean();
     }
 
     public function getCustomBodyContent(): string
     {
-        if (!\file_exists($this->dirs->getPartsRoot() . '/custom_body_content.php')) {
+        if (!\file_exists($this->getConfiguration()->getDirs()->getPartsRoot() . '/custom_body_content.php')) {
             return '';
         }
         /** @noinspection PhpUnusedLocalVariableInspection */
@@ -147,7 +146,7 @@ class FrontendController extends StrictObject
         $content = '<div id="customBodyContent">';
         \ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $this->dirs->getPartsRoot() . '/custom_body_content.php';
+        include $this->getConfiguration()->getDirs()->getPartsRoot() . '/custom_body_content.php';
         $content .= \ob_get_clean();
         $content .= '</div>';
 
@@ -160,11 +159,13 @@ class FrontendController extends StrictObject
         $controller = $this;
         $content = '';
         foreach ($this->getWebFiles() as $webFile) {
-            if (\preg_match('~\.php$~', $webFile)) {
+            if (\preg_match('~[.]php$~', $webFile)) {
                 \ob_start();
                 /** @noinspection PhpIncludeInspection */
                 include $webFile;
                 $content .= \ob_get_clean();
+            } elseif (\preg_match('~[.]md$~', $webFile)) {
+                $content .= \Parsedown::instance()->parse(\file_get_contents($webFile));
             } else {
                 $content .= \file_get_contents($webFile);
             }
@@ -176,7 +177,7 @@ class FrontendController extends StrictObject
     public function getWebFiles(): WebFiles
     {
         if ($this->webFiles === null) {
-            $this->webFiles = new WebFiles($this->dirs->getWebRoot());
+            $this->webFiles = new WebFiles($this->getConfiguration()->getDirs());
         }
 
         return $this->webFiles;
@@ -185,7 +186,7 @@ class FrontendController extends StrictObject
     public function getWebVersions(): WebVersions
     {
         if ($this->webVersions === null) {
-            $this->webVersions = new WebVersions($this->dirs);
+            $this->webVersions = new WebVersions($this->getConfiguration(), $this);
         }
 
         return $this->webVersions;
@@ -240,7 +241,7 @@ class FrontendController extends StrictObject
     public function getPageCache(): PageCache
     {
         if ($this->pageCache === null) {
-            $this->pageCache = new PageCache($this->getWebVersions(), $this->dirs, $this->htmlHelper->isInProduction());
+            $this->pageCache = new PageCache($this->getWebVersions(), $this->getConfiguration()->getDirs(), $this->htmlHelper->isInProduction());
         }
 
         return $this->pageCache;
@@ -253,11 +254,6 @@ class FrontendController extends StrictObject
         }
 
         return '';
-    }
-
-    public function getCurrentVersion(): string
-    {
-        return $this->getWebVersions()->getCurrentVersion();
     }
 
     public function getCurrentPatchVersion(): string
@@ -283,5 +279,19 @@ class FrontendController extends StrictObject
         $cachedDocument->head->appendChild($meta);
 
         return $cachedDocument->saveHTML();
+    }
+
+    public function getCookiesService(): CookiesService
+    {
+        if ($this->cookiesService === null) {
+            $this->cookiesService = new CookiesService();
+        }
+
+        return $this->cookiesService;
+    }
+
+    public function getCurrentVersion(): string
+    {
+        return $this->getRequest()->getValue('version') ?? $this->getConfiguration()->getLatestVersion();
     }
 }

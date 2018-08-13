@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
-/** be strict for parameter types, https://www.quora.com/Are-strict_types-in-PHP-7-not-a-bad-idea */
 
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 use DrdPlus\FrontendSkeleton\Cache;
+use DrdPlus\FrontendSkeleton\Configuration;
 use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
@@ -146,9 +146,9 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function getDefinedPageTitle(): string
     {
-        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
+        $dirs = $this->createDirs();
 
-        return (new FrontendController('Google Foo', $this->createHtmlHelper($dirs), $dirs))->getPageTitle();
+        return (new FrontendController($this->createConfiguration($dirs), $this->createHtmlHelper($dirs)))->getPageTitle();
     }
 
     /**
@@ -172,7 +172,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function createDirs(string $documentRoot = null): Dirs
     {
-        return new Dirs($this->getMasterDocumentRoot(), $documentRoot ?? $this->getDocumentRoot());
+        return new Dirs($documentRoot ?? $this->getDocumentRoot());
     }
 
     protected function fetchNonCachedContent(FrontendController $controller = null): string
@@ -282,5 +282,10 @@ abstract class AbstractContentTest extends SkeletonTestCase
         }
 
         return ['output' => $output, 'result' => $result];
+    }
+
+    protected function createConfiguration(Dirs $dirs = null): Configuration
+    {
+        return Configuration::createFromYml($dirs ?? $this->createDirs());
     }
 }
