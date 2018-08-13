@@ -531,7 +531,7 @@ class HtmlHelper extends StrictObject
         if (!$webVersions->isCurrentVersionStable()) {
             return;
         }
-        $relativeVersionDocumentRoot = $webVersions->getRelativeVersionDocumentRoot($webVersions->getCurrentVersion());
+        $relativeVersionDocumentRoot = $this->dirs->getRelativeVersionDocumentRoot($webVersions->getCurrentVersion());
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
             $this->updateAssetLinkToCurrentVersion($image, 'src', $relativeVersionDocumentRoot);
         }
