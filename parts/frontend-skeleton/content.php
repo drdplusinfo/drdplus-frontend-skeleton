@@ -59,7 +59,7 @@ $htmlHelper->resolveDisplayMode($htmlDocument);
 $htmlHelper->markExternalLinksByClass($htmlDocument);
 $htmlHelper->externalLinksTargetToBlank($htmlDocument);
 $htmlHelper->injectIframesWithRemoteTables($htmlDocument);
-$htmlHelper->updateAssetLinks($htmlDocument, $controller->getWebVersions());
+$htmlHelper->addVersionHashToAssets($htmlDocument);
 if (!$htmlHelper->isInProduction()) {
     $htmlHelper->makeExternalDrdPlusLinksLocal($htmlDocument);
 }

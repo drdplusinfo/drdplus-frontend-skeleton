@@ -35,7 +35,7 @@ class WebVersions extends StrictObject
     /** @var string[] */
     private $lastPatchVersionsOf = [];
     /** @var string */
-    private $lastUnstableVersionWebRoot;
+    private $lastUnstableVersionRoot;
 
     public function __construct(Configuration $configuration, CurrentVersionProvider $currentVersionProvider)
     {
@@ -65,11 +65,11 @@ class WebVersions extends StrictObject
 
     protected function getLastUnstableVersionWebRoot(): string
     {
-        if ($this->lastUnstableVersionWebRoot === null) {
-            $this->lastUnstableVersionWebRoot = $this->configuration->getDirs()->getVersionWebRoot(static::LAST_UNSTABLE_VERSION);
+        if ($this->lastUnstableVersionRoot === null) {
+            $this->lastUnstableVersionRoot = $this->configuration->getDirs()->getVersionRoot(static::LAST_UNSTABLE_VERSION);
         }
 
-        return $this->lastUnstableVersionWebRoot;
+        return $this->lastUnstableVersionRoot;
     }
 
     /**
@@ -202,8 +202,8 @@ class WebVersions extends StrictObject
     {
         if ($this->currentCommitHash === null) {
             $this->ensureMinorVersionExists($this->getCurrentVersion());
-            $escapedWebVersionsRootDir = \escapeshellarg($this->configuration->getDirs()->getVersionWebRoot($this->getCurrentVersion()));
-            $this->currentCommitHash = $this->executeCommand("git -C $escapedWebVersionsRootDir log --max-count=1 --format=%H --no-abbrev-commit");
+            $escapedVersionRoot = \escapeshellarg($this->configuration->getDirs()->getVersionRoot($this->getCurrentVersion()));
+            $this->currentCommitHash = $this->executeCommand("git -C $escapedVersionRoot log --max-count=1 --format=%H --no-abbrev-commit");
         }
 
         return $this->currentCommitHash;
@@ -220,7 +220,7 @@ class WebVersions extends StrictObject
     protected function ensureMinorVersionExists(string $minorVersion): bool
     {
         if (($this->existingMinorVersions[$minorVersion] ?? null) === null) {
-            $toMinorVersionDir = $this->configuration->getDirs()->getVersionWebRoot($minorVersion);
+            $toMinorVersionDir = $this->configuration->getDirs()->getVersionRoot($minorVersion);
             if (!\file_exists($toMinorVersionDir)) {
                 $this->clone($minorVersion, $toMinorVersionDir);
             } else {

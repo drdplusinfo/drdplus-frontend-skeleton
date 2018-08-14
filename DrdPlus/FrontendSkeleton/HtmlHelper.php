@@ -520,46 +520,7 @@ class HtmlHelper extends StrictObject
         );
     }
 
-    public function updateAssetLinks(HtmlDocument $htmlDocument, WebVersions $webVersions): void
-    {
-        $this->updateAssetLinksToCurrentVersion($htmlDocument, $webVersions);
-        $this->addVersionHashToAssets($htmlDocument);
-    }
-
-    private function updateAssetLinksToCurrentVersion(HtmlDocument $htmlDocument, WebVersions $webVersions): void
-    {
-        if (!$webVersions->isCurrentVersionStable()) {
-            return;
-        }
-        $relativeVersionWebRoot = $this->dirs->getRelativeVersionWebRoot($webVersions->getCurrentVersion());
-        foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-            $this->updateAssetLinkToCurrentVersion($image, 'src', $relativeVersionWebRoot);
-        }
-        foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-            $this->updateAssetLinkToCurrentVersion($link, 'href', $relativeVersionWebRoot);
-        }
-        foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-            $this->updateAssetLinkToCurrentVersion($script, 'src', $relativeVersionWebRoot);
-        }
-    }
-
-    private function updateAssetLinkToCurrentVersion(Element $element, string $attributeName, string $relativeVersionDocumentRoot): void
-    {
-        $link = $element->getAttribute($attributeName);
-        if ($this->isLinkExternal($link)) {
-            return;
-        }
-        $element->setAttribute($attributeName, $relativeVersionDocumentRoot . '/' . \ltrim($link, '/'));
-    }
-
-    private function isLinkExternal(string $link): bool
-    {
-        $urlParts = \parse_url($link);
-
-        return !empty($urlParts['host']);
-    }
-
-    private function addVersionHashToAssets(HtmlDocument $htmlDocument): void
+    public function addVersionHashToAssets(HtmlDocument $htmlDocument): void
     {
         $documentRoot = $this->dirs->getDocumentRoot();
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
@@ -582,6 +543,13 @@ class HtmlHelper extends StrictObject
         $absolutePath = $this->getAbsolutePath($link, $masterDocumentRoot);
         $hash = $this->getFileHash($absolutePath);
         $element->setAttribute($attributeName, $link . '?version=' . \urlencode($hash));
+    }
+
+    private function isLinkExternal(string $link): bool
+    {
+        $urlParts = \parse_url($link);
+
+        return !empty($urlParts['host']);
     }
 
     private function getAbsolutePath(string $relativePath, string $masterDocumentRoot): string
