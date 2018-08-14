@@ -236,4 +236,23 @@ class WebVersionsTest extends AbstractContentTest
         }
         $webVersions->getLastPatchVersionOf($nonExistingVersion);
     }
+
+    /**
+     * @test
+     */
+    public function I_can_get_index_of_another_version(): void
+    {
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
+        $versions = $webVersions->getAllVersions();
+        if (!$this->getTestsConfiguration()->hasMoreVersions()) {
+            self::assertCount(1, $versions, 'Only a single version expected due to a config');
+
+            return;
+        }
+        self::assertGreaterThan(
+            1,
+            \count($versions),
+            'Expected at least two versions to test, got only ' . \implode(',', $versions)
+        );
+    }
 }

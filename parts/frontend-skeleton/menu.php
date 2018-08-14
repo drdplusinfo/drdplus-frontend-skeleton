@@ -1,5 +1,5 @@
 <?php /** @var \DrdPlus\FrontendSkeleton\FrontendController $controller */ ?>
-  <div class="contacts visible top <?php if ($controller->isContactsFixed()) { ?>fixed<?php } ?> permanent" id="contacts">
+  <div class="contacts visible top <?php if ($controller->isMenuFixed()) { ?>fixed<?php } ?> permanent" id="menu">
     <div class="container">
         <?php if ($controller->isShownHomeButton()) { ?>
           <span class="menu">

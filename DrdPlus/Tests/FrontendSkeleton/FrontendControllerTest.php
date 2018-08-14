@@ -120,29 +120,29 @@ class FrontendControllerTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_can_set_contacts_fixed(): void
+    public function I_can_set_menu_fixed(): void
     {
         $controller = $this->createController();
-        self::assertFalse($controller->isContactsFixed(), 'Contacts are expected to be simply on top by default');
+        self::assertFalse($controller->isMenuFixed(), 'Contacts are expected to be simply on top by default');
         if ($this->isSkeletonChecked()) {
-            /** @var Element $contacts */
-            $contacts = $this->getHtmlDocument()->getElementById('contacts');
-            self::assertNotEmpty($contacts, 'Contacts are missing');
-            self::assertTrue($contacts->classList->contains('top'), 'Contacts should be positioned on top');
-            self::assertFalse($contacts->classList->contains('fixed'), 'Contacts should not be fixed as controller does not say so');
+            /** @var Element $menu */
+            $menu = $this->getHtmlDocument()->getElementById('menu');
+            self::assertNotEmpty($menu, 'Contacts are missing');
+            self::assertTrue($menu->classList->contains('top'), 'Contacts should be positioned on top');
+            self::assertFalse($menu->classList->contains('fixed'), 'Contacts should not be fixed as controller does not say so');
         }
-        $controller->setContactsFixed();
-        self::assertTrue($controller->isContactsFixed(), 'Failed to set contacts as fixed');
+        $controller->setMenuFixed();
+        self::assertTrue($controller->isMenuFixed(), 'Failed to set menu as fixed');
         if ($this->isSkeletonChecked()) {
             $content = $this->fetchNonCachedContent($controller);
             $htmlDocument = new HtmlDocument($content);
-            $contacts = $htmlDocument->getElementById('contacts');
-            self::assertNotEmpty($contacts, 'Contacts are missing');
-            self::assertTrue($contacts->classList->contains('top'), 'Contacts should be positioned on top');
+            $menu = $htmlDocument->getElementById('menu');
+            self::assertNotEmpty($menu, 'Contacts are missing');
+            self::assertTrue($menu->classList->contains('top'), 'Contacts should be positioned on top');
             self::assertTrue(
-                $contacts->classList->contains('fixed'),
+                $menu->classList->contains('fixed'),
                 'Contacts should be fixed as controller says so;'
-                . ' current classes are ' . \implode(',', $this->tokenListToArray($contacts->classList))
+                . ' current classes are ' . \implode(',', $this->tokenListToArray($menu->classList))
             );
         }
     }

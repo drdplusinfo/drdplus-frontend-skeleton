@@ -52,9 +52,8 @@ class WebVersions extends StrictObject
     {
         if ($this->allVersions === null) {
             $escapedLatestVersionWebRoot = \escapeshellarg($this->getLastUnstableVersionWebRoot());
-            $branches = $this->executeArray(
-                "git -C $escapedLatestVersionWebRoot branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse"
-            );
+            $command = "git -C $escapedLatestVersionWebRoot branch -r | cut -d '/' -f2 | grep HEAD --invert-match | grep -P 'v?\d+\.\d+' --only-matching | sort --version-sort --reverse";
+            $branches = $this->executeArray($command);
             \array_unshift($branches, $this->getLastUnstableVersion());
 
             $this->allVersions = $branches;
@@ -95,14 +94,8 @@ class WebVersions extends StrictObject
     public function getLastStableVersion(): string
     {
         if ($this->lastStableVersion === null) {
-            $versions = $this->getAllVersions();
-            $lastVersion = \array_pop($versions);
-            // last version is not a master (strange but...) or it is the only version we got
-            if ($lastVersion !== $this->getLastUnstableVersion() || \count($versions) === 0) {
-                return $lastVersion;
-            }
-
-            $this->lastStableVersion = \reset($versions); // next last version
+            $stableVersions = $this->getAllStableVersions();
+            $this->lastStableVersion = \reset($stableVersions);
         }
 
         return $this->lastStableVersion;
@@ -254,8 +247,7 @@ class WebVersions extends StrictObject
     private function update(string $minorVersion, string $toVersionDir): void
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
-        $toVersionEscaped = \escapeshellarg($minorVersion);
-        $command = "git -C $toVersionDirEscaped checkout $toVersionEscaped 2>&1 && git -C $toVersionDirEscaped pull --ff-only 2>&1";
+        $command = "git -C $toVersionDirEscaped pull --ff-only 2>&1 && git -C $toVersionDirEscaped pull --tags";
         $rows = []; // resetting rows as they may NOT be changed on failure
         \exec($command, $rows, $returnCode);
         if ($returnCode !== 0) {

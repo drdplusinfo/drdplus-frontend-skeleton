@@ -26,7 +26,7 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
     /** @var array */
     private $bodyClasses;
     /** @var bool */
-    private $contactsFixed = false;
+    private $menuFixed = false;
     /** @var bool */
     private $showHomeButton = true;
     /** @var PageCache */
@@ -125,13 +125,13 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
         return $this->pageTitle;
     }
 
-    public function getContacts(): string
+    public function getMenu(): string
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
         $controller = $this;
         \ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $this->getConfiguration()->getDirs()->getGenericPartsRoot() . '/contacts.php';
+        include $this->getConfiguration()->getDirs()->getGenericPartsRoot() . '/menu.php';
 
         return \ob_get_clean();
     }
@@ -211,9 +211,9 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
         $this->bodyClasses[] = $class;
     }
 
-    public function setContactsFixed(): FrontendController
+    public function setMenuFixed(): FrontendController
     {
-        $this->contactsFixed = true;
+        $this->menuFixed = true;
 
         return $this;
     }
@@ -221,9 +221,9 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
     /**
      * @return bool
      */
-    public function isContactsFixed(): bool
+    public function isMenuFixed(): bool
     {
-        return $this->contactsFixed;
+        return $this->menuFixed;
     }
 
     public function hideHomeButton(): FrontendController

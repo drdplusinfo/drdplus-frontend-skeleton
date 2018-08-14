@@ -45,18 +45,18 @@ class   WebFiles extends StrictObject implements \IteratorAggregate
      */
     private function getUnsortedWebFileNames(): array
     {
-        if (!\is_dir($this->getCurrentVersionRoot())) {
-            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->getCurrentVersionRoot()}' for web files");
+        if (!\is_dir($this->getCurrentVersionWebRoot())) {
+            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->getCurrentVersionWebRoot()}' for web files");
         }
 
-        return \array_filter(\scandir($this->getCurrentVersionRoot(), \SCANDIR_SORT_NONE), function ($file) {
+        return \array_filter(\scandir($this->getCurrentVersionWebRoot(), \SCANDIR_SORT_NONE), function ($file) {
             return $file !== '.' && $file !== '..' && \preg_match('~\.(html|php|md)$~', $file);
         });
     }
 
-    protected function getCurrentVersionRoot(): string
+    protected function getCurrentVersionWebRoot(): string
     {
-        return $this->dirs->getVersionRoot($this->currentVersion);
+        return $this->dirs->getVersionWebRoot($this->currentVersion);
     }
 
     /**
@@ -123,7 +123,7 @@ class   WebFiles extends StrictObject implements \IteratorAggregate
     {
         return \array_map(
             function ($htmlFile) {
-                return $this->getCurrentVersionRoot() . '/' . $htmlFile;
+                return $this->getCurrentVersionWebRoot() . '/' . $htmlFile;
             },
             $relativeFileNames
         );
