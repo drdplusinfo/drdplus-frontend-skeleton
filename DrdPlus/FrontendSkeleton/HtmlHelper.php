@@ -531,15 +531,15 @@ class HtmlHelper extends StrictObject
         if (!$webVersions->isCurrentVersionStable()) {
             return;
         }
-        $relativeVersionDocumentRoot = $this->dirs->getRelativeVersionDocumentRoot($webVersions->getCurrentVersion());
+        $relativeVersionWebRoot = $this->dirs->getRelativeVersionWebRoot($webVersions->getCurrentVersion());
         foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-            $this->updateAssetLinkToCurrentVersion($image, 'src', $relativeVersionDocumentRoot);
+            $this->updateAssetLinkToCurrentVersion($image, 'src', $relativeVersionWebRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-            $this->updateAssetLinkToCurrentVersion($link, 'href', $relativeVersionDocumentRoot);
+            $this->updateAssetLinkToCurrentVersion($link, 'href', $relativeVersionWebRoot);
         }
         foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-            $this->updateAssetLinkToCurrentVersion($script, 'src', $relativeVersionDocumentRoot);
+            $this->updateAssetLinkToCurrentVersion($script, 'src', $relativeVersionWebRoot);
         }
     }
 

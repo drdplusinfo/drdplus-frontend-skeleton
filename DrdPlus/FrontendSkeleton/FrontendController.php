@@ -177,7 +177,7 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
     public function getWebFiles(): WebFiles
     {
         if ($this->webFiles === null) {
-            $this->webFiles = new WebFiles($this->getConfiguration()->getDirs());
+            $this->webFiles = new WebFiles($this->getConfiguration()->getDirs(), $this);
         }
 
         return $this->webFiles;
@@ -292,6 +292,6 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
 
     public function getCurrentVersion(): string
     {
-        return $this->getRequest()->getValue('version') ?? $this->getConfiguration()->getLatestVersion();
+        return $this->getRequest()->getValue('version') ?? $this->getConfiguration()->getLastStableVersion();
     }
 }

@@ -2,7 +2,7 @@ dirs:
   master_document_root: null
   document_root: null
 web:
-  latest_version: '1.0'
-  repository: git@github.com:jaroslavtyc/drd-plus-frontend-skeleton-web.git
+  last_stable_version: '1.0'
+  repository_url: git@github.com:jaroslavtyc/drd-plus-frontend-skeleton-web.git
 google:
   analytics_id: UA-121206931-1

@@ -8,6 +8,7 @@ use DrdPlus\FrontendSkeleton\Configuration;
 use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
+use DrdPlus\FrontendSkeleton\Partials\CurrentVersionProvider;
 use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
 
@@ -287,5 +288,15 @@ abstract class AbstractContentTest extends SkeletonTestCase
     protected function createConfiguration(Dirs $dirs = null): Configuration
     {
         return Configuration::createFromYml($dirs ?? $this->createDirs());
+    }
+
+    protected function createCurrentVersionProvider(string $currentVersion = null): CurrentVersionProvider
+    {
+        $currentVersionProvider = $this->mockery(CurrentVersionProvider::class);
+        $currentVersionProvider->allows('getCurrentVersion')
+            ->andReturn($currentVersion ?? $this->getTestsConfiguration()->getExpectedLastVersion());
+
+        /** @var CurrentVersionProvider $currentVersionProvider */
+        return $currentVersionProvider;
     }
 }

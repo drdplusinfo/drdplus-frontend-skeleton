@@ -3,19 +3,23 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\Partials\CurrentVersionProvider;
 use Granam\Strict\Object\StrictObject;
 
 /**
  * Gives files to serve on frontend (html, php or md)
  */
-class WebFiles extends StrictObject implements \IteratorAggregate
+class   WebFiles extends StrictObject implements \IteratorAggregate
 {
     /** @var Dirs */
     private $dirs;
+    /** @var string */
+    private $currentVersion;
 
-    public function __construct(Dirs $dirs)
+    public function __construct(Dirs $dirs, CurrentVersionProvider $currentVersionProvider)
     {
         $this->dirs = $dirs;
+        $this->currentVersion = $currentVersionProvider->getCurrentVersion();
     }
 
     /**
@@ -41,13 +45,18 @@ class WebFiles extends StrictObject implements \IteratorAggregate
      */
     private function getUnsortedWebFileNames(): array
     {
-        if (!\is_dir($this->dirs->getWebRoot())) {
-            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->dirs->getWebRoot()}' for web files");
+        if (!\is_dir($this->getCurrentVersionWebRoot())) {
+            throw new Exceptions\UnknownWebFilesDir("Can not read dir '{$this->getCurrentVersionWebRoot()}' for web files");
         }
 
-        return \array_filter(\scandir($this->dirs->getWebRoot(), SCANDIR_SORT_NONE), function ($file) {
+        return \array_filter(\scandir($this->getCurrentVersionWebRoot(), \SCANDIR_SORT_NONE), function ($file) {
             return $file !== '.' && $file !== '..' && \preg_match('~\.(html|php|md)$~', $file);
         });
+    }
+
+    protected function getCurrentVersionWebRoot(): string
+    {
+        return $this->dirs->getVersionWebRoot($this->currentVersion);
     }
 
     /**
@@ -73,7 +82,7 @@ class WebFiles extends StrictObject implements \IteratorAggregate
                 if (isset($secondNameParts['column'])) {
                     $secondNameColumn = $secondNameParts['column'];
                 }
-                $columnComparison = strcmp($firstNameColumn, $secondNameColumn);
+                $columnComparison = \strcmp($firstNameColumn, $secondNameColumn);
                 if ($columnComparison !== 0) {
                     return $columnComparison;
                 }
@@ -114,7 +123,7 @@ class WebFiles extends StrictObject implements \IteratorAggregate
     {
         return \array_map(
             function ($htmlFile) {
-                return $this->dirs->getWebRoot() . '/' . $htmlFile;
+                return $this->getCurrentVersionWebRoot() . '/' . $htmlFile;
             },
             $relativeFileNames
         );

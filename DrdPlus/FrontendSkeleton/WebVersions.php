@@ -12,18 +12,30 @@ use Granam\Strict\Object\StrictObject;
 class WebVersions extends StrictObject
 {
 
-    public const LATEST_VERSION = 'master';
+    public const LAST_UNSTABLE_VERSION = 'master';
 
     /** @var Configuration */
     private $configuration;
     /** @var string */
     private $currentVersion;
+    /** @var string[] */
     private $allVersions;
+    /** @var string */
     private $lastStableVersion;
-    private $lastUnstableVersion;
+    /** @var string[] */
     private $allStableVersions;
+    /** @var string */
     private $currentCommitHash;
+    /** @var string[] */
     private $patchVersions;
+    /** @var string */
+    private $currentPatchVersion;
+    /** @var string[] */
+    private $existingMinorVersions = [];
+    /** @var string[] */
+    private $lastPatchVersionsOf = [];
+    /** @var string */
+    private $lastUnstableVersionWebRoot;
 
     public function __construct(Configuration $configuration, CurrentVersionProvider $currentVersionProvider)
     {
@@ -32,22 +44,32 @@ class WebVersions extends StrictObject
     }
 
     /**
-     * Intentionally are versions taken from branch only, not tags, to lower amount of versions to switch into.
+     * Intentionally are versions taken from branches only, not tags, to lower amount of versions to switch into.
      * @return array|string[]
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
     public function getAllVersions(): array
     {
         if ($this->allVersions === null) {
+            $escapedLatestVersionWebRoot = \escapeshellarg($this->getLastUnstableVersionWebRoot());
             $branches = $this->executeArray(
-                'cd ' . \escapeshellarg($this->configuration->getDirs()->getDocumentRoot()) . ' && git branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse'
+                "git -C $escapedLatestVersionWebRoot branch | grep -P \'v?\d+\.\d+\' --only-matching | sort --version-sort --reverse"
             );
-            \array_unshift($branches, self::LATEST_VERSION);
+            \array_unshift($branches, $this->getLastUnstableVersion());
 
             $this->allVersions = $branches;
         }
 
         return $this->allVersions;
+    }
+
+    protected function getLastUnstableVersionWebRoot(): string
+    {
+        if ($this->lastUnstableVersionWebRoot) {
+            $this->lastUnstableVersionWebRoot = $this->configuration->getDirs()->getVersionWebRoot(static::LAST_UNSTABLE_VERSION);
+        }
+
+        return $this->lastUnstableVersionWebRoot;
     }
 
     /**
@@ -76,7 +98,7 @@ class WebVersions extends StrictObject
             $versions = $this->getAllVersions();
             $lastVersion = \array_pop($versions);
             // last version is not a master (strange but...) or it is the only version we got
-            if ($lastVersion !== self::LATEST_VERSION || \count($versions) === 0) {
+            if ($lastVersion !== $this->getLastUnstableVersion() || \count($versions) === 0) {
                 return $lastVersion;
             }
 
@@ -92,13 +114,7 @@ class WebVersions extends StrictObject
      */
     public function getLastUnstableVersion(): string
     {
-        if ($this->lastUnstableVersion === null) {
-            $versions = $this->getAllVersions();
-
-            $this->lastUnstableVersion = \reset($versions);
-        }
-
-        return $this->lastUnstableVersion;
+        return static::LAST_UNSTABLE_VERSION;
     }
 
     public function getAllStableVersions(): array
@@ -141,19 +157,13 @@ class WebVersions extends StrictObject
         return \in_array($version, $this->getAllVersions(), true);
     }
 
-    /**
-     * Intentionally are shown only minor versions.
-     * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     */
-    public function getLatestVersion(): string
-    {
-        return $this->configuration->getLatestVersion();
-    }
-
     public function getCurrentPatchVersion(): string
     {
-        return $this->getLastPatchVersionOf($this->getCurrentVersion());
+        if ($this->currentPatchVersion === null) {
+            $this->currentPatchVersion = $this->getLastPatchVersionOf($this->getCurrentVersion());
+        }
+
+        return $this->currentPatchVersion;
     }
 
     /**
@@ -181,7 +191,7 @@ class WebVersions extends StrictObject
 
     public function getVersionHumanName(string $version): string
     {
-        return $version !== self::LATEST_VERSION ? "verze $version" : 'testovací!';
+        return $version !== $this->getLastUnstableVersion() ? "verze $version" : 'testovací!';
     }
 
     /**
@@ -191,8 +201,8 @@ class WebVersions extends StrictObject
     public function getCurrentCommitHash(): string
     {
         if ($this->currentCommitHash === null) {
-            $this->ensureVersionExists($this->getCurrentVersion());
-            $escapedWebVersionsRootDir = \escapeshellarg($this->configuration->getDirs()->getVersionDocumentRoot($this->getCurrentVersion()));
+            $this->ensureMinorVersionExists($this->getCurrentVersion());
+            $escapedWebVersionsRootDir = \escapeshellarg($this->configuration->getDirs()->getVersionWebRoot($this->getCurrentVersion()));
             $this->currentCommitHash = $this->executeCommand("git -C $escapedWebVersionsRootDir log --max-count=1 --format=%H --no-abbrev-commit");
         }
 
@@ -200,38 +210,37 @@ class WebVersions extends StrictObject
     }
 
     /**
-     * @param string $toMinorVersion
+     * @param string $minorVersion
      * @return bool
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownVersionToSwitchInto
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateGitVersion
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    protected function ensureVersionExists(string $toMinorVersion): bool
+    protected function ensureMinorVersionExists(string $minorVersion): bool
     {
-        $lastPatchVersion = $this->getLastPatchVersionOf($toMinorVersion);
-        $toMinorVersionDir = $this->configuration->getDirs()->getVersionDocumentRoot($toMinorVersion);
-        if (!\file_exists($toMinorVersionDir)) {
-            $this->clone($lastPatchVersion, $toMinorVersion, $toMinorVersionDir);
-        } else {
-            $this->update($lastPatchVersion, $toMinorVersion, $toMinorVersionDir);
+        if (($this->existingMinorVersions[$minorVersion] ?? null) === null) {
+            $toMinorVersionDir = $this->configuration->getDirs()->getVersionWebRoot($minorVersion);
+            if (!\file_exists($toMinorVersionDir)) {
+                $this->clone($minorVersion, $toMinorVersionDir);
+            } else {
+                $this->update($minorVersion, $toMinorVersionDir);
+            }
         }
 
         return true;
     }
 
     /**
-     * @param string $patchVersion
      * @param string $minorVersion
      * @param string $toVersionDir
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
      */
-    private function clone(string $patchVersion, string $minorVersion, string $toVersionDir): void
+    private function clone(string $minorVersion, string $toVersionDir): void
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
         $toVersionEscaped = \escapeshellarg($minorVersion);
-        $toLastPatchVersionEscaped = \escapeshellarg($patchVersion);
-        $command = "git clone --branch $toVersionEscaped . $toVersionDirEscaped 2>&1 && git -C $toVersionDirEscaped checkout $toLastPatchVersionEscaped 2>&1";
+        $command = "git clone --branch $toVersionEscaped {$this->configuration->getWebRepositoryUrl()} $toVersionDirEscaped 2>&1";
         \exec($command, $rows, $returnCode);
         if ($returnCode !== 0) {
             throw new Exceptions\CanNotLocallyCloneGitVersion(
@@ -242,12 +251,11 @@ class WebVersions extends StrictObject
         }
     }
 
-    private function update(string $patchVersion, string $minorVersion, string $toVersionDir): void
+    private function update(string $minorVersion, string $toVersionDir): void
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
         $toVersionEscaped = \escapeshellarg($minorVersion);
-        $toLastPatchVersionEscaped = \escapeshellarg($patchVersion);
-        $command = "git -C $toVersionDirEscaped checkout $toVersionEscaped 2>&1 && git -C $toVersionDirEscaped pull --ff-only 2>&1 && git -C $toVersionDirEscaped checkout $toLastPatchVersionEscaped 2>&1";
+        $command = "git -C $toVersionDirEscaped checkout $toVersionEscaped 2>&1 && git -C $toVersionDirEscaped pull --ff-only 2>&1";
         $rows = []; // resetting rows as they may NOT be changed on failure
         \exec($command, $rows, $returnCode);
         if ($returnCode !== 0) {
@@ -259,11 +267,6 @@ class WebVersions extends StrictObject
         }
     }
 
-    protected function getLatestVersionDocumentRoot(): string
-    {
-        return $this->configuration->getDirs()->getVersionDocumentRoot(static::LATEST_VERSION);
-    }
-
     /**
      * @param string $superiorVersion
      * @return string
@@ -271,8 +274,17 @@ class WebVersions extends StrictObject
      */
     public function getLastPatchVersionOf(string $superiorVersion): string
     {
-        if ($superiorVersion === static::LATEST_VERSION) {
-            return self::LATEST_VERSION;
+        if (($this->lastPatchVersionsOf[$superiorVersion] ?? null) === null) {
+            $this->lastPatchVersionsOf[$superiorVersion] = $this->determineLastPatchVersionOf($superiorVersion);
+        }
+
+        return $this->lastPatchVersionsOf[$superiorVersion];
+    }
+
+    private function determineLastPatchVersionOf(string $superiorVersion): string
+    {
+        if ($superiorVersion === $this->getLastUnstableVersion()) {
+            return $this->getLastUnstableVersion();
         }
         $patchVersions = $this->getPatchVersions();
         $matchingPatchVersions = [];
@@ -282,7 +294,8 @@ class WebVersions extends StrictObject
             }
         }
         if (!$matchingPatchVersions) {
-            throw new Exceptions\NoPatchVersionsMatch("No patch version matches to given superior version $superiorVersion");
+            throw new Exceptions\NoPatchVersionsMatch(
+                "No patch version matches to given superior version $superiorVersion, available are only " . ($patchVersions ? \implode(',', $patchVersions) : "'nothing'"));
         }
         \usort($matchingPatchVersions, 'version_compare');
 
@@ -296,7 +309,8 @@ class WebVersions extends StrictObject
     public function getPatchVersions(): array
     {
         if ($this->patchVersions === null) {
-            $escapedWebVersionsRootDir = \escapeshellarg($this->getLatestVersionDocumentRoot());
+            $this->ensureMinorVersionExists($this->getLastUnstableVersion());
+            $escapedWebVersionsRootDir = \escapeshellarg($this->getLastUnstableVersionWebRoot());
             $this->patchVersions = $this->executeArray(<<<CMD
 git -C $escapedWebVersionsRootDir tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse
 CMD

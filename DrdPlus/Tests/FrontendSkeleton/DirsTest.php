@@ -17,12 +17,13 @@ class DirsTest extends AbstractContentTest
         /** @var Dirs $dirs */
         $dirs = new $dirsClass('foo');
         self::assertSame('foo', $dirs->getDocumentRoot());
-        self::assertSame('foo/web', $dirs->getWebRoot());
         self::assertSame('foo/vendor', $dirs->getVendorRoot());
         self::assertSame('foo/parts', $dirs->getPartsRoot());
         self::assertSame('foo/parts/frontend-skeleton', $dirs->getGenericPartsRoot());
         self::assertSame('foo/versions', $dirs->getDirForVersions());
         self::assertSame('foo/cache/' . \PHP_SAPI, $dirs->getCacheRoot());
+        self::assertSame('foo/versions/1.2' . \PHP_SAPI, $dirs->getVersionWebRoot('1.2'));
+        self::assertSame('versions/1.2' . \PHP_SAPI, $dirs->getRelativeVersionWebRoot('1.2'));
     }
 
     /**

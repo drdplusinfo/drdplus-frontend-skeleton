@@ -10,8 +10,6 @@ class Dirs extends StrictObject
     /** @var string */
     protected $documentRoot;
     /** @var string */
-    protected $webRoot;
-    /** @var string */
     protected $vendorRoot;
     /** @var string */
     protected $partsRoot;
@@ -34,7 +32,6 @@ class Dirs extends StrictObject
 
     protected function populateSubRoots(string $documentRoot): void
     {
-        $this->webRoot = $documentRoot . '/web';
         $this->vendorRoot = $documentRoot . '/vendor';
         $this->partsRoot = $documentRoot . '/parts';
         $this->genericPartsRoot = \file_exists($documentRoot . '/vendor/frontend-skeleton/parts/frontend-skeleton')
@@ -59,14 +56,6 @@ class Dirs extends StrictObject
     public function getDocumentRoot(): string
     {
         return $this->documentRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWebRoot(): string
-    {
-        return $this->webRoot;
     }
 
     /**
@@ -125,15 +114,15 @@ class Dirs extends StrictObject
         return $this->cacheRoot;
     }
 
-    public function getVersionDocumentRoot(string $forVersion): string
+    public function getVersionWebRoot(string $forVersion): string
     {
         return $this->getDirForVersions() . '/' . $forVersion;
     }
 
-    public function getRelativeVersionDocumentRoot(string $forVersion): string
+    public function getRelativeVersionWebRoot(string $forVersion): string
     {
         // /foo/bar/versions/1.0
-        $currentVersionDocumentRoot = $this->getVersionDocumentRoot($forVersion);
+        $currentVersionDocumentRoot = $this->getVersionWebRoot($forVersion);
 
         // /versions/1.0
         return \str_replace($this->getDocumentRoot(), '', $currentVersionDocumentRoot);

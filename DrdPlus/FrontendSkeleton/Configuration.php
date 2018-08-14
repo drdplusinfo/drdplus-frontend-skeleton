@@ -11,7 +11,7 @@ class Configuration extends StrictObject
     {
         $localConfig = new Yaml($dirs->getDocumentRoot() . '/config.local.yml');
         $globalConfig = new Yaml($dirs->getDocumentRoot() . '/config.distribution.yml');
-        $config = \array_merge($localConfig->getValues(), $globalConfig->getValues());
+        $config = \array_merge($globalConfig->getValues(), $localConfig->getValues());
 
         return new static($dirs, $config);
     }
@@ -31,6 +31,7 @@ class Configuration extends StrictObject
         $this->dirs = $dirs;
         $this->guardValidLastMinorVersion($settings);
         $this->guardValidGoogleAnalyticsId($settings);
+        $this->guardValidWebRepositoryUrl($settings);
         $this->settings = $settings;
     }
 
@@ -40,9 +41,9 @@ class Configuration extends StrictObject
      */
     protected function guardValidLastMinorVersion(array $settings): void
     {
-        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings['web']['latest_version'] ?? ''))) {
+        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings['web']['last_stable_version'] ?? ''))) {
             throw new Exceptions\InvalidMinorVersion(
-                'Expected something like 1.13 in configuration, got ' . ($settings['web']['latest_version'] ?? 'nothing')
+                'Expected something like 1.13 in configuration, got ' . ($settings['web']['last_stable_version'] ?? 'nothing')
             );
         }
     }
@@ -56,6 +57,19 @@ class Configuration extends StrictObject
         if (!\preg_match('~^UA-121206931-\d+$~', $settings['google']['analytics_id'] ?? '')) {
             throw new Exceptions\InvalidMinorVersion(
                 'Expected something like UA-121206931-1 in configuration, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
+            );
+        }
+    }
+
+    /**
+     * @param array $settings
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidWebRepositoryUrl
+     */
+    protected function guardValidWebRepositoryUrl(array $settings): void
+    {
+        if (!\preg_match('~^.+[.git]$~', $settings['web']['repository_url'] ?? '')) {
+            throw new Exceptions\InvalidWebRepositoryUrl(
+                'Expected something git@github.com/foo/bar.git in configuration, got ' . ($settings['web']['repository_url'] ?? 'nothing')
             );
         }
     }
@@ -76,14 +90,19 @@ class Configuration extends StrictObject
         return $this->settings;
     }
 
-    public function getLatestVersion(): string
+    public function getLastStableVersion(): string
     {
-        return $this->getSettings()['web']['latest_version'];
+        return $this->getSettings()['web']['last_stable_version'];
     }
 
     public function getGoogleAnalyticsId(): string
     {
         return $this->getSettings()['google']['analytics_id'];
+    }
+
+    public function getWebRepositoryUrl(): string
+    {
+        return $this->getSettings()['web']['repository_url'];
     }
 
 }
