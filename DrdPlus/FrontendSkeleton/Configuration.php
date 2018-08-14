@@ -67,9 +67,10 @@ class Configuration extends StrictObject
      */
     protected function guardValidWebRepositoryUrl(array $settings): void
     {
-        if (!\preg_match('~^.+[.git]$~', $settings['web']['repository_url'] ?? '')) {
+        $repositoryUrl = $settings['web']['repository_url'] ?? '';
+        if (!\preg_match('~^.+[.git]$~', $repositoryUrl) && !\file_exists($repositoryUrl)) {
             throw new Exceptions\InvalidWebRepositoryUrl(
-                'Expected something git@github.com/foo/bar.git in configuration, got ' . ($settings['web']['repository_url'] ?? 'nothing')
+                'Expected something git@github.com/foo/bar.git in configuration, got ' . ($repositoryUrl ?: 'nothing')
             );
         }
     }
