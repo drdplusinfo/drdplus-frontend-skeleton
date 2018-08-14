@@ -65,7 +65,7 @@ class WebVersions extends StrictObject
 
     protected function getLastUnstableVersionWebRoot(): string
     {
-        if ($this->lastUnstableVersionWebRoot) {
+        if ($this->lastUnstableVersionWebRoot === null) {
             $this->lastUnstableVersionWebRoot = $this->configuration->getDirs()->getVersionWebRoot(static::LAST_UNSTABLE_VERSION);
         }
 
@@ -295,7 +295,7 @@ class WebVersions extends StrictObject
         }
         if (!$matchingPatchVersions) {
             throw new Exceptions\NoPatchVersionsMatch(
-                "No patch version matches to given superior version $superiorVersion, available are only " . ($patchVersions ? \implode(',', $patchVersions) : "'nothing'"));
+                "No patch version matches given superior version $superiorVersion, available are only " . ($patchVersions ? \implode(',', $patchVersions) : "'nothing'"));
         }
         \usort($matchingPatchVersions, 'version_compare');
 
