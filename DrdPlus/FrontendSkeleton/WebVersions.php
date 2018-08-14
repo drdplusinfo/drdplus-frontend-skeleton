@@ -246,7 +246,7 @@ class WebVersions extends StrictObject
     private function update(string $minorVersion, string $toVersionDir): void
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
-        $command = "git -C $toVersionDirEscaped pull --ff-only 2>&1 && git -C $toVersionDirEscaped pull --tags";
+        $command = "cd $toVersionDirEscaped && git pull --ff-only 2>&1 && git pull --tags 2>&1";
         $rows = []; // resetting rows as they may NOT be changed on failure
         \exec($command, $rows, $returnCode);
         if ($returnCode !== 0) {
@@ -286,7 +286,8 @@ class WebVersions extends StrictObject
         }
         if (!$matchingPatchVersions) {
             throw new Exceptions\NoPatchVersionsMatch(
-                "No patch version matches given superior version $superiorVersion, available are only " . ($patchVersions ? \implode(',', $patchVersions) : "'nothing'"));
+                "No patch version matches given superior version $superiorVersion, available are only "
+                . ($patchVersions ? \implode(',', $patchVersions) : "'nothing'"));
         }
         \usort($matchingPatchVersions, 'version_compare');
 
