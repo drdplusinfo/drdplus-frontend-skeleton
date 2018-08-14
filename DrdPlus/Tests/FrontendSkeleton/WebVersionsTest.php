@@ -170,7 +170,9 @@ class WebVersionsTest extends AbstractContentTest
      */
     public function I_can_get_patch_versions(): void
     {
-        $tags = $this->runCommand('git -C ' . \escapeshellarg($this->getDocumentRoot()) . ' tag');
+        $tags = $this->runCommand(
+            'git -C ' . \escapeshellarg($this->createConfiguration()->getDirs()->getVersionRoot($this->getTestsConfiguration()->getExpectedLastUnstableVersion())) . ' tag'
+        );
         $expectedVersionTags = [];
         foreach ($tags as $tag) {
             if (\preg_match('~^(\d+[.]){2}[[:alnum:]]+([.]\d+)?$~', $tag)) {
