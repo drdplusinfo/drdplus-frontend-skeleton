@@ -123,13 +123,4 @@ class Dirs extends StrictObject
     {
         return $this->getVersionRoot($forVersion) . '/web';
     }
-
-    public function getRelativeVersionWebRoot(string $forVersion): string
-    {
-        // /foo/bar/versions/1.0
-        $currentVersionDocumentRoot = $this->getVersionRoot($forVersion);
-
-        // /versions/1.0
-        return \str_replace($this->getDocumentRoot(), '', $currentVersionDocumentRoot);
-    }
 }

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\Dirs;
+use DrdPlus\FrontendSkeleton\Configuration;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
@@ -22,17 +22,8 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass(
-            'Google Analytics Foo',
-            $this->createHtmlHelper(),
-            $this->createDirs()
-        );
-        self::assertSame('Google Analytics Foo', $controller->getGoogleAnalyticsId());
-    }
-
-    protected function createDirs(string $documentRoot = null): Dirs
-    {
-        return new Dirs($this->getMasterDocumentRoot(), $documentRoot ?? $this->getDocumentRoot());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
+        self::assertSame($this->getTestsConfiguration()->getExpectedGoogleAnalyticsId(), $controller->getGoogleAnalyticsId());
     }
 
     /**
@@ -42,7 +33,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertSame($this->getTestsConfiguration()->getExpectedWebName(), $controller->getWebName());
     }
 
@@ -53,7 +44,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertSame($this->getTestsConfiguration()->getExpectedPageTitle(), $controller->getPageTitle());
     }
 
@@ -64,9 +55,11 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_not_get_page_title_if_text_file_with_its_name_does_not_exist(): void
     {
+        $configuration = $this->mockery(Configuration::class);
+        $configuration->allows('getDirs')->andReturn($this->createDirs('Not from this world'));
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs('Not from this world'));
+        $controller = new $controllerClass($configuration, $this->createHtmlHelper());
         $controller->getPageTitle();
     }
 
@@ -77,7 +70,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertNotEmpty($controller->getWebVersions());
     }
 
@@ -88,7 +81,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertNotEmpty($controller->getWebFiles());
     }
 
@@ -99,7 +92,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertNotEmpty($controller->getRequest());
     }
 
@@ -110,7 +103,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertSame([], $controller->getBodyClasses());
         $controller->addBodyClass('rumbling');
         $controller->addBodyClass('cracking');
@@ -187,11 +180,11 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(null, true /* in production */), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper(null, true /* in production */));
         self::assertTrue($controller->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(null, false /* not in production */), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper(null, false /* not in production */));
         self::assertFalse($controller->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
     }
 
@@ -202,7 +195,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertNull($controller->getRedirect());
         $controller->setRedirect($redirect = new Redirect('redirect to the future', 999));
         self::assertSame($redirect, $controller->getRedirect());
@@ -225,18 +218,16 @@ class FrontendControllerTest extends AbstractContentTest
     }
 
     protected function createController(
-        string $googleAnalyticsId = 'Google Analytics Foo',
         HtmlHelper $htmlHelper = null,
         string $documentRoot = null
     ): FrontendController
     {
         $controllerClass = static::getSutClass();
-        $dirs = $this->createDirs($documentRoot);
+        $configuration = $this->createConfiguration($dirs = $this->createDirs($documentRoot));
 
         return new $controllerClass(
-            $googleAnalyticsId,
-            $htmlHelper ?? $this->createHtmlHelper($dirs, false, false, false, false),
-            $dirs
+            $configuration,
+            $htmlHelper ?? $this->createHtmlHelper($dirs, false, false, false, false)
         );
     }
 
@@ -248,14 +239,14 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         $reflection = new \ReflectionClass(FrontendController::class);
-        self::assertTrue($reflection->hasProperty('webVersions'), FrontendController::class . ' no more has webVersions property');
-        $webVersionsProperty = $reflection->getProperty('webVersions');
+        self::assertTrue($reflection->hasProperty('configuration'), FrontendController::class . ' no more has configuration property');
+        $webVersionsProperty = $reflection->getProperty('configuration');
         $webVersionsProperty->setAccessible(true);
-        $webVersions = $this->mockery(WebVersions::class);
-        $webVersionsProperty->setValue($controller, $webVersions);
-        $webVersions->expects('getCurrentVersion')
+        $configuration = $this->mockery(Configuration::class);
+        $webVersionsProperty->setValue($controller, $configuration);
+        $configuration->expects('getLastStableVersion')
             ->andReturn('foo');
         self::assertSame('foo', $controller->getCurrentVersion());
     }
@@ -268,7 +259,7 @@ class FrontendControllerTest extends AbstractContentTest
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
-        $controller = new $controllerClass('Google Analytics Foo', $this->createHtmlHelper(), $this->createDirs());
+        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         $reflection = new \ReflectionClass(FrontendController::class);
         self::assertTrue($reflection->hasProperty('webVersions'), FrontendController::class . ' no more has webVersions property');
         $webVersionsProperty = $reflection->getProperty('webVersions');

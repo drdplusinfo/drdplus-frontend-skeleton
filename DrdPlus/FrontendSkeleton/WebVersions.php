@@ -205,7 +205,6 @@ class WebVersions extends StrictObject
     /**
      * @param string $minorVersion
      * @return bool
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownVersionToSwitchInto
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateGitVersion
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed

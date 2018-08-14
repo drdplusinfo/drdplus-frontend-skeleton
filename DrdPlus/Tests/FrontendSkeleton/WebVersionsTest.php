@@ -114,21 +114,27 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_current_commit_hash(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        self::assertSame($this->getLastCommitHashFromHeadFile(), $webVersions->getCurrentCommitHash());
+        self::assertSame(
+            $this->getLastCommitHashFromHeadFile(
+                $this->createDirs()->getVersionRoot($this->getTestsConfiguration()->getExpectedLastVersion())
+            ),
+            $webVersions->getCurrentCommitHash()
+        );
     }
 
     /**
+     * @param string $dir
      * @return string
      * @throws \DrdPlus\Tests\FrontendSkeleton\Exceptions\CanNotReadGitHead
      */
-    private function getLastCommitHashFromHeadFile(): string
+    private function getLastCommitHashFromHeadFile(string $dir): string
     {
-        $head = \file_get_contents($this->getDocumentRoot() . '/.git/HEAD');
+        $head = \file_get_contents($dir . '/.git/HEAD');
         if (\preg_match('~^[[:alnum:]]{40,}$~', $head)) {
             return $head; // the HEAD file contained the has itself
         }
-        $gitHeadFile = \trim(\preg_replace('~ref:\s*~', '', \file_get_contents($this->getDocumentRoot() . '/.git/HEAD')));
-        $gitHeadFilePath = $this->getDocumentRoot() . '/.git/' . $gitHeadFile;
+        $gitHeadFile = \trim(\preg_replace('~ref:\s*~', '', \file_get_contents($dir . '/.git/HEAD')));
+        $gitHeadFilePath = $dir . '/.git/' . $gitHeadFile;
         if (!\is_readable($gitHeadFilePath)) {
             throw new Exceptions\CanNotReadGitHead(
                 "Could not read $gitHeadFilePath, in that dir are files "

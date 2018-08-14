@@ -55,7 +55,7 @@ class Configuration extends StrictObject
     protected function guardValidGoogleAnalyticsId(array $settings): void
     {
         if (!\preg_match('~^UA-121206931-\d+$~', $settings['google']['analytics_id'] ?? '')) {
-            throw new Exceptions\InvalidMinorVersion(
+            throw new Exceptions\InvalidGoogleAnalyticsId(
                 'Expected something like UA-121206931-1 in configuration, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
             );
         }

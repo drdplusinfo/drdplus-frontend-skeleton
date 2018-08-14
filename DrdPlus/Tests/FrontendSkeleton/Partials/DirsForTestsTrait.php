@@ -3,8 +3,15 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
+use DrdPlus\FrontendSkeleton\Dirs;
+
 trait DirsForTestsTrait
 {
+    protected function createDirs(string $documentRoot = null): Dirs
+    {
+        return new Dirs($documentRoot ?? $this->getDocumentRoot());
+    }
+
     protected function getDocumentRoot(): string
     {
         static $masterDocumentRoot;

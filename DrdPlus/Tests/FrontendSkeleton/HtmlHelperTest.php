@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
@@ -42,7 +41,7 @@ class HtmlHelperTest extends AbstractContentTest
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        self::assertFalse($htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()))->isInProduction());
+        self::assertFalse($htmlHelperClass::createFromGlobals($this->createDirs())->isInProduction());
         // there is no way how to change PHP_SAPI constant value
     }
 
@@ -53,7 +52,7 @@ class HtmlHelperTest extends AbstractContentTest
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
 
         $allTables = $htmlHelper->findTablesWithIds($this->getHtmlDocument());
         if (!$this->getTestsConfiguration()->hasTables()) {
@@ -98,7 +97,7 @@ class HtmlHelperTest extends AbstractContentTest
         }
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $someExpectedTableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
         self::assertGreaterThan(0, \count($someExpectedTableIds), 'Some tables expected according to tests config');
         $tableId = \current($someExpectedTableIds);
@@ -115,7 +114,7 @@ class HtmlHelperTest extends AbstractContentTest
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
     }
 
@@ -126,7 +125,7 @@ class HtmlHelperTest extends AbstractContentTest
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $content = '<!DOCTYPE html>
 <html><body><a href="" id="someId">Foo</a></body></html>';
         $htmlDocument = new HtmlDocument($content);
@@ -141,7 +140,7 @@ class HtmlHelperTest extends AbstractContentTest
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $originalId = 'Příliš # žluťoučký # kůň # úpěl # ďábelské # ódy';
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
@@ -191,7 +190,7 @@ HTML
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
 <html lang="cs-CZ">
@@ -219,7 +218,7 @@ HTML
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
 <html lang="cs-CZ">
@@ -256,7 +255,7 @@ HTML
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $htmlHelper->injectIframesWithRemoteTables(new HtmlDocument());
     }
 
@@ -267,7 +266,7 @@ HTML
     {
         /** @var HtmlHelper $htmlHelperClass */
         $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals(new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot()));
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
         $htmlDocument = new HtmlDocument(<<<HTML
         <!DOCTYPE html>
 <html lang="cs-CZ">

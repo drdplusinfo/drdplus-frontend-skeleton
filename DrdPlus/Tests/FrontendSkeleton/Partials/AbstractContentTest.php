@@ -171,24 +171,23 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return new HtmlHelper($dirs ?? $this->createDirs(), $inDevMode, $inForcedProductionMode, $shouldHideCovered, $showIntroductionOnly);
     }
 
-    protected function createDirs(string $documentRoot = null): Dirs
+    protected function fetchNonCachedContent(FrontendController $controller = null, bool $backupGlobals = true): string
     {
-        return new Dirs($documentRoot ?? $this->getDocumentRoot());
-    }
-
-    protected function fetchNonCachedContent(FrontendController $controller = null): string
-    {
+        $originalGet = $_GET;
+        $originalPost = $_POST;
+        $originalCookies = $_COOKIE;
         /** @noinspection PhpUnusedLocalVariableInspection */
         $controller = $controller ?? null;
-        $cacheOriginalValue = $_GET[Cache::CACHE] ?? null;
         $_GET[Cache::CACHE] = Cache::DISABLE;
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $latestVersion = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';
         $content = \ob_get_clean();
-        $_GET[Cache::CACHE] = $cacheOriginalValue;
+        if ($backupGlobals) {
+            $_GET = $originalGet;
+            $_POST = $originalPost;
+            $_COOKIE = $originalCookies;
+        }
 
         return $content;
     }

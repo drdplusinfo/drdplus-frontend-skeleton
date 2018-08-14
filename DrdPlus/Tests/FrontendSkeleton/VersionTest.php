@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
@@ -59,8 +58,7 @@ class VersionTest extends AbstractContentTest
      */
     public function I_can_switch_to_every_version(string $source): void
     {
-        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
-        $webVersions = new WebVersions($dirs);
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
         foreach ($webVersions->getAllVersions() as $webVersion) {
             $post = [];
             $cookies = [];
@@ -104,8 +102,7 @@ class VersionTest extends AbstractContentTest
 
             return;
         }
-        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
-        $webVersions = new WebVersions($dirs);
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
         $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching');
         self::assertNotEmpty(
             $tags,
@@ -125,14 +122,15 @@ class VersionTest extends AbstractContentTest
 
     /**
      * @test
+     * @backupGlobals enabled
      */
     public function Current_version_is_written_into_cookie(): void
     {
         unset($_COOKIE['version']);
-        $this->fetchNonCachedContent();
+        $this->fetchNonCachedContent(null, false /* keep changed globals */);
         self::assertArrayHasKey('version', $_COOKIE, "Missing 'version' in cookie");
         // unstable version is forced by test, it should be stable version by default
-        self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $_COOKIE['version']);
+        self::assertSame($this->getTestsConfiguration()->getExpectedLastVersion(), $_COOKIE['version']);
     }
 
     /**
@@ -145,20 +143,19 @@ class VersionTest extends AbstractContentTest
 
             return;
         }
-        $dirs = new Dirs($this->getMasterDocumentRoot(), $this->getDocumentRoot());
-        $webVersions = new WebVersions($dirs);
-        $masterDocumentRoot = $dirs->getMasterDocumentRoot();
+        $webVersions = new WebVersions($configuration = $this->createConfiguration(), $this->createCurrentVersionProvider());
+        $documentRoot = $configuration->getDirs()->getDocumentRoot();
         $checked = 0;
         foreach ($webVersions->getAllStableVersions() as $stableVersion) {
             $htmlDocument = $this->getHtmlDocument(['version' => $stableVersion]);
             foreach ($htmlDocument->getElementsByTagName('img') as $image) {
-                $checked += $this->Asset_file_exists($image, 'src', $masterDocumentRoot);
+                $checked += $this->Asset_file_exists($image, 'src', $documentRoot);
             }
             foreach ($htmlDocument->getElementsByTagName('link') as $link) {
-                $checked += $this->Asset_file_exists($link, 'href', $masterDocumentRoot);
+                $checked += $this->Asset_file_exists($link, 'href', $documentRoot);
             }
             foreach ($htmlDocument->getElementsByTagName('script') as $script) {
-                $checked += $this->Asset_file_exists($script, 'src', $masterDocumentRoot);
+                $checked += $this->Asset_file_exists($script, 'src', $documentRoot);
             }
         }
     }
