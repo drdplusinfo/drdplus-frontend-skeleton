@@ -7,14 +7,23 @@ use Granam\Strict\Object\StrictObject;
 
 class Configuration extends StrictObject
 {
+    public const CONFIG_LOCAL_YML = 'config.local.yml';
+    public const CONFIG_DISTRIBUTION_YML = 'config.distribution.yml';
+
     public static function createFromYml(Dirs $dirs): Configuration
     {
-        $localConfig = new Yaml($dirs->getDocumentRoot() . '/config.local.yml');
-        $globalConfig = new Yaml($dirs->getDocumentRoot() . '/config.distribution.yml');
+        $localConfig = new Yaml($dirs->getDocumentRoot() . '/' . self::CONFIG_LOCAL_YML);
+        $globalConfig = new Yaml($dirs->getDocumentRoot() . '/' . self::CONFIG_DISTRIBUTION_YML);
         $config = \array_merge($globalConfig->getValues(), $localConfig->getValues());
 
         return new static($dirs, $config);
     }
+    
+    public const WEB = 'web';
+    public const LAST_STABLE_VERSION = 'last_stable_version';
+    public const REPOSITORY_URL = 'repository_url';
+    public const GOOGLE = 'google';
+    public const ANALYTICS_ID = 'analytics_id';
 
     /** @var Dirs */
     private $dirs;
@@ -41,9 +50,9 @@ class Configuration extends StrictObject
      */
     protected function guardValidLastMinorVersion(array $settings): void
     {
-        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings['web']['last_stable_version'] ?? ''))) {
+        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings[self::WEB]['last_stable_version'] ?? ''))) {
             throw new Exceptions\InvalidMinorVersion(
-                'Expected something like 1.13 in configuration, got ' . ($settings['web']['last_stable_version'] ?? 'nothing')
+                'Expected something like 1.13 in configuration web.last_stable_version, got ' . ($settings[self::WEB]['last_stable_version'] ?? 'nothing')
             );
         }
     }
@@ -56,7 +65,7 @@ class Configuration extends StrictObject
     {
         if (!\preg_match('~^UA-121206931-\d+$~', $settings['google']['analytics_id'] ?? '')) {
             throw new Exceptions\InvalidGoogleAnalyticsId(
-                'Expected something like UA-121206931-1 in configuration, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
+                'Expected something like UA-121206931-1 in configuration google.analytics_id, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
             );
         }
     }
@@ -67,10 +76,10 @@ class Configuration extends StrictObject
      */
     protected function guardValidWebRepositoryUrl(array $settings): void
     {
-        $repositoryUrl = $settings['web']['repository_url'] ?? '';
+        $repositoryUrl = $settings[self::WEB]['repository_url'] ?? '';
         if (!\preg_match('~^.+[.git]$~', $repositoryUrl) && !\file_exists($repositoryUrl)) {
             throw new Exceptions\InvalidWebRepositoryUrl(
-                'Expected something git@github.com/foo/bar.git in configuration, got ' . ($repositoryUrl ?: 'nothing')
+                'Expected something git@github.com/foo/bar.git in configuration web.repository_url, got ' . ($repositoryUrl ?: 'nothing')
             );
         }
     }
@@ -91,19 +100,19 @@ class Configuration extends StrictObject
         return $this->settings;
     }
 
-    public function getLastStableVersion(): string
+    public function getWebLastStableVersion(): string
     {
-        return $this->getSettings()['web']['last_stable_version'];
+        return $this->getSettings()[self::WEB][self::LAST_STABLE_VERSION];
     }
 
     public function getGoogleAnalyticsId(): string
     {
-        return $this->getSettings()['google']['analytics_id'];
+        return $this->getSettings()['google'][self::ANALYTICS_ID];
     }
 
     public function getWebRepositoryUrl(): string
     {
-        return $this->getSettings()['web']['repository_url'];
+        return $this->getSettings()[self::WEB][self::REPOSITORY_URL];
     }
 
 }
