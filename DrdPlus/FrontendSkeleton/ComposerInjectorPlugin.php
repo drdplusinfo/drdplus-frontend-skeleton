@@ -19,16 +19,24 @@ class ComposerInjectorPlugin implements PluginInterface, EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [
-            PackageEvents::POST_PACKAGE_INSTALL => 'addVersionsToAssets',
-            PackageEvents::POST_PACKAGE_UPDATE => 'addVersionsToAssets',
+            PackageEvents::POST_PACKAGE_INSTALL => 'plugInSkeleton',
+            PackageEvents::POST_PACKAGE_UPDATE => 'plugInSkeleton',
         ];
     }
 
-    public function addVersionsToAssets()
+    public function plugInSkeleton()
     {
         $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
+        $this->addVersionsToAssets($documentRoot);
+    }
+
+    private function addVersionsToAssets(string $documentRoot)
+    {
         $assetsVersion = new AssetsVersion(true, false);
-        $assetsVersion->addVersionsToAssetLinks($documentRoot, ['css'], [], [], false);
+        $changedFiles = $assetsVersion->addVersionsToAssetLinks($documentRoot, ['css'], [], [], false);
+        if ($changedFiles) {
+            $this->io->write('Those assets got versions to asset links: ' . \implode(', ', $changedFiles));
+        }
     }
 
     public function activate(Composer $composer, IOInterface $io): void
