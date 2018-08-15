@@ -18,7 +18,7 @@ class Configuration extends StrictObject
 
         return new static($dirs, $config);
     }
-    
+
     public const WEB = 'web';
     public const LAST_STABLE_VERSION = 'last_stable_version';
     public const REPOSITORY_URL = 'repository_url';
@@ -39,8 +39,8 @@ class Configuration extends StrictObject
     {
         $this->dirs = $dirs;
         $this->guardValidLastMinorVersion($settings);
-        $this->guardValidGoogleAnalyticsId($settings);
         $this->guardValidWebRepositoryUrl($settings);
+        $this->guardValidGoogleAnalyticsId($settings);
         $this->settings = $settings;
     }
 
@@ -59,19 +59,6 @@ class Configuration extends StrictObject
 
     /**
      * @param array $settings
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidGoogleAnalyticsId
-     */
-    protected function guardValidGoogleAnalyticsId(array $settings): void
-    {
-        if (!\preg_match('~^UA-121206931-\d+$~', $settings['google']['analytics_id'] ?? '')) {
-            throw new Exceptions\InvalidGoogleAnalyticsId(
-                'Expected something like UA-121206931-1 in configuration google.analytics_id, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
-            );
-        }
-    }
-
-    /**
-     * @param array $settings
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidWebRepositoryUrl
      */
     protected function guardValidWebRepositoryUrl(array $settings): void
@@ -80,6 +67,19 @@ class Configuration extends StrictObject
         if (!\preg_match('~^.+[.git]$~', $repositoryUrl) && !\file_exists($repositoryUrl)) {
             throw new Exceptions\InvalidWebRepositoryUrl(
                 'Expected something git@github.com/foo/bar.git in configuration web.repository_url, got ' . ($repositoryUrl ?: 'nothing')
+            );
+        }
+    }
+
+    /**
+     * @param array $settings
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidGoogleAnalyticsId
+     */
+    protected function guardValidGoogleAnalyticsId(array $settings): void
+    {
+        if (!\preg_match('~^UA-121206931-\d+$~', $settings['google']['analytics_id'] ?? '')) {
+            throw new Exceptions\InvalidGoogleAnalyticsId(
+                'Expected something like UA-121206931-1 in configuration google.analytics_id, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
             );
         }
     }
