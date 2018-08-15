@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed;
 use DrdPlus\FrontendSkeleton\Partials\CurrentVersionProvider;
 use Granam\Strict\Object\StrictObject;
 
@@ -73,11 +74,27 @@ class WebVersions extends StrictObject
 
     /**
      * @param string $command
+     * @param bool $sendErrorsToStdOut = true
+     * @param bool $solveMissingHomeDir = true
      * @return string[]|array
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    private function executeArray(string $command): array
+    private function executeArray(string $command, bool $sendErrorsToStdOut = true, bool $solveMissingHomeDir = true): array
     {
+        if ($sendErrorsToStdOut) {
+            $command .= ' 2>&1';
+        }
+        if ($solveMissingHomeDir) {
+            $homeDir = \exec('echo $HOME 2>&1', $output, $returnCode);
+            $this->guardCommandWithoutError($returnCode, $command, $output);
+            if (!$homeDir) {
+                if (\file_exists('/home/www-data')) {
+                    $command = 'export HOME=/home/www-data 2>&1 && ' . $command;
+                } elseif (\file_exists('/var/www')) {
+                    $command = 'export HOME=/var/www 2>&1 && ' . $command;
+                } // else we will hope it will somehow pass without fatal: failed to expand user dir in: '~/.gitignore'
+            }
+        }
         $returnCode = 0;
         $output = [];
         \exec($command, $output, $returnCode);
@@ -135,7 +152,8 @@ class WebVersions extends StrictObject
                 . ($output !== null ?
                     ("with output: '" . \implode("\n", $output) . "'")
                     : ''
-                )
+                ),
+                $returnCode
             );
         }
     }
@@ -169,17 +187,16 @@ class WebVersions extends StrictObject
 
     /**
      * @param string $command
+     * @param bool $sendErrorsToStdOut = true
+     * @param bool $solveMissingHomeDir = true
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
-    private function executeCommand(string $command): string
+    private function execute(string $command, bool $sendErrorsToStdOut = true, bool $solveMissingHomeDir = true): string
     {
-        $returnCode = 0;
-        $output = [];
-        $lastRow = \exec($command, $output, $returnCode);
-        $this->guardCommandWithoutError($returnCode, $command, $output);
+        $rows = $this->executeArray($command, $sendErrorsToStdOut, $solveMissingHomeDir);
 
-        return $lastRow;
+        return \end($rows);
     }
 
     public function getVersionHumanName(string $version): string
@@ -196,7 +213,7 @@ class WebVersions extends StrictObject
         if ($this->currentCommitHash === null) {
             $this->ensureMinorVersionExists($this->getCurrentVersion());
             $escapedVersionRoot = \escapeshellarg($this->configuration->getDirs()->getVersionRoot($this->getCurrentVersion()));
-            $this->currentCommitHash = $this->executeCommand("git -C $escapedVersionRoot log --max-count=1 --format=%H --no-abbrev-commit");
+            $this->currentCommitHash = $this->execute("git -C $escapedVersionRoot log --max-count=1 --format=%H --no-abbrev-commit");
         }
 
         return $this->currentCommitHash;
@@ -246,16 +263,33 @@ class WebVersions extends StrictObject
     private function update(string $minorVersion, string $toVersionDir): void
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
-        $command = "cd $toVersionDirEscaped && git pull --ff-only 2>&1 && git pull --tags 2>&1";
-        $rows = []; // resetting rows as they may NOT be changed on failure
-        \exec($command, $rows, $returnCode);
-        if ($returnCode !== 0) {
+        $commands = [];
+        $commands[] = "cd $toVersionDirEscaped";
+        $commands[] = 'git pull --ff-only';
+        $commands[] = 'git pull --tags';
+        try {
+            $this->executeCommandsChainArray($commands);
+        } catch (ExecutingCommandFailed $executingCommandFailed) {
             throw new Exceptions\CanNotUpdateGitVersion(
-                "Can not update required version '{$minorVersion}' by command '{$command}'"
-                . ", got return code '{$returnCode}' and output\n"
-                . \implode("\n", $rows)
+                "Can not update required version '{$minorVersion}' by command '{$commands}': " . $executingCommandFailed->getMessage(),
+                $executingCommandFailed->getCode(),
+                $executingCommandFailed
             );
         }
+    }
+
+    private function executeCommandsChainArray(array $commands): array
+    {
+        return $this->executeArray($this->getChainedCommands($commands), false);
+    }
+
+    private function getChainedCommands(array $commands): string
+    {
+        foreach ($commands as &$command) {
+            $command .= ' 2>&1';
+        }
+
+        return \implode(' && ', $commands);
     }
 
     /**
