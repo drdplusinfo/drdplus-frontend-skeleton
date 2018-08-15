@@ -5,6 +5,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 
@@ -18,13 +19,16 @@ class ComposerInjectorPlugin implements PluginInterface, EventSubscriberInterfac
     public static function getSubscribedEvents(): array
     {
         return [
-            'post-autoload-dump' => 'addVersionsToAssets',
+            PackageEvents::POST_PACKAGE_INSTALL => 'addVersionsToAssets',
+            PackageEvents::POST_PACKAGE_UPDATE => 'addVersionsToAssets',
         ];
     }
 
     public function addVersionsToAssets()
     {
-        $vendorDir = $this->composer->getConfig()->get('vendor-dir');
+        $documentRoot = $GLOBALS['documentRoot'];
+        $assetsVersion = new AssetsVersion(true, false);
+        $assetsVersion->addVersionsToAssetLinks($documentRoot, ['css'], [], [], false);
     }
 
     public function activate(Composer $composer, IOInterface $io): void
