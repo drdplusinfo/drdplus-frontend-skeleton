@@ -14,8 +14,8 @@ class WebVersionsTest extends AbstractContentTest
      */
     public function I_can_get_current_version(): void
     {
-        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        self::assertSame($this->executeCommand('git rev-parse --abbrev-ref HEAD'), $webVersions->getCurrentVersion());
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider('foo'));
+        self::assertSame('foo', $webVersions->getCurrentVersion());
     }
 
     /**
