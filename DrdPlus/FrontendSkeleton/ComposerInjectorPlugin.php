@@ -26,7 +26,7 @@ class ComposerInjectorPlugin implements PluginInterface, EventSubscriberInterfac
 
     public function addVersionsToAssets()
     {
-        $documentRoot = $GLOBALS['documentRoot'];
+        $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
         $assetsVersion = new AssetsVersion(true, false);
         $assetsVersion->addVersionsToAssetLinks($documentRoot, ['css'], [], [], false);
     }
