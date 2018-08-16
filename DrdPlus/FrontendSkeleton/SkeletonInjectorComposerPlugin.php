@@ -33,6 +33,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
     public function plugInSkeleton()
     {
         $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
+        $this->io->write('Injecting drd-plus/frontend-skeleton using document root ' . $documentRoot);
         $this->publishSkeletonImages($documentRoot);
         $this->publishSkeletonCss($documentRoot);
         $this->publishSkeletonJs($documentRoot);
@@ -40,6 +41,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->addVersionsToAssets($documentRoot);
         $this->copyGoogleVerification($documentRoot);
         $this->copyPhpUnitConfig($documentRoot);
+        $this->io->write('Injection of drd-plus/frontend-skeleton finished');
     }
 
     private function addVersionsToAssets(string $documentRoot)
