@@ -41,6 +41,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->addVersionsToAssets($documentRoot);
         $this->copyGoogleVerification($documentRoot);
         $this->copyPhpUnitConfig($documentRoot);
+        $this->copyProjectConfig($documentRoot);
         $this->io->write('Injection of drd-plus/frontend-skeleton finished');
     }
 
@@ -128,5 +129,13 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
     private function copyPhpUnitConfig(string $documentRoot)
     {
         $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
+    }
+
+    private function copyProjectConfig(string $documentRoot)
+    {
+        $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
+        if (!\file_exists($documentRoot . '/config.local.yml')) {
+            $this->io->write('config.local.yml is missing, you can use config.distribution.yml for inspiration', true, $this->io::VERBOSE);
+        }
     }
 }
