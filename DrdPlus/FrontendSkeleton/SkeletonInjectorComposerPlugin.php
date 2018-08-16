@@ -9,7 +9,7 @@ use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 
-class ComposerInjectorPlugin implements PluginInterface, EventSubscriberInterface
+class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriberInterface
 {
     /** @var Composer */
     private $composer;

@@ -48,7 +48,7 @@
     "sort-packages": true
   },
   "extra": {
-    "class": "DrdPlus\\FrontendSkeleton\\ComposerInjectorPlugin"
+    "class": "DrdPlus\\FrontendSkeleton\\SkeletonInjectorComposerPlugin"
   },
   "scripts": {
     "pre-autoload-dump": [
