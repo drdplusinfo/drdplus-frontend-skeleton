@@ -73,10 +73,15 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         }
         unset($command);
         $chain = \implode(' && ', $commands);
-        \passthru($chain, $returnCode);
+        \exec($chain, $output, $returnCode);
         if ($returnCode !== 0) {
-            $this->io->writeError('Failed injecting skeleton by command ' . $chain);
+            $this->io->writeError(
+                "Failed injecting skeleton by command $chain\nGot return code $returnCode and output " . \implode("\n", $output)
+            );
+
+            return;
         }
+        $this->io->write($chain . ' ' . \implode("\n", $output));
     }
 
     private function publishSkeletonCss(string $documentRoot): void
