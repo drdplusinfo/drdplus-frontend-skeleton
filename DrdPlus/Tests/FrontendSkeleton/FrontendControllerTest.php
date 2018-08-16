@@ -116,7 +116,7 @@ class FrontendControllerTest extends AbstractContentTest
     public function I_can_set_menu_fixed(): void
     {
         $controller = $this->createController();
-        self::assertFalse($controller->isMenuFixed(), 'Contacts are expected to be simply on top by default');
+        self::assertFalse($controller->isMenuPositionFixed(), 'Contacts are expected to be simply on top by default');
         if ($this->isSkeletonChecked()) {
             /** @var Element $menu */
             $menu = $this->getHtmlDocument()->getElementById('menu');
@@ -125,7 +125,7 @@ class FrontendControllerTest extends AbstractContentTest
             self::assertFalse($menu->classList->contains('fixed'), 'Contacts should not be fixed as controller does not say so');
         }
         $controller->setMenuFixed();
-        self::assertTrue($controller->isMenuFixed(), 'Failed to set menu as fixed');
+        self::assertTrue($controller->isMenuPositionFixed(), 'Failed to set menu as fixed');
         if ($this->isSkeletonChecked()) {
             $content = $this->fetchNonCachedContent($controller);
             $htmlDocument = new HtmlDocument($content);

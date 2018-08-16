@@ -45,6 +45,11 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->io->write('Injection of drd-plus/frontend-skeleton finished');
     }
 
+    private function shouldSkipFile(string $fileName): bool
+    {
+        return \in_array($fileName, $this->composer->getConfig()->get('frontend-skeleton')['skip-injecting'] ?? [], true);
+    }
+
     private function addVersionsToAssets(string $documentRoot)
     {
         $assetsVersion = new AssetsVersion(true, false);
@@ -128,12 +133,20 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
 
     private function copyPhpUnitConfig(string $documentRoot)
     {
-        $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
+        if ($this->shouldSkipFile('phpunit.xml.dist')) {
+            $this->io->write('Skipping phpunit.xml.dist');
+        } else {
+            $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
+        }
     }
 
     private function copyProjectConfig(string $documentRoot)
     {
-        $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
+        if ($this->shouldSkipFile('config.distribution.yml')) {
+            $this->io->write('Skipping config.distribution.yml');
+        } else {
+            $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
+        }
         if (!\file_exists($documentRoot . '/config.local.yml')) {
             $this->io->write('config.local.yml is missing, you can use config.distribution.yml for inspiration', true, $this->io::VERBOSE);
         }

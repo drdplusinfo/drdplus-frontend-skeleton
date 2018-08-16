@@ -14,6 +14,25 @@ class HtmlHelperTest extends AbstractContentTest
 
     /**
      * @test
+     * @dataProvider providePublicAndLocalLinks
+     * @param string $publicLink
+     * @param string $expectedLocalLink
+     */
+    public function I_can_turn_public_link_to_local(string $publicLink, string $expectedLocalLink): void
+    {
+        self::assertSame($expectedLocalLink, HtmlHelper::turnToLocalLink($publicLink));
+    }
+
+    public function providePublicAndLocalLinks(): array
+    {
+        return [
+            ['https://www.drdplus.info', 'http://www.drdplus.loc:88'],
+            ['https://hranicar.drdplus.info', 'http://hranicar.drdplus.loc:88'],
+        ];
+    }
+
+    /**
+     * @test
      */
     public function I_can_create_id_from_any_name(): void
     {

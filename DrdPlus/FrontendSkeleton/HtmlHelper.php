@@ -10,6 +10,17 @@ use Gt\Dom\HTMLCollection;
 
 class HtmlHelper extends StrictObject
 {
+
+    /**
+     * Turn link into local version
+     * @param string $link
+     * @return string
+     */
+    public static function turnToLocalLink(string $link): string
+    {
+        return \preg_replace('~https?://((?:[[:alnum:]]+\.)*)drdplus\.info~', 'http://$1drdplus.loc:88', $link);
+    }
+
     public const INVISIBLE_ID_CLASS = 'invisible-id';
     public const CALCULATION_CLASS = 'calculation';
     public const DATA_ORIGINAL_ID = 'data-original-id';
@@ -500,24 +511,15 @@ class HtmlHelper extends StrictObject
             );
         }
         foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
-            $anchor->setAttribute('href', $this->makeDrdPlusHostLocal($anchor->getAttribute('href')));
+            $anchor->setAttribute('href', static::turnToLocalLink($anchor->getAttribute('href')));
         }
         /** @var Element $iFrame */
         foreach ($htmlDocument->getElementsByTagName('iframe') as $iFrame) {
-            $iFrame->setAttribute('src', $this->makeDrdPlusHostLocal($iFrame->getAttribute('src')));
+            $iFrame->setAttribute('src', static::turnToLocalLink($iFrame->getAttribute('src')));
             $iFrame->setAttribute('id', \str_replace('drdplus.info', 'drdplus.loc', $iFrame->getAttribute('id')));
         }
 
         return $htmlDocument;
-    }
-
-    private function makeDrdPlusHostLocal(string $linkWithRemoteDrdPlusHost): string
-    {
-        return \preg_replace(
-            '~(?:https?:)?//((?:[^.]+[.])+)drdplus[.]info~',
-            'http://$1drdplus.loc',
-            $linkWithRemoteDrdPlusHost
-        );
     }
 
     public function addVersionHashToAssets(HtmlDocument $htmlDocument): void

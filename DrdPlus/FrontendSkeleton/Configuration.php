@@ -22,6 +22,8 @@ class Configuration extends StrictObject
     public const WEB = 'web';
     public const LAST_STABLE_VERSION = 'last_stable_version';
     public const REPOSITORY_URL = 'repository_url';
+    public const MENU_POSITION_FIXED = 'menu_position_fixed';
+    public const SHOW_HOME_BUTTON = 'show_home_button';
     public const GOOGLE = 'google';
     public const ANALYTICS_ID = 'analytics_id';
 
@@ -115,4 +117,13 @@ class Configuration extends StrictObject
         return $this->getSettings()[self::WEB][self::REPOSITORY_URL];
     }
 
+    public function isMenuPositionFixed(): bool
+    {
+        return (bool)$this->getSettings()[self::WEB][self::MENU_POSITION_FIXED];
+    }
+
+    public function isShowHomeButton(): bool
+    {
+        return (bool)$this->getSettings()[self::WEB][self::SHOW_HOME_BUTTON];
+    }
 }
