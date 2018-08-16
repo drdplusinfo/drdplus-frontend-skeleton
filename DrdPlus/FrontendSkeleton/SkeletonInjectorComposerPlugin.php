@@ -81,7 +81,10 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
 
             return;
         }
-        $this->io->write($chain . ' ' . \implode("\n", $output));
+        $this->io->write($chain);
+        if ($output) {
+            $this->io->write(' ' . \implode("\n", $output));
+        }
     }
 
     private function publishSkeletonCss(string $documentRoot): void
