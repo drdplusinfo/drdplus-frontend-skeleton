@@ -1,6 +1,3 @@
-dirs:
-  master_document_root: null
-  document_root: null
 web:
   last_stable_version: '1.0'
   repository: null
