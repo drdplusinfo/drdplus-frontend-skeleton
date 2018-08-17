@@ -54,7 +54,8 @@ class Configuration extends StrictObject
     {
         if (!\preg_match('~^\d+[.]\d+$~', (string)($settings[self::WEB]['last_stable_version'] ?? ''))) {
             throw new Exceptions\InvalidMinorVersion(
-                'Expected something like 1.13 in configuration web.last_stable_version, got ' . ($settings[self::WEB]['last_stable_version'] ?? 'nothing')
+                'Expected something like 1.13 in configuration web.last_stable_version, got '
+                . ($settings[self::WEB]['last_stable_version'] ?? 'nothing')
             );
         }
     }
@@ -68,7 +69,11 @@ class Configuration extends StrictObject
         $repositoryUrl = $settings[self::WEB]['repository_url'] ?? '';
         if (!\preg_match('~^.+[.git]$~', $repositoryUrl) && !\file_exists($repositoryUrl)) {
             throw new Exceptions\InvalidWebRepositoryUrl(
-                'Expected something git@github.com/foo/bar.git in configuration web.repository_url, got ' . ($repositoryUrl ?: 'nothing')
+                'Expected something like git@github.com/foo/bar.git in configuration web.repository_url, got '
+                . ($repositoryUrl
+                    ? ('non-valid URL, non-existing dir ' . $repositoryUrl)
+                    : 'nothing'
+                )
             );
         }
     }
