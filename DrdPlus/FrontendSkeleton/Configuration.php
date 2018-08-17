@@ -14,7 +14,7 @@ class Configuration extends StrictObject
     {
         $localConfig = new Yaml($dirs->getDocumentRoot() . '/' . self::CONFIG_LOCAL_YML);
         $globalConfig = new Yaml($dirs->getDocumentRoot() . '/' . self::CONFIG_DISTRIBUTION_YML);
-        $config = \array_merge($globalConfig->getValues(), $localConfig->getValues());
+        $config = \array_replace_recursive($globalConfig->getValues(), $localConfig->getValues());
 
         return new static($dirs, $config);
     }

@@ -41,11 +41,16 @@ class ConfigurationTest extends AbstractContentTest
 
     public function provideCompleteLocalAndDistributionYamlContent(): array
     {
-        $yamlContent = $this->getCompleteYamlContent();
+        $completeYamlContent = $this->getCompleteYamlContent();
+        $limitedWebSection = $completeYamlContent;
+        $limitedWebSection[Configuration::WEB] = [Configuration::LAST_STABLE_VERSION => '456.789'];
+        $changedCompleteYamlContent = $completeYamlContent;w
+        $changedCompleteYamlContent[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = '456.789';
 
         return [
-            [$yamlContent, [], $yamlContent],
-            [[], $yamlContent, $yamlContent],
+            [$completeYamlContent, [], $completeYamlContent],
+            [$limitedWebSection, $completeYamlContent, $changedCompleteYamlContent],
+            [$completeYamlContent, $limitedWebSection, $completeYamlContent],
         ];
     }
 
