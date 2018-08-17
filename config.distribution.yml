@@ -1,5 +1,2 @@
 web:
-  last_stable_version: '1.0'
-  repository: null
-google:
-  analytics_id: UA-121206931-1
+  repository_url: git@github.com:jaroslavtyc/drd-plus-frontend-skeleton-web.git

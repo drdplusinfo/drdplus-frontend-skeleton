@@ -142,13 +142,6 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
 
     private function copyProjectConfig(string $documentRoot)
     {
-        if ($this->shouldSkipFile('config.distribution.yml')) {
-            $this->io->write('Skipping config.distribution.yml');
-        } else {
-            $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
-        }
-        if (!\file_exists($documentRoot . '/config.local.yml')) {
-            $this->io->write('config.local.yml is missing, you can use config.distribution.yml for inspiration', true, $this->io::VERBOSE);
-        }
+        $this->passThrough(['cp --no-clobber ./vendor/drd-plus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
     }
 }
