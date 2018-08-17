@@ -15,21 +15,24 @@ class Yaml extends StrictObject implements \ArrayAccess
     public function __construct(string $yamlFile)
     {
         $this->yamlFile = $yamlFile;
+        $this->values = $this->fetchValues();
     }
 
     /**
+     * @return array
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotParseYamlFile
      */
+    private function fetchValues(): array
+    {
+        $values = \yaml_parse_file($this->yamlFile);
+        if ($values !== false) {
+            return $values;
+        }
+        throw new Exceptions\CanNotParseYamlFile("Can not parse content of YAML file '{$this->yamlFile}'");
+    }
+
     public function getValues(): array
     {
-        if ($this->values === null) {
-            $values = \yaml_parse_file($this->yamlFile);
-            if ($values === false) {
-                throw new Exceptions\CanNotParseYamlFile("Can not parse content of YAML file '{$this->yamlFile}'");
-            }
-            $this->values = (array)$values;
-        }
-
         return $this->values;
     }
 
@@ -46,20 +49,20 @@ class Yaml extends StrictObject implements \ArrayAccess
     /**
      * @param mixed $offset
      * @param mixed $value
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\YamlContentIsReadOnly
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\YamlObjectContentIsReadOnly
      */
     public function offsetSet($offset, $value): void
     {
-        throw new Exceptions\YamlContentIsReadOnly('Content of ' . static::class . ' can not be changed');
+        throw new Exceptions\YamlObjectContentIsReadOnly('Content of ' . static::class . ' can not be changed');
     }
 
     /**
      * @param mixed $offset
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\YamlContentIsReadOnly
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\YamlObjectContentIsReadOnly
      */
     public function offsetUnset($offset): void
     {
-        throw new Exceptions\YamlContentIsReadOnly('Content of ' . static::class . ' can not be changed');
+        throw new Exceptions\YamlObjectContentIsReadOnly('Content of ' . static::class . ' can not be changed');
     }
 
 }

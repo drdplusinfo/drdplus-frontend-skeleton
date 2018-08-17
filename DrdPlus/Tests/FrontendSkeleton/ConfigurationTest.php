@@ -8,6 +8,7 @@ use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class ConfigurationTest extends AbstractContentTest
 {
+    use YamlFileTestTrait;
 
     /**
      * @test
@@ -27,15 +28,10 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_create_it_from_yaml_files(array $localYamlContent, array $distributionYamlContent, array $expectedYamlContent): void
     {
-        $testingDir = \sys_get_temp_dir() . '/' . \uniqid('configuration_test', true);
-        self::assertTrue(\mkdir($testingDir), 'Testing temporary dir can not be created: ' . $testingDir);
-        $localTempYaml = $testingDir . '/' . Configuration::CONFIG_LOCAL_YML;
-        $distributionTempYaml = $testingDir . '/' . Configuration::CONFIG_DISTRIBUTION_YML;
-        $this->createYamlFile($localTempYaml, $localYamlContent);
-        $this->createYamlFile($distributionTempYaml, $distributionYamlContent);
-        $configuration = Configuration::createFromYml($dirs = $this->createDirs($testingDir));
-        \unlink($localTempYaml);
-        \unlink($distributionTempYaml);
+        $yamlTestingDir = $this->getYamlTestingDir();
+        $this->createYamlLocalConfig($localYamlContent, $yamlTestingDir);
+        $this->createYamlDistributionConfig($distributionYamlContent, $yamlTestingDir);
+        $configuration = Configuration::createFromYml($dirs = $this->createDirs($yamlTestingDir));
         self::assertSame($expectedYamlContent, $configuration->getSettings());
         self::assertSame($expectedYamlContent[Configuration::WEB][Configuration::LAST_STABLE_VERSION], $configuration->getWebLastStableVersion());
         self::assertSame($expectedYamlContent[Configuration::WEB][Configuration::REPOSITORY_URL], $configuration->getWebRepositoryUrl());
@@ -59,11 +55,6 @@ class ConfigurationTest extends AbstractContentTest
             Configuration::WEB => [Configuration::LAST_STABLE_VERSION => '123.456', Configuration::REPOSITORY_URL => \sys_get_temp_dir()],
             Configuration::GOOGLE => [Configuration::ANALYTICS_ID => 'UA-121206931-999']
         ];
-    }
-
-    private function createYamlFile(string $file, array $data): void
-    {
-        self::assertTrue(\yaml_emit_file($file, $data), 'Yaml file has not been created: ' . $file);
     }
 
     /**
