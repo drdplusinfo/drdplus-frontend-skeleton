@@ -1,6 +1,6 @@
 web:
   last_stable_version: '1.0'
-  repository_url: git@github.com:jaroslavtyc/drd-plus-frontend-skeleton-web.git
+  repository_url: git@github.com:drdplusinfo/frontend-skeleton-web.git
   menu_position_fixed: false
   show_home_button: true
 google:
