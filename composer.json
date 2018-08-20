@@ -1,5 +1,5 @@
 {
-  "name": "drd-plus/frontend-skeleton",
+  "name": "drdplus/frontend-skeleton",
   "license": "MIT",
   "type": "composer-plugin",
   "description": "Skeleton for DrD+ pages",
