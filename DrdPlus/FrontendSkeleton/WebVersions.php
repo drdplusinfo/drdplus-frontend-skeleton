@@ -271,7 +271,7 @@ class WebVersions extends StrictObject
             $this->executeCommandsChainArray($commands);
         } catch (ExecutingCommandFailed $executingCommandFailed) {
             throw new Exceptions\CanNotUpdateGitVersion(
-                "Can not update required version '{$minorVersion}' by command '{$commands}': " . $executingCommandFailed->getMessage(),
+                "Can not update required version '{$minorVersion}': " . $executingCommandFailed->getMessage(),
                 $executingCommandFailed->getCode(),
                 $executingCommandFailed
             );

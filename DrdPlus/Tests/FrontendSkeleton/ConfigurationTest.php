@@ -44,7 +44,7 @@ class ConfigurationTest extends AbstractContentTest
         $completeYamlContent = $this->getCompleteYamlContent();
         $limitedWebSection = $completeYamlContent;
         $limitedWebSection[Configuration::WEB] = [Configuration::LAST_STABLE_VERSION => '456.789'];
-        $changedCompleteYamlContent = $completeYamlContent;w
+        $changedCompleteYamlContent = $completeYamlContent;
         $changedCompleteYamlContent[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = '456.789';
 
         return [
@@ -57,7 +57,12 @@ class ConfigurationTest extends AbstractContentTest
     private function getCompleteYamlContent(): array
     {
         return [
-            Configuration::WEB => [Configuration::LAST_STABLE_VERSION => '123.456', Configuration::REPOSITORY_URL => \sys_get_temp_dir()],
+            Configuration::WEB => [
+                Configuration::LAST_STABLE_VERSION => '123.456',
+                Configuration::REPOSITORY_URL => \sys_get_temp_dir(),
+                Configuration::MENU_POSITION_FIXED => false,
+                Configuration::SHOW_HOME_BUTTON => true,
+            ],
             Configuration::GOOGLE => [Configuration::ANALYTICS_ID => 'UA-121206931-999']
         ];
     }
@@ -95,6 +100,28 @@ class ConfigurationTest extends AbstractContentTest
     {
         $yamlContent = $this->getCompleteYamlContent();
         $yamlContent[Configuration::GOOGLE][Configuration::ANALYTICS_ID] = 'GoogleItself';
+        new Configuration($this->createDirs(), $yamlContent);
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\InvalidMenuPosition
+     */
+    public function I_can_not_create_it_without_defining_if_menu_should_be_fixed(): void
+    {
+        $yamlContent = $this->getCompleteYamlContent();
+        unset($yamlContent[Configuration::WEB][Configuration::MENU_POSITION_FIXED]);
+        new Configuration($this->createDirs(), $yamlContent);
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\InvalidShowOfHomeButton
+     */
+    public function I_can_not_create_it_without_defining_if_show_home_button(): void
+    {
+        $yamlContent = $this->getCompleteYamlContent();
+        unset($yamlContent[Configuration::WEB][Configuration::SHOW_HOME_BUTTON]);
         new Configuration($this->createDirs(), $yamlContent);
     }
 }

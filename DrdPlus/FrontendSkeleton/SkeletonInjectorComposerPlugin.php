@@ -101,7 +101,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
             [
                 'rm -f ./css/generic/skeleton/frontend*',
                 'rm -fr ./css/generic/skeleton/vendor/frontend',
-                'cp -r ./vendor/drd-plus/frontend-skeleton/css/generic ./css/',
+                'cp -r ./vendor/drdplus/frontend-skeleton/css/generic ./css/',
                 'chmod -R g+w ./css/generic/skeleton/vendor/frontend'
             ],
             $documentRoot

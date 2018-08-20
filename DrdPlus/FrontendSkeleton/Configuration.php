@@ -43,6 +43,8 @@ class Configuration extends StrictObject
         $this->guardValidLastMinorVersion($settings);
         $this->guardValidWebRepositoryUrl($settings);
         $this->guardValidGoogleAnalyticsId($settings);
+        $this->guardSetIfUseFixedMenuPosition($settings);
+        $this->guardSetIfShowHomeButton($settings);
         $this->settings = $settings;
     }
 
@@ -52,10 +54,10 @@ class Configuration extends StrictObject
      */
     protected function guardValidLastMinorVersion(array $settings): void
     {
-        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings[self::WEB]['last_stable_version'] ?? ''))) {
+        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings[static::WEB][static::LAST_STABLE_VERSION] ?? ''))) {
             throw new Exceptions\InvalidMinorVersion(
                 'Expected something like 1.13 in configuration web.last_stable_version, got '
-                . ($settings[self::WEB]['last_stable_version'] ?? 'nothing')
+                . ($settings[static::WEB]['last_stable_version'] ?? 'nothing')
             );
         }
     }
@@ -66,7 +68,7 @@ class Configuration extends StrictObject
      */
     protected function guardValidWebRepositoryUrl(array $settings): void
     {
-        $repositoryUrl = $settings[self::WEB]['repository_url'] ?? '';
+        $repositoryUrl = $settings[static::WEB][static::REPOSITORY_URL] ?? '';
         if (!\preg_match('~^.+[.git]$~', $repositoryUrl) && !\file_exists($repositoryUrl)) {
             throw new Exceptions\InvalidWebRepositoryUrl(
                 'Expected something like git@github.com/foo/bar.git in configuration web.repository_url, got '
@@ -84,9 +86,35 @@ class Configuration extends StrictObject
      */
     protected function guardValidGoogleAnalyticsId(array $settings): void
     {
-        if (!\preg_match('~^UA-121206931-\d+$~', $settings['google']['analytics_id'] ?? '')) {
+        if (!\preg_match('~^UA-121206931-\d+$~', $settings[static::GOOGLE][static::ANALYTICS_ID] ?? '')) {
             throw new Exceptions\InvalidGoogleAnalyticsId(
-                'Expected something like UA-121206931-1 in configuration google.analytics_id, got ' . ($settings['google']['analytics_id'] ?? 'nothing')
+                'Expected something like UA-121206931-1 in configuration google.analytics_id, got ' . ($settings[static::GOOGLE][static::ANALYTICS_ID] ?? 'nothing')
+            );
+        }
+    }
+
+    /**
+     * @param array $settings
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidMenuPosition
+     */
+    protected function guardSetIfUseFixedMenuPosition(array $settings): void
+    {
+        if (($settings[static::WEB][static::MENU_POSITION_FIXED] ?? null) === null) {
+            throw new Exceptions\InvalidMenuPosition(
+                'Expected explicitly defined menu position fix to true or false in configuration web.menu_position_fixed, got nothing'
+            );
+        }
+    }
+
+    /**
+     * @param array $settings
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\InvalidShowOfHomeButton
+     */
+    protected function guardSetIfShowHomeButton(array $settings): void
+    {
+        if (($settings[static::WEB][static::SHOW_HOME_BUTTON] ?? null) === null) {
+            throw new Exceptions\InvalidShowOfHomeButton(
+                'Expected explicitly defined if show home button to true or false in configuration web.show_home_button, got nothing'
             );
         }
     }
