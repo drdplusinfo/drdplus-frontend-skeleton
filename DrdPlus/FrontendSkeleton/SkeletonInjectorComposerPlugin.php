@@ -33,7 +33,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
     public function plugInSkeleton()
     {
         $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
-        $this->io->write('Injecting drd-plus/frontend-skeleton using document root ' . $documentRoot);
+        $this->io->write('Injecting drdplus/frontend-skeleton using document root ' . $documentRoot);
         $this->publishSkeletonImages($documentRoot);
         $this->publishSkeletonCss($documentRoot);
         $this->publishSkeletonJs($documentRoot);
@@ -42,7 +42,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->copyGoogleVerification($documentRoot);
         $this->copyPhpUnitConfig($documentRoot);
         $this->copyProjectConfig($documentRoot);
-        $this->io->write('Injection of drd-plus/frontend-skeleton finished');
+        $this->io->write('Injection of drdplus/frontend-skeleton finished');
     }
 
     private function shouldSkipFile(string $fileName): bool
@@ -64,7 +64,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->passThrough(
             [
                 'rm -f ./images/generic/skeleton/frontend*',
-                'cp -r ./vendor/drd-plus/frontend-skeleton/images/generic ./images/'
+                'cp -r ./vendor/drdplus/frontend-skeleton/images/generic ./images/'
             ],
             $documentRoot
         );
@@ -114,7 +114,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
             [
                 'rm -f ./js/generic/skeleton/frontend*',
                 'rm -fr ./js/generic/skeleton/vendor/frontend',
-                'cp -r ./vendor/drd-plus/frontend-skeleton/js/generic ./js/',
+                'cp -r ./vendor/drdplus/frontend-skeleton/js/generic ./js/',
                 'chmod -R g+w ./js/generic/skeleton/vendor/frontend'
             ],
             $documentRoot
@@ -128,7 +128,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
 
     private function copyGoogleVerification(string $documentRoot)
     {
-        $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/google8d8724e0c2818dfc.html .'], $documentRoot);
+        $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/google8d8724e0c2818dfc.html .'], $documentRoot);
     }
 
     private function copyPhpUnitConfig(string $documentRoot)
@@ -136,12 +136,12 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         if ($this->shouldSkipFile('phpunit.xml.dist')) {
             $this->io->write('Skipping phpunit.xml.dist');
         } else {
-            $this->passThrough(['cp ./vendor/drd-plus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
+            $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
         }
     }
 
     private function copyProjectConfig(string $documentRoot)
     {
-        $this->passThrough(['cp --no-clobber ./vendor/drd-plus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
+        $this->passThrough(['cp --no-clobber ./vendor/drdplus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
     }
 }
