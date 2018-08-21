@@ -51,14 +51,11 @@
     "class": "DrdPlus\\FrontendSkeleton\\SkeletonInjectorComposerPlugin"
   },
   "scripts": {
-    "pre-autoload-dump": [
-      "rm -f ./vendor/bin/assets && ln -s ../../bin/assets ./vendor/bin/"
-    ],
     "post-update-cmd": [
-      "php ./vendor/bin/assets --css --dir=css"
+      "php bin/assets --css --dir=css"
     ],
     "post-install-cmd": [
-      "php ./vendor/bin/assets --css --dir=css"
+      "php bin/assets --css --dir=css"
     ]
   }
 }

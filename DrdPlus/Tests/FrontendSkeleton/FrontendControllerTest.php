@@ -12,6 +12,7 @@ use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
+use Mockery\MockInterface;
 
 class FrontendControllerTest extends AbstractContentTest
 {
@@ -124,7 +125,13 @@ class FrontendControllerTest extends AbstractContentTest
             self::assertTrue($menu->classList->contains('top'), 'Contacts should be positioned on top');
             self::assertFalse($menu->classList->contains('fixed'), 'Contacts should not be fixed as controller does not say so');
         }
-        $controller->setMenuFixed();
+        $configuration = $this->mockery(Configuration::class);
+        $configuration->makePartial();
+        /** @var Configuration|MockInterface $configuration */
+        $configuration::createFromYml($this->createDirs());
+        $configuration->shouldReceive('isMenuFixed')
+            ->andReturn(true);
+        $controller = $this->createController(null, null, $configuration);
         self::assertTrue($controller->isMenuPositionFixed(), 'Failed to set menu as fixed');
         if ($this->isSkeletonChecked()) {
             $content = $this->fetchNonCachedContent($controller);
@@ -219,11 +226,13 @@ class FrontendControllerTest extends AbstractContentTest
 
     protected function createController(
         HtmlHelper $htmlHelper = null,
-        string $documentRoot = null
+        string $documentRoot = null,
+        Configuration $configuration = null
     ): FrontendController
     {
         $controllerClass = static::getSutClass();
-        $configuration = $this->createConfiguration($dirs = $this->createDirs($documentRoot));
+        $dirs = $this->createDirs($documentRoot);
+        $configuration = $configuration ?? $this->createConfiguration($dirs);
 
         return new $controllerClass(
             $configuration,
