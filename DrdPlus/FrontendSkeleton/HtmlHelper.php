@@ -18,7 +18,7 @@ class HtmlHelper extends StrictObject
      */
     public static function turnToLocalLink(string $link): string
     {
-        return \preg_replace('~https?://((?:[[:alnum:]]+\.)*)drdplus\.info~', 'http://$1drdplus.loc:88', $link);
+        return \preg_replace('~https?://((?:[^.]+[.])*)drdplus\.info~', 'http://$1drdplus.loc:88', $link);
     }
 
     public const INVISIBLE_ID_CLASS = 'invisible-id';

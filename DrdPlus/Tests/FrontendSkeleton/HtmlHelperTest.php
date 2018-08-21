@@ -227,7 +227,7 @@ HTML
         $htmlHelper->makeExternalDrdPlusLinksLocal($htmlDocument);
         $localizedLink = $htmlDocument->getElementById('single_link');
         self::assertNotEmpty($localizedLink, 'No element found by ID single_link');
-        self::assertSame('http://foo-bar.baz.drdplus.loc', $localizedLink->getAttribute('href'));
+        self::assertSame('http://foo-bar.baz.drdplus.loc:88', $localizedLink->getAttribute('href'));
     }
 
     /**
