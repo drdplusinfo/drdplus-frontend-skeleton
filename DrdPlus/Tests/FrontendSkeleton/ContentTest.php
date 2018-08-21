@@ -17,7 +17,6 @@ class ContentTest extends AbstractContentTest
      */
     public function Page_has_title(): void
     {
-        self::assertFileExists($this->getDocumentRoot() . '/name.txt', 'Expected file name.txt with page title is missing');
         $definedPageTitle = $this->getDefinedPageTitle();
         $currentPageTitle = $this->getCurrentPageTitle();
         self::assertNotEmpty($definedPageTitle, 'Page title is not defined');

@@ -11,6 +11,7 @@ use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\Partials\CurrentVersionProvider;
 use Gt\Dom\Element;
 use Gt\Dom\HTMLDocument;
+use Mockery\MockInterface;
 
 abstract class AbstractContentTest extends SkeletonTestCase
 {
@@ -123,6 +124,11 @@ abstract class AbstractContentTest extends SkeletonTestCase
     }
 
     protected function isSkeletonChecked(): bool
+    {
+        return $this->isFrontendSkeletonChecked();
+    }
+
+    protected function isFrontendSkeletonChecked(): bool
     {
         $documentRootRealPath = \realpath($this->getDocumentRoot());
         $frontendSkeletonRealPath = \realpath(__DIR__ . '/../../../..');
@@ -297,5 +303,21 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
         /** @var CurrentVersionProvider $currentVersionProvider */
         return $currentVersionProvider;
+    }
+
+    /**
+     * @param array $customSettings
+     * @return Configuration|MockInterface
+     */
+    protected function createCustomConfiguration(array $customSettings): Configuration
+    {
+        $originalConfiguration = $this->createConfiguration();
+        $configurationClass = \get_class($originalConfiguration);
+        $customConfiguration = new $configurationClass(
+            $originalConfiguration->getDirs(),
+            \array_replace_recursive($originalConfiguration->getSettings(), $customSettings)
+        );
+
+        return $customConfiguration;
     }
 }

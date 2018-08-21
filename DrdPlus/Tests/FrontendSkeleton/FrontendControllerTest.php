@@ -12,7 +12,6 @@ use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
-use Mockery\MockInterface;
 
 class FrontendControllerTest extends AbstractContentTest
 {
@@ -47,21 +46,6 @@ class FrontendControllerTest extends AbstractContentTest
         /** @var FrontendController $controller */
         $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
         self::assertSame($this->getTestsConfiguration()->getExpectedPageTitle(), $controller->getPageTitle());
-    }
-
-    /**
-     * @test
-     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\MissingFileWithPageName
-     * @expectedExceptionMessageRegExp ~'Not from this world/name[.]txt'~
-     */
-    public function I_can_not_get_page_title_if_text_file_with_its_name_does_not_exist(): void
-    {
-        $configuration = $this->mockery(Configuration::class);
-        $configuration->allows('getDirs')->andReturn($this->createDirs('Not from this world'));
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($configuration, $this->createHtmlHelper());
-        $controller->getPageTitle();
     }
 
     /**
@@ -114,9 +98,11 @@ class FrontendControllerTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_can_set_menu_fixed(): void
+    public function I_can_ask_if_menu_is_fixed(): void
     {
-        $controller = $this->createController();
+        $configurationWithoutFixedMenu = $this->createCustomConfiguration([Configuration::WEB => [Configuration::MENU_POSITION_FIXED => false]]);
+        self::assertFalse($configurationWithoutFixedMenu->isMenuPositionFixed(), 'Expected configuration with menu position not fixed');
+        $controller = $this->createController(null, null, $configurationWithoutFixedMenu);
         self::assertFalse($controller->isMenuPositionFixed(), 'Contacts are expected to be simply on top by default');
         if ($this->isSkeletonChecked()) {
             /** @var Element $menu */
@@ -125,14 +111,10 @@ class FrontendControllerTest extends AbstractContentTest
             self::assertTrue($menu->classList->contains('top'), 'Contacts should be positioned on top');
             self::assertFalse($menu->classList->contains('fixed'), 'Contacts should not be fixed as controller does not say so');
         }
-        $configuration = $this->mockery(Configuration::class);
-        $configuration->makePartial();
-        /** @var Configuration|MockInterface $configuration */
-        $configuration::createFromYml($this->createDirs());
-        $configuration->shouldReceive('isMenuFixed')
-            ->andReturn(true);
-        $controller = $this->createController(null, null, $configuration);
-        self::assertTrue($controller->isMenuPositionFixed(), 'Failed to set menu as fixed');
+        $configurationWithFixedMenu = $this->createCustomConfiguration([Configuration::WEB => [Configuration::MENU_POSITION_FIXED => true]]);
+        self::assertTrue($configurationWithFixedMenu->isMenuPositionFixed(), 'Expected configuration with menu position fixed');
+        $controller = $this->createController(null, null, $configurationWithFixedMenu);
+        self::assertTrue($controller->isMenuPositionFixed(), 'Menu should be fixed');
         if ($this->isSkeletonChecked()) {
             $content = $this->fetchNonCachedContent($controller);
             $htmlDocument = new HtmlDocument($content);
@@ -162,16 +144,20 @@ class FrontendControllerTest extends AbstractContentTest
      */
     public function I_can_hide_home_button(): void
     {
-        $controller = $this->createController();
-        self::assertTrue($controller->isShownHomeButton(), 'Home button should be shown by default');
+        $configurationWithShownHomeButton = $this->createCustomConfiguration([Configuration::WEB => [Configuration::SHOW_HOME_BUTTON => true]]);
+        self::assertTrue($configurationWithShownHomeButton->isShowHomeButton(), 'Expected configuration with shown home button');
+        $controller = $this->createController(null, null, $configurationWithShownHomeButton);
+        self::assertTrue($controller->isShownHomeButton(), 'Home button should be set as shown');
         if ($this->isSkeletonChecked()) {
             /** @var Element $homeButton */
             $homeButton = $this->getHtmlDocument()->getElementById('home_button');
             self::assertNotEmpty($homeButton, 'Home button is missing');
             self::assertSame('https://www.drdplus.info', $homeButton->getAttribute('href'), 'Link of home button should lead to home');
         }
-        $controller->hideHomeButton();
-        self::assertFalse($controller->isShownHomeButton(), 'Failed to hide home button');
+        $configurationWithHiddenHomeButton = $this->createCustomConfiguration([Configuration::WEB => [Configuration::SHOW_HOME_BUTTON => false]]);
+        self::assertFalse($configurationWithHiddenHomeButton->isShowHomeButton(), 'Expected configuration with hidden home button');
+        $controller = $this->createController(null, null, $configurationWithHiddenHomeButton);
+        self::assertFalse($controller->isShownHomeButton(), 'Home button should be hidden');
         if ($this->isSkeletonChecked()) {
             $content = $this->fetchNonCachedContent($controller);
             $htmlDocument = new HtmlDocument($content);

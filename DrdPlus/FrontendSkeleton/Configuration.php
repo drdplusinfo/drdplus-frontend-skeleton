@@ -12,18 +12,22 @@ class Configuration extends StrictObject
 
     public static function createFromYml(Dirs $dirs): Configuration
     {
-        $localConfig = new Yaml($dirs->getDocumentRoot() . '/' . self::CONFIG_LOCAL_YML);
-        $globalConfig = new Yaml($dirs->getDocumentRoot() . '/' . self::CONFIG_DISTRIBUTION_YML);
+        $localConfig = new Yaml($dirs->getDocumentRoot() . '/' . static::CONFIG_LOCAL_YML);
+        $globalConfig = new Yaml($dirs->getDocumentRoot() . '/' . static::CONFIG_DISTRIBUTION_YML);
         $config = \array_replace_recursive($globalConfig->getValues(), $localConfig->getValues());
 
         return new static($dirs, $config);
     }
 
+    // web
     public const WEB = 'web';
     public const LAST_STABLE_VERSION = 'last_stable_version';
     public const REPOSITORY_URL = 'repository_url';
     public const MENU_POSITION_FIXED = 'menu_position_fixed';
     public const SHOW_HOME_BUTTON = 'show_home_button';
+    public const NAME = 'name';
+    public const TITLE_SMILEY = 'title_smiley';
+    // google
     public const GOOGLE = 'google';
     public const ANALYTICS_ID = 'analytics_id';
 
@@ -45,6 +49,8 @@ class Configuration extends StrictObject
         $this->guardValidGoogleAnalyticsId($settings);
         $this->guardSetIfUseFixedMenuPosition($settings);
         $this->guardSetIfShowHomeButton($settings);
+        $this->guardNonEmptyWebName($settings);
+        $this->guardSetTitleSmiley($settings);
         $this->settings = $settings;
     }
 
@@ -120,6 +126,32 @@ class Configuration extends StrictObject
     }
 
     /**
+     * @param array $settings
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\MissingWebName
+     */
+    protected function guardNonEmptyWebName(array $settings): void
+    {
+        if (($settings[static::WEB][static::NAME] ?? '') === '') {
+            throw new Exceptions\MissingWebName(
+                'Expected some web name in configuration web.name'
+            );
+        }
+    }
+
+    /**
+     * @param array $settings
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\TitleSmileyIsNotSet
+     */
+    protected function guardSetTitleSmiley(array $settings): void
+    {
+        if (!\array_key_exists(static::TITLE_SMILEY, $settings[static::WEB])) {
+            throw new Exceptions\TitleSmileyIsNotSet(
+                'Title smiley should be set in configuration web.title_smiley, even if just an empty string'
+            );
+        }
+    }
+
+    /**
      * @return Dirs
      */
     public function getDirs(): Dirs
@@ -137,26 +169,36 @@ class Configuration extends StrictObject
 
     public function getWebLastStableVersion(): string
     {
-        return $this->getSettings()[self::WEB][self::LAST_STABLE_VERSION];
+        return $this->getSettings()[static::WEB][static::LAST_STABLE_VERSION];
     }
 
     public function getGoogleAnalyticsId(): string
     {
-        return $this->getSettings()['google'][self::ANALYTICS_ID];
+        return $this->getSettings()['google'][static::ANALYTICS_ID];
     }
 
     public function getWebRepositoryUrl(): string
     {
-        return $this->getSettings()[self::WEB][self::REPOSITORY_URL];
+        return $this->getSettings()[static::WEB][static::REPOSITORY_URL];
     }
 
     public function isMenuPositionFixed(): bool
     {
-        return (bool)$this->getSettings()[self::WEB][self::MENU_POSITION_FIXED];
+        return (bool)$this->getSettings()[static::WEB][static::MENU_POSITION_FIXED];
     }
 
     public function isShowHomeButton(): bool
     {
-        return (bool)$this->getSettings()[self::WEB][self::SHOW_HOME_BUTTON];
+        return (bool)$this->getSettings()[static::WEB][static::SHOW_HOME_BUTTON];
+    }
+
+    public function getWebName(): string
+    {
+        return $this->getSettings()[static::WEB][static::NAME];
+    }
+
+    public function getTitleSmiley(): string
+    {
+        return (string)$this->getSettings()[static::WEB][static::TITLE_SMILEY];
     }
 }

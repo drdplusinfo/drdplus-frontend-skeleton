@@ -3,5 +3,7 @@ web:
   repository_url: git@github.com:drdplusinfo/frontend-skeleton-web.git
   menu_position_fixed: false
   show_home_button: true
+  name: HTML kostra pro DrD+ webový obsah
+  title_smiley: 🔱
 google:
   analytics_id: UA-121206931-1

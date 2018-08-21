@@ -14,8 +14,6 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
     /** @var HtmlHelper */
     private $htmlHelper;
     /** @var string */
-    private $webName;
-    /** @var string */
     private $pageTitle;
     /** @var WebFiles */
     private $webFiles;
@@ -97,28 +95,14 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
 
     public function getWebName(): string
     {
-        if ($this->webName === null) {
-            if (!\file_exists($this->getConfiguration()->getDirs()->getDocumentRoot() . '/name.txt')) {
-                throw new Exceptions\MissingFileWithPageName("Can not find file '{$this->getConfiguration()->getDirs()->getDocumentRoot()}/name.txt'");
-            }
-            $webName = \trim((string)\file_get_contents($this->getConfiguration()->getDirs()->getDocumentRoot() . '/name.txt'));
-            if ($webName === '') {
-                throw new Exceptions\FileWithPageNameIsEmpty("File '{$this->getConfiguration()->getDirs()->getDocumentRoot()}/name.txt' is empty");
-            }
-            $this->webName = $webName;
-        }
-
-        return $this->webName;
+        return $this->getConfiguration()->getWebName();
     }
 
     public function getPageTitle(): string
     {
         if ($this->pageTitle === null) {
             $name = $this->getWebName();
-            $smiley = \file_exists($this->getConfiguration()->getDirs()->getDocumentRoot() . '/title_smiley.txt')
-                ? \trim(\file_get_contents($this->getConfiguration()->getDirs()->getDocumentRoot() . '/title_smiley.txt'))
-                : '';
-
+            $smiley = $this->getConfiguration()->getTitleSmiley();
             $this->pageTitle = ($smiley !== '')
                 ? ($smiley . ' ' . $name)
                 : $name;

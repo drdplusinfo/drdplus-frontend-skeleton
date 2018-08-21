@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\SkeletonInjectorComposerPlugin;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 /**
@@ -42,46 +43,29 @@ class ComposerConfigTest extends AbstractContentTest
     /**
      * @test
      */
-    public function Assets_have_checked_versions(): void
+    public function Assets_have_injected_versions(): void
     {
+        if ($this->isFrontendSkeletonChecked()) {
+            self::assertFalse(false, 'Assets versions are injected by ' . SkeletonInjectorComposerPlugin::class);
+
+            return;
+        }
         $postInstallScripts = static::$composerConfig['scripts']['post-install-cmd'] ?? [];
         self::assertNotEmpty(
             $postInstallScripts,
-            'Missing post-install-cmd scripts, expected at least "php ./vendor/bin/assets --css --dir=css"'
+            'Missing post-install-cmd scripts, expected at least "php bin/assets --css --dir=css"'
         );
         $postUpdateScripts = static::$composerConfig['scripts']['post-update-cmd'] ?? [];
         self::assertNotEmpty(
             $postUpdateScripts,
-            'Missing post-update-cmd scripts, expected at least "php ./vendor/bin/assets --css --dir=css"'
+            'Missing post-update-cmd scripts, expected at least "php bin/assets --css --dir=css"'
         );
         foreach ([$postInstallScripts, $postUpdateScripts] as $postChangeScripts) {
             self::assertContains(
-                'php ./vendor/bin/assets --css --dir=css',
+                'php bin/assets --css --dir=css',
                 $postChangeScripts,
                 'Missing script to compile assets, there are only scripts '
                 . \preg_replace('~^Array\n\((.+)\)~', '$1', \var_export($postChangeScripts, true))
-            );
-        }
-    }
-
-    /**
-     * @test
-     */
-    public function Generic_assets_are_hard_copied_from_libraries(): void
-    {
-        $preAutoloadDump = static::$composerConfig['scripts']['pre-autoload-dump'] ?? [];
-        self::assertNotEmpty($preAutoloadDump, 'Missing pre-autoload-dump scripts');
-        if ($this->isSkeletonChecked()) {
-            self::assertFalse(false, 'Skeleton does not have assets hard copied as it is their creator');
-
-            return;
-        }
-        foreach (['css', 'js', 'images'] as $assets) {
-            self::assertContains(
-                "rm -fr ./$assets/generic && cp -r ./vendor/drdplus/frontend-skeleton/$assets/generic ./$assets/",
-                $preAutoloadDump,
-                "Missing script to copy $assets assets, there are only scripts "
-                . \preg_replace('~^Array\n\((.+)\)~', '$1', \var_export($preAutoloadDump, true))
             );
         }
     }

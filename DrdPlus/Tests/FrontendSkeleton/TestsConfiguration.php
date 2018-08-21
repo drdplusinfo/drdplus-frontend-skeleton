@@ -36,7 +36,7 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     /** @var string */
     private $expectedWebName = 'HTML kostra pro DrD+ webový obsah';
     /** @var string */
-    private $expectedPageTitle = 'HTML kostra pro DrD+ webový obsah';
+    private $expectedPageTitle = '🔱 HTML kostra pro DrD+ webový obsah';
     /** @var string */
     private $expectedGoogleAnalyticsId = 'UA-121206931-1';
     /** @var array|string[] */

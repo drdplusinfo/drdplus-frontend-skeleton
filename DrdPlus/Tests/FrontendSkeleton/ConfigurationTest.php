@@ -41,7 +41,7 @@ class ConfigurationTest extends AbstractContentTest
 
     public function provideCompleteLocalAndDistributionYamlContent(): array
     {
-        $completeYamlContent = $this->getCompleteYamlContent();
+        $completeYamlContent = $this->getCompleteSettings();
         $limitedWebSection = $completeYamlContent;
         $limitedWebSection[Configuration::WEB] = [Configuration::LAST_STABLE_VERSION => '456.789'];
         $changedCompleteYamlContent = $completeYamlContent;
@@ -54,7 +54,7 @@ class ConfigurationTest extends AbstractContentTest
         ];
     }
 
-    private function getCompleteYamlContent(): array
+    private function getCompleteSettings(): array
     {
         return [
             Configuration::WEB => [
@@ -62,6 +62,8 @@ class ConfigurationTest extends AbstractContentTest
                 Configuration::REPOSITORY_URL => \sys_get_temp_dir(),
                 Configuration::MENU_POSITION_FIXED => false,
                 Configuration::SHOW_HOME_BUTTON => true,
+                Configuration::NAME => 'Foo',
+                Configuration::TITLE_SMILEY => '',
             ],
             Configuration::GOOGLE => [Configuration::ANALYTICS_ID => 'UA-121206931-999']
         ];
@@ -74,9 +76,9 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_with_invalid_last_stable_version(): void
     {
-        $yamlContent = $this->getCompleteYamlContent();
-        $yamlContent[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = 'public enemy';
-        new Configuration($this->createDirs(), $yamlContent);
+        $completeSettings = $this->getCompleteSettings();
+        $completeSettings[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = 'public enemy';
+        new Configuration($this->createDirs(), $completeSettings);
     }
 
     /**
@@ -86,9 +88,9 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_with_invalid_web_repository_url(): void
     {
-        $yamlContent = $this->getCompleteYamlContent();
-        $yamlContent[Configuration::WEB][Configuration::REPOSITORY_URL] = '/somewhere://over.the?rainbow=GPS';
-        new Configuration($this->createDirs(), $yamlContent);
+        $completeSettings = $this->getCompleteSettings();
+        $completeSettings[Configuration::WEB][Configuration::REPOSITORY_URL] = '/somewhere://over.the?rainbow=GPS';
+        new Configuration($this->createDirs(), $completeSettings);
     }
 
     /**
@@ -98,9 +100,9 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_with_invalid_google_analytics_id(): void
     {
-        $yamlContent = $this->getCompleteYamlContent();
-        $yamlContent[Configuration::GOOGLE][Configuration::ANALYTICS_ID] = 'GoogleItself';
-        new Configuration($this->createDirs(), $yamlContent);
+        $completeSettings = $this->getCompleteSettings();
+        $completeSettings[Configuration::GOOGLE][Configuration::ANALYTICS_ID] = 'GoogleItself';
+        new Configuration($this->createDirs(), $completeSettings);
     }
 
     /**
@@ -109,9 +111,9 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_without_defining_if_menu_should_be_fixed(): void
     {
-        $yamlContent = $this->getCompleteYamlContent();
-        unset($yamlContent[Configuration::WEB][Configuration::MENU_POSITION_FIXED]);
-        new Configuration($this->createDirs(), $yamlContent);
+        $completeSettings = $this->getCompleteSettings();
+        unset($completeSettings[Configuration::WEB][Configuration::MENU_POSITION_FIXED]);
+        new Configuration($this->createDirs(), $completeSettings);
     }
 
     /**
@@ -120,8 +122,41 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_without_defining_if_show_home_button(): void
     {
-        $yamlContent = $this->getCompleteYamlContent();
-        unset($yamlContent[Configuration::WEB][Configuration::SHOW_HOME_BUTTON]);
-        new Configuration($this->createDirs(), $yamlContent);
+        $completeSettings = $this->getCompleteSettings();
+        unset($completeSettings[Configuration::WEB][Configuration::SHOW_HOME_BUTTON]);
+        new Configuration($this->createDirs(), $completeSettings);
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\MissingWebName
+     */
+    public function I_can_not_create_it_without_web_name(): void
+    {
+        $completeSettings = $this->getCompleteSettings();
+        $completeSettings[Configuration::WEB][Configuration::NAME] = '';
+        new Configuration($this->createDirs(), $completeSettings);
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\TitleSmileyIsNotSet
+     */
+    public function I_can_not_create_it_without_set_title_smiley(): void
+    {
+        $completeSettings = $this->getCompleteSettings();
+        unset($completeSettings[Configuration::WEB][Configuration::TITLE_SMILEY]);
+        new Configuration($this->createDirs(), $completeSettings);
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_create_it_title_smiley_as_null(): void
+    {
+        $completeSettings = $this->getCompleteSettings();
+        $completeSettings[Configuration::WEB][Configuration::TITLE_SMILEY] = null;
+        $configuration = new Configuration($this->createDirs(), $completeSettings);
+        self::assertSame('', $configuration->getTitleSmiley());
     }
 }
