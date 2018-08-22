@@ -15,7 +15,12 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_use_both_config_distribution_as_well_as_local_yaml_files(): void
     {
-        self::assertFileExists($this->getDocumentRoot() . '/' . Configuration::CONFIG_LOCAL_YML);
+        if ($this->isSkeletonChecked()) {
+            self::assertFileExists(
+                $this->getDocumentRoot() . '/' . Configuration::CONFIG_LOCAL_YML,
+                'Local configuration expected on skeleton for testing purpose'
+            );
+        }
         self::assertFileExists($this->getDocumentRoot() . '/' . Configuration::CONFIG_DISTRIBUTION_YML);
     }
 

@@ -5,7 +5,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-class Yaml extends StrictObject implements \ArrayAccess
+class YamlReader extends StrictObject implements \ArrayAccess
 {
     /** @var string */
     private $yamlFile;
@@ -20,15 +20,23 @@ class Yaml extends StrictObject implements \ArrayAccess
 
     /**
      * @return array
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadYamlFile
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotParseYamlFile
      */
     private function fetchValues(): array
     {
-        $values = \yaml_parse_file($this->yamlFile);
+        $yamlContent = \file_get_contents($this->yamlFile);
+        if ($yamlContent === false) {
+            throw new Exceptions\CanNotReadYamlFile("Can not parse content '{$yamlContent}' of YAML file '{$this->yamlFile}'");
+        }
+        if (!$yamlContent) {
+            return [];
+        }
+        $values = \yaml_parse($yamlContent);
         if ($values !== false) {
             return $values;
         }
-        throw new Exceptions\CanNotParseYamlFile("Can not parse content of YAML file '{$this->yamlFile}'");
+        throw new Exceptions\CanNotParseYamlFile("Can not parse content '{$yamlContent}' of YAML file '{$this->yamlFile}'");
     }
 
     public function getValues(): array

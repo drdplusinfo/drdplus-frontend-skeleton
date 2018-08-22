@@ -12,9 +12,13 @@ class Configuration extends StrictObject
 
     public static function createFromYml(Dirs $dirs): Configuration
     {
-        $localConfig = new Yaml($dirs->getDocumentRoot() . '/' . static::CONFIG_LOCAL_YML);
-        $globalConfig = new Yaml($dirs->getDocumentRoot() . '/' . static::CONFIG_DISTRIBUTION_YML);
-        $config = \array_replace_recursive($globalConfig->getValues(), $localConfig->getValues());
+        $globalConfig = new YamlReader($dirs->getDocumentRoot() . '/' . static::CONFIG_DISTRIBUTION_YML);
+        $config = $globalConfig->getValues();
+        $localConfigFile = $dirs->getDocumentRoot() . '/' . static::CONFIG_LOCAL_YML;
+        if (\file_exists($localConfigFile)) {
+            $localConfig = new YamlReader($dirs->getDocumentRoot() . '/' . static::CONFIG_LOCAL_YML);
+            $config = \array_replace_recursive($config, $localConfig->getValues());
+        }
 
         return new static($dirs, $config);
     }

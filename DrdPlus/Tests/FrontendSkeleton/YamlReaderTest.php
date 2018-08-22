@@ -1,10 +1,10 @@
 <?php
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\Yaml;
+use DrdPlus\FrontendSkeleton\YamlReader;
 use PHPUnit\Framework\TestCase;
 
-class YamlTest extends TestCase
+class YamlReaderTest extends TestCase
 {
     use YamlFileTestTrait;
 
@@ -15,7 +15,7 @@ class YamlTest extends TestCase
     {
         $yamlTestingDir = $this->getYamlTestingDir();
         $yamlFile = $this->createYamlLocalConfig($data = ['foo' => 'bar', 'baz' => ['qux' => true]], $yamlTestingDir);
-        $yaml = new Yaml($yamlFile);
+        $yaml = new YamlReader($yamlFile);
         self::assertSame($data, $yaml->getValues());
         foreach ($data as $key => $value) {
             self::assertArrayHasKey($key, $yaml);
@@ -32,7 +32,7 @@ class YamlTest extends TestCase
         try {
             $yamlTestingDir = $this->getYamlTestingDir();
             $yamlFile = $this->createYamlLocalConfig([], $yamlTestingDir);
-            $yaml = new Yaml($yamlFile);
+            $yaml = new YamlReader($yamlFile);
         } catch (\Exception $exception) {
             self::fail('No exception expected so far: ' . $exception->getMessage());
         }
@@ -48,7 +48,7 @@ class YamlTest extends TestCase
         try {
             $yamlTestingDir = $this->getYamlTestingDir();
             $yamlFile = $this->createYamlLocalConfig(['foo' => 'bar'], $yamlTestingDir);
-            $yaml = new Yaml($yamlFile);
+            $yaml = new YamlReader($yamlFile);
         } catch (\Exception $exception) {
             self::fail('No exception expected so far: ' . $exception->getMessage());
         }
