@@ -14,7 +14,7 @@ use Composer\Plugin\PluginInterface;
 
 class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriberInterface
 {
-    public const SKELETON_PACKAGE_NAME = 'drdplus/frontend-skeleton';
+    public const FRONTEND_SKELETON_PACKAGE_NAME = 'drdplus/frontend-skeleton';
     /** @var Composer */
     private $composer;
     /** @var IOInterface */
@@ -52,7 +52,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->io->write('Injection of drdplus/frontend-skeleton finished');
     }
 
-    private function isThisPackageChanged(PackageEvent $event)
+    private function isThisPackageChanged(PackageEvent $event): bool
     {
         /** @var InstallOperation|UpdateOperation $operation */
         $operation = $event->getOperation();
@@ -64,7 +64,12 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
             return false;
         }
 
-        return $changedPackageName === static::SKELETON_PACKAGE_NAME;
+        return $this->isChangedPackageThisOne($changedPackageName);
+    }
+
+    protected function isChangedPackageThisOne(string $changedPackageName): bool
+    {
+        return $changedPackageName === static::FRONTEND_SKELETON_PACKAGE_NAME;
     }
 
     private function shouldSkipFile(string $fileName): bool
