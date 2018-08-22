@@ -55,7 +55,13 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
     {
         /** @var InstallOperation|UpdateOperation $operation */
         $operation = $event->getOperation();
-        $changedPackageName = $operation->getPackage()->getName();
+        if ($operation instanceof InstallOperation) {
+            $changedPackageName = $operation->getPackage()->getName();
+        } elseif ($operation instanceof UpdateOperation) {
+            $changedPackageName = $operation->getInitialPackage()->getName();
+        } else {
+            return false;
+        }
         $skeletonPackageName = $this->composer->getPackage()->getName();
 
         return $changedPackageName === $skeletonPackageName;
