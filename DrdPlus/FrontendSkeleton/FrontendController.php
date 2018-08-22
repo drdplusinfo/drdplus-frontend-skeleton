@@ -122,23 +122,6 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
         return \ob_get_clean();
     }
 
-    public function getCustomBodyContent(): string
-    {
-        if (!\file_exists($this->getConfiguration()->getDirs()->getPartsRoot() . '/custom_body_content.php')) {
-            return '';
-        }
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $controller = $this;
-        $content = '<div id="customBodyContent">';
-        \ob_start();
-        /** @noinspection PhpIncludeInspection */
-        include $this->getConfiguration()->getDirs()->getPartsRoot() . '/custom_body_content.php';
-        $content .= \ob_get_clean();
-        $content .= '</div>';
-
-        return $content;
-    }
-
     public function getWebContent(): string
     {
         /** @noinspection PhpUnusedLocalVariableInspection */

@@ -41,7 +41,6 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
         $content = \ob_get_contents();
         \ob_clean();
         $content .= $controller->getMenu();
-        $content .= $controller->getCustomBodyContent();
         $content .= $controller->getWebContent(); ?>
     </body>
   </html>

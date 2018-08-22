@@ -79,26 +79,6 @@ class ContentTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_get_pages_with_custom_body_content(): void
-    {
-        $customBodyContentFile = $this->getPartsRoot() . '/custom_body_content.php';
-        if (!$this->getTestsConfiguration()->hasCustomBodyContent()) {
-            self::assertFileNotExists($customBodyContentFile, "Does not expected {$customBodyContentFile} to exists according to tests config");
-
-            return;
-        }
-        $customBodyContentId = StringTools::camelCaseToSnakeCase('customBodyContent');
-        self::assertFileExists($customBodyContentFile, "Expected {$customBodyContentFile} to exists according to tests config");
-        $customBodyContent = $this->getHtmlDocument()->getElementById($customBodyContentId);
-        self::assertNotEmpty($customBodyContent, "Custom body content element has not been found by ID '$customBodyContentId'");
-        self::assertInstanceOf(Element::class, $customBodyContent);
-        /** @var Element $customBodyContent */
-        self::assertNotEmpty($customBodyContent->innerHTML, "Content of '$customBodyContentId' is empty");
-    }
-
-    /**
-     * @test
-     */
     public function I_can_navigate_to_every_heading_by_expected_anchor(): void
     {
         $htmlDocument = $this->getHtmlDocument();
