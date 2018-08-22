@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace DrdPlus\FrontendSkeleton;
 
 use Composer\Composer;
+use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
@@ -30,8 +33,11 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->io = $io;
     }
 
-    public function plugInSkeleton()
+    public function plugInSkeleton(PackageEvent $event)
     {
+        if (!$this->isThisPackageChanged($event)) {
+            return;
+        }
         $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
         $this->io->write('Injecting drdplus/frontend-skeleton using document root ' . $documentRoot);
         $this->publishSkeletonImages($documentRoot);
@@ -43,6 +49,16 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->copyPhpUnitConfig($documentRoot);
         $this->copyProjectConfig($documentRoot);
         $this->io->write('Injection of drdplus/frontend-skeleton finished');
+    }
+
+    private function isThisPackageChanged(PackageEvent $event)
+    {
+        /** @var InstallOperation|UpdateOperation $operation */
+        $operation = $event->getOperation();
+        $changedPackageName = $operation->getPackage()->getName();
+        $skeletonPackageName = $this->composer->getPackage()->getName();
+
+        return $changedPackageName === $skeletonPackageName;
     }
 
     private function shouldSkipFile(string $fileName): bool
