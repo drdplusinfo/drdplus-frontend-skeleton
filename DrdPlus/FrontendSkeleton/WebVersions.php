@@ -235,6 +235,7 @@ class WebVersions extends StrictObject
             } else {
                 $this->update($minorVersion, $toMinorVersionDir);
             }
+            $this->existingMinorVersions[$minorVersion] = true;
         }
 
         return true;
