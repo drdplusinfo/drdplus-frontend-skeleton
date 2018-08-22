@@ -45,7 +45,7 @@ class ComposerConfigTest extends AbstractContentTest
      */
     public function Assets_have_injected_versions(): void
     {
-        if ($this->isFrontendSkeletonChecked()) {
+        if (!$this->isFrontendSkeletonChecked()) {
             self::assertFalse(false, 'Assets versions are injected by ' . SkeletonInjectorComposerPlugin::class);
 
             return;
