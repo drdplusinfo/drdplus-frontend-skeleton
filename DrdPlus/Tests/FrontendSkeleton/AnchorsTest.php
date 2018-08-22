@@ -107,7 +107,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $skippedExternalUrls = [];
         foreach ($this->getExternalAnchors() as $originalLink) {
-            $link = $this->turnToLocalLink($originalLink);
+            $link = HtmlHelper::turnToLocalLink($originalLink);
             if (\in_array($link, self::$checkedExternalAnchors, true)) {
                 continue;
             }
@@ -234,7 +234,7 @@ class AnchorsTest extends AbstractContentTest
         self::assertNotEmpty($externalAnchorsWithHash, 'Some external anchors expected');
         $skippedExternalUrls = [];
         foreach ($externalAnchorsWithHash as $originalLink) {
-            $link = $this->turnToLocalLink($originalLink);
+            $link = HtmlHelper::turnToLocalLink($originalLink);
             if ($this->isLinkAccessible($originalLink, $link)) {
                 $skippedExternalUrls[] = $link;
                 continue;
