@@ -39,8 +39,9 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         if (!$this->isThisPackageChanged($event)) {
             return;
         }
+        $skeletonPackageName = $this->composer->getPackage()->getName();
         $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
-        $this->io->write('Injecting drdplus/frontend-skeleton using document root ' . $documentRoot);
+        $this->io->write("Injecting $skeletonPackageName using document root $documentRoot");
         $this->publishSkeletonImages($documentRoot);
         $this->publishSkeletonCss($documentRoot);
         $this->publishSkeletonJs($documentRoot);
@@ -49,7 +50,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->copyGoogleVerification($documentRoot);
         $this->copyPhpUnitConfig($documentRoot);
         $this->copyProjectConfig($documentRoot);
-        $this->io->write('Injection of drdplus/frontend-skeleton finished');
+        $this->io->write("Injection of $skeletonPackageName finished");
     }
 
     private function isThisPackageChanged(PackageEvent $event): bool
