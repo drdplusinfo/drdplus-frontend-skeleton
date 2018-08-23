@@ -124,7 +124,7 @@ abstract class Cache extends StrictObject
         if ($return !== 0) {
             throw new Exceptions\CanNotGetGitStatus('Can not run `git status`, got result code ' . $return);
         }
-        \exec('git diff', $diffRows, $return);
+        \exec('git diff origin/master', $diffRows, $return);
         if ($return !== 0) {
             throw new Exceptions\CanNotGetGitDiff('Can not run `git diff`, got result code ' . $return);
         }
