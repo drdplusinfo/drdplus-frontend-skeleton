@@ -16,9 +16,9 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
 {
     public const FRONTEND_SKELETON_PACKAGE_NAME = 'drdplus/frontend-skeleton';
     /** @var Composer */
-    private $composer;
+    protected $composer;
     /** @var IOInterface */
-    private $io;
+    protected $io;
 
     public static function getSubscribedEvents(): array
     {
@@ -53,7 +53,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->io->write("Injection of $skeletonPackageName finished");
     }
 
-    private function isThisPackageChanged(PackageEvent $event): bool
+    protected function isThisPackageChanged(PackageEvent $event): bool
     {
         /** @var InstallOperation|UpdateOperation $operation */
         $operation = $event->getOperation();
@@ -73,12 +73,12 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         return $changedPackageName === static::FRONTEND_SKELETON_PACKAGE_NAME;
     }
 
-    private function shouldSkipFile(string $fileName): bool
+    protected function shouldSkipFile(string $fileName): bool
     {
         return \in_array($fileName, $this->composer->getConfig()->get('frontend-skeleton')['skip-injecting'] ?? [], true);
     }
 
-    private function addVersionsToAssets(string $documentRoot)
+    protected function addVersionsToAssets(string $documentRoot)
     {
         $assetsVersion = new AssetsVersion(true, false);
         $changedFiles = $assetsVersion->addVersionsToAssetLinks($documentRoot, ['css'], [], [], false);
@@ -87,7 +87,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         }
     }
 
-    private function publishSkeletonImages(string $documentRoot)
+    protected function publishSkeletonImages(string $documentRoot)
     {
         $this->passThrough(
             [
@@ -98,7 +98,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         );
     }
 
-    private function passThrough(array $commands, string $workingDir = null): void
+    protected function passThrough(array $commands, string $workingDir = null): void
     {
         if ($workingDir !== null) {
             $escapedWorkingDir = \escapeshellarg($workingDir);
@@ -123,7 +123,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         }
     }
 
-    private function publishSkeletonCss(string $documentRoot): void
+    protected function publishSkeletonCss(string $documentRoot): void
     {
         $this->passThrough(
             [
@@ -136,7 +136,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         );
     }
 
-    private function publishSkeletonJs(string $documentRoot): void
+    protected function publishSkeletonJs(string $documentRoot): void
     {
         $this->passThrough(
             [
@@ -149,17 +149,17 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         );
     }
 
-    private function flushCache(string $documentRoot): void
+    protected function flushCache(string $documentRoot): void
     {
         $this->passThrough(['find ./cache -mindepth 2 -type f -exec rm {} +'], $documentRoot);
     }
 
-    private function copyGoogleVerification(string $documentRoot)
+    protected function copyGoogleVerification(string $documentRoot)
     {
         $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/google8d8724e0c2818dfc.html .'], $documentRoot);
     }
 
-    private function copyPhpUnitConfig(string $documentRoot)
+    protected function copyPhpUnitConfig(string $documentRoot)
     {
         if ($this->shouldSkipFile('phpunit.xml.dist')) {
             $this->io->write('Skipping phpunit.xml.dist');
@@ -168,7 +168,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         }
     }
 
-    private function copyProjectConfig(string $documentRoot)
+    protected function copyProjectConfig(string $documentRoot)
     {
         $this->passThrough(['cp --no-clobber ./vendor/drdplus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
     }
