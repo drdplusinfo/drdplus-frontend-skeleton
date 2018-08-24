@@ -19,6 +19,8 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
     protected $composer;
     /** @var IOInterface */
     protected $io;
+    /** @var bool */
+    protected $alreadyInjected = false;
 
     public static function getSubscribedEvents(): array
     {
@@ -36,7 +38,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
 
     public function plugInSkeleton(PackageEvent $event)
     {
-        if (!$this->isThisPackageChanged($event)) {
+        if ($this->alreadyInjected || !$this->isThisPackageChanged($event)) {
             return;
         }
         $skeletonPackageName = $this->composer->getPackage()->getName();
@@ -50,6 +52,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->copyGoogleVerification($documentRoot);
         $this->copyPhpUnitConfig($documentRoot);
         $this->copyProjectConfig($documentRoot);
+        $this->alreadyInjected = true;
         $this->io->write("Injection of $skeletonPackageName finished");
     }
 
