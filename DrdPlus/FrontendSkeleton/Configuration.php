@@ -64,9 +64,9 @@ class Configuration extends StrictObject
      */
     protected function guardValidLastMinorVersion(array $settings): void
     {
-        if (!\preg_match('~^\d+[.]\d+$~', (string)($settings[static::WEB][static::LAST_STABLE_VERSION] ?? ''))) {
+        if (!\preg_match('~^(\d+[.]\d+|master)$~', (string)($settings[static::WEB][static::LAST_STABLE_VERSION] ?? ''))) {
             throw new Exceptions\InvalidMinorVersion(
-                'Expected something like 1.13 in configuration web.last_stable_version, got '
+                'Expected something like 1.13 or master in configuration web.last_stable_version, got '
                 . ($settings[static::WEB]['last_stable_version'] ?? 'nothing')
             );
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Configuration;
+use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class ConfigurationTest extends AbstractContentTest
@@ -72,6 +73,17 @@ class ConfigurationTest extends AbstractContentTest
             ],
             Configuration::GOOGLE => [Configuration::ANALYTICS_ID => 'UA-121206931-999']
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_create_it_with_master_as_last_stable_version(): void
+    {
+        $completeSettings = $this->getCompleteSettings();
+        $completeSettings[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = 'master';
+        $configuration = new Configuration($this->createDirs(), $completeSettings);
+        self::assertSame('master', $configuration->getWebLastStableVersion());
     }
 
     /**
