@@ -3,37 +3,15 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
-use Composer\Composer;
-use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UpdateOperation;
-use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
-use Composer\Installer\PackageEvents;
-use Composer\IO\IOInterface;
-use Composer\Plugin\PluginInterface;
 
-class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriberInterface
+class SkeletonInjectorComposerPlugin extends AbstractSkeletonInjectorComposerPlugin
 {
     public const FRONTEND_SKELETON_PACKAGE_NAME = 'drdplus/frontend-skeleton';
-    /** @var Composer */
-    protected $composer;
-    /** @var IOInterface */
-    protected $io;
-    /** @var bool */
-    protected $alreadyInjected = false;
 
-    public static function getSubscribedEvents(): array
+    public function __construct()
     {
-        return [
-            PackageEvents::POST_PACKAGE_INSTALL => 'plugInSkeleton',
-            PackageEvents::POST_PACKAGE_UPDATE => 'plugInSkeleton',
-        ];
-    }
-
-    public function activate(Composer $composer, IOInterface $io): void
-    {
-        $this->composer = $composer;
-        $this->io = $io;
+        parent::__construct(static::FRONTEND_SKELETON_PACKAGE_NAME);
     }
 
     public function plugInSkeleton(PackageEvent $event)
@@ -56,41 +34,7 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         $this->io->write("Injection of $skeletonPackageName finished");
     }
 
-    protected function isThisPackageChanged(PackageEvent $event): bool
-    {
-        /** @var InstallOperation|UpdateOperation $operation */
-        $operation = $event->getOperation();
-        if ($operation instanceof InstallOperation) {
-            $changedPackageName = $operation->getPackage()->getName();
-        } elseif ($operation instanceof UpdateOperation) {
-            $changedPackageName = $operation->getInitialPackage()->getName();
-        } else {
-            return false;
-        }
-
-        return $this->isChangedPackageThisOne($changedPackageName);
-    }
-
-    protected function isChangedPackageThisOne(string $changedPackageName): bool
-    {
-        return $changedPackageName === static::FRONTEND_SKELETON_PACKAGE_NAME;
-    }
-
-    protected function shouldSkipFile(string $fileName): bool
-    {
-        return \in_array($fileName, $this->composer->getConfig()->get('frontend-skeleton')['skip-injecting'] ?? [], true);
-    }
-
-    protected function addVersionsToAssets(string $documentRoot)
-    {
-        $assetsVersion = new AssetsVersion(true, false);
-        $changedFiles = $assetsVersion->addVersionsToAssetLinks($documentRoot, ['css'], [], [], false);
-        if ($changedFiles) {
-            $this->io->write('Those assets got versions to asset links: ' . \implode(', ', $changedFiles));
-        }
-    }
-
-    protected function publishSkeletonImages(string $documentRoot)
+    protected function publishSkeletonImages(string $documentRoot): void
     {
         $this->passThrough(
             [
@@ -99,31 +43,6 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
             ],
             $documentRoot
         );
-    }
-
-    protected function passThrough(array $commands, string $workingDir = null): void
-    {
-        if ($workingDir !== null) {
-            $escapedWorkingDir = \escapeshellarg($workingDir);
-            \array_unshift($commands, 'cd ' . $escapedWorkingDir);
-        }
-        foreach ($commands as &$command) {
-            $command .= ' 2>&1';
-        }
-        unset($command);
-        $chain = \implode(' && ', $commands);
-        \exec($chain, $output, $returnCode);
-        if ($returnCode !== 0) {
-            $this->io->writeError(
-                "Failed injecting skeleton by command $chain\nGot return code $returnCode and output " . \implode("\n", $output)
-            );
-
-            return;
-        }
-        $this->io->write($chain);
-        if ($output) {
-            $this->io->write(' ' . \implode("\n", $output));
-        }
     }
 
     protected function publishSkeletonCss(string $documentRoot): void
@@ -152,26 +71,17 @@ class SkeletonInjectorComposerPlugin implements PluginInterface, EventSubscriber
         );
     }
 
-    protected function flushCache(string $documentRoot): void
-    {
-        $this->passThrough(['find ./cache -mindepth 2 -type f -exec rm {} +'], $documentRoot);
-    }
-
-    protected function copyGoogleVerification(string $documentRoot)
+    protected function copyGoogleVerification(string $documentRoot): void
     {
         $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/google8d8724e0c2818dfc.html .'], $documentRoot);
     }
 
-    protected function copyPhpUnitConfig(string $documentRoot)
+    protected function copyPhpUnitConfig(string $documentRoot): void
     {
-        if ($this->shouldSkipFile('phpunit.xml.dist')) {
-            $this->io->write('Skipping phpunit.xml.dist');
-        } else {
-            $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
-        }
+        $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/phpunit.xml.dist .'], $documentRoot);
     }
 
-    protected function copyProjectConfig(string $documentRoot)
+    protected function copyProjectConfig(string $documentRoot): void
     {
         $this->passThrough(['cp --no-clobber ./vendor/drdplus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
     }
