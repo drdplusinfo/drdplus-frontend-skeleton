@@ -156,13 +156,28 @@ class WebVersionsTest extends AbstractContentTest
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertSame([$this->getTestsConfiguration()->getExpectedLastUnstableVersion()], $allWebVersions);
         } else {
-            self::assertSame($this->getBranchesFromFileSystem(), $allWebVersions);
+            self::assertSame(
+                $this->getVersionsRange($this->getTestsConfiguration()->getExpectedLastVersion()),
+                $allWebVersions
+            );
         }
     }
 
-    private function getBranchesFromFileSystem(): array
+    protected function getVersionsRange(string $lastVersion): array
     {
-        return $this->runCommand('ls -1 .git/logs/refs/heads/ | sort --version-sort --reverse'); // from latest to oldest
+        $stableVersions = \range(1.0, (float)$lastVersion);
+
+        $stringStableVersions = \array_map(function (float $version) {
+            $stringVersion = (string)$version;
+            if (\strpos($stringVersion, '.') === false) {
+                $stringVersion .= '.0';
+            }
+
+            return $stringVersion;
+        }, $stableVersions);
+        \array_unshift($stringStableVersions, WebVersions::LAST_UNSTABLE_VERSION);
+
+        return $stringStableVersions;
     }
 
     /**

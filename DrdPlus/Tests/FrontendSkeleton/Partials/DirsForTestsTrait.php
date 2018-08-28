@@ -32,11 +32,6 @@ trait DirsForTestsTrait
         return $this->getDocumentRoot() . '/vendor';
     }
 
-    protected function getWebRoot(): string
-    {
-        return $this->getDocumentRoot() . '/web';
-    }
-
     protected function getPartsRoot(): string
     {
         return $this->getDocumentRoot() . '/parts';
