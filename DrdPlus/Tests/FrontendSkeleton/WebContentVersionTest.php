@@ -8,7 +8,7 @@ use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 
-class VersionTest extends AbstractContentTest
+class WebContentVersionTest extends AbstractContentTest
 {
     /**
      * @test
@@ -26,7 +26,7 @@ class VersionTest extends AbstractContentTest
             $this->getTestsConfiguration()->getExpectedLastVersion(),
             'Expected some stable version'
         );
-        $version = $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-version');
+        $version = $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-content-version');
         self::assertNotEmpty($version, 'No version get from document data-version attribute');
         if ($this->getTestsConfiguration()->getExpectedLastVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
             self::assertSame(
@@ -73,13 +73,17 @@ class VersionTest extends AbstractContentTest
             $content = $this->fetchContentFromLink($url, true, $post, $cookies)['content'];
             self::assertNotEmpty($content);
             $document = new HtmlDocument($content);
-            $versionFromContent = $document->documentElement->getAttribute('data-version');
-            self::assertNotNull($versionFromContent, "Can not find attribute 'data-version' in content fetched from $url");
+            $versionFromContent = $document->documentElement->getAttribute('data-content-version');
+            self::assertNotNull($versionFromContent, "Can not find attribute 'data-content-version' in content fetched from $url");
             if ($webVersion === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
                 self::assertSame($webVersion, $versionFromContent, 'Expected different version, seems version switching does not work');
             } else {
                 self::assertStringStartsWith("$webVersion.", $versionFromContent, 'Expected different version, seems version switching does not work');
             }
+            $cachedAtString = $this->fetchHtmlDocumentFromLocalUrl()->documentElement->getAttribute('data-cached-at');
+            $cachedAt = new \DateTime($cachedAtString);
+            self::assertLessThanOrEqual(new \DateTime(), $cachedAt, 'Expected data-cached-at from presence or past, not future');
+            self::assertSame($cachedAtString, $cachedAt->format(\DATE_ATOM), 'Expected data-cached-at in format Atom: ' . \DATE_ATOM);
         }
     }
 

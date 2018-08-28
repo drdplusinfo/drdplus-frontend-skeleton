@@ -10,7 +10,7 @@ $previousMemoryLimit = \ini_set('memory_limit', '1G');
 \ob_start();
 ?>
   <!DOCTYPE html>
-  <html lang="cs" data-version="<?= $controller->getCurrentPatchVersion() ?>">
+  <html lang="cs" data-content-version="<?= $controller->getCurrentPatchVersion() ?>" data-cached-at="<?= \date(\DATE_ATOM); ?>">
     <head>
         <?php
         $content = \ob_get_contents();
