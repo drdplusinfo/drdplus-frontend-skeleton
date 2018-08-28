@@ -232,8 +232,6 @@ class WebVersions extends StrictObject
             $toMinorVersionDir = $this->configuration->getDirs()->getVersionRoot($minorVersion);
             if (!\file_exists($toMinorVersionDir)) {
                 $this->clone($minorVersion, $toMinorVersionDir);
-            } else {
-                $this->update($minorVersion, $toMinorVersionDir);
             }
             $this->existingMinorVersions[$minorVersion] = true;
         }
@@ -261,8 +259,9 @@ class WebVersions extends StrictObject
         }
     }
 
-    private function update(string $minorVersion, string $toVersionDir): void
+    public function update(string $minorVersion): void
     {
+        $toVersionDir = $this->configuration->getDirs()->getVersionRoot($minorVersion);
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
         $commands = [];
         $commands[] = "cd $toVersionDirEscaped";
