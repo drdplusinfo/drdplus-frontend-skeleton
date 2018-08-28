@@ -111,6 +111,17 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
         return $this->pageTitle;
     }
 
+    public function getHead(): string
+    {
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $controller = $this;
+        \ob_start();
+        /** @noinspection PhpIncludeInspection */
+        include $this->getConfiguration()->getDirs()->getGenericPartsRoot() . '/head.php';
+
+        return \ob_get_clean();
+    }
+
     public function getMenu(): string
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
