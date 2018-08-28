@@ -19,9 +19,8 @@ class SkeletonInjectorComposerPlugin extends AbstractSkeletonInjectorComposerPlu
         if ($this->alreadyInjected || !$this->isThisPackageChanged($event)) {
             return;
         }
-        $skeletonPackageName = $this->composer->getPackage()->getName();
         $documentRoot = $GLOBALS['documentRoot'] ?? getcwd();
-        $this->io->write("Injecting $skeletonPackageName using document root $documentRoot");
+        $this->io->write("Injecting {$this->skeletonPackageName} using document root $documentRoot");
         $this->publishSkeletonImages($documentRoot);
         $this->publishSkeletonCss($documentRoot);
         $this->publishSkeletonJs($documentRoot);
@@ -31,7 +30,7 @@ class SkeletonInjectorComposerPlugin extends AbstractSkeletonInjectorComposerPlu
         $this->copyPhpUnitConfig($documentRoot);
         $this->copyProjectConfig($documentRoot);
         $this->alreadyInjected = true;
-        $this->io->write("Injection of $skeletonPackageName finished");
+        $this->io->write("Injection of {$this->skeletonPackageName} finished");
     }
 
     protected function publishSkeletonImages(string $documentRoot): void
