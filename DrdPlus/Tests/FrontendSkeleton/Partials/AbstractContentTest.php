@@ -268,7 +268,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $metaRefreshes;
     }
 
-    protected function getDirVersioning(string $dirToCheck): array
+    protected function getGitFolderIgnoring(string $dirToCheck): array
     {
         $documentRootEscaped = \escapeshellarg($this->getDocumentRoot());
         $dirToCheckEscaped = \escapeshellarg($dirToCheck);
