@@ -66,7 +66,8 @@ class WebVersions extends StrictObject
     protected function getLastUnstableVersionWebRoot(): string
     {
         if ($this->lastUnstableVersionRoot === null) {
-            $this->lastUnstableVersionRoot = $this->configuration->getDirs()->getVersionRoot(static::LAST_UNSTABLE_VERSION);
+            $this->ensureMinorVersionExists($this->getLastUnstableVersion());
+            $this->lastUnstableVersionRoot = $this->configuration->getDirs()->getVersionRoot($this->getLastUnstableVersion());
         }
 
         return $this->lastUnstableVersionRoot;
@@ -335,7 +336,6 @@ class WebVersions extends StrictObject
     public function getPatchVersions(): array
     {
         if ($this->patchVersions === null) {
-            $this->ensureMinorVersionExists($this->getLastUnstableVersion());
             $escapedWebVersionsRootDir = \escapeshellarg($this->getLastUnstableVersionWebRoot());
             $this->patchVersions = $this->executeArray(<<<CMD
 git -C $escapedWebVersionsRootDir tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse
