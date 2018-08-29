@@ -3,7 +3,7 @@
     <div class="container">
         <?php if ($controller->isShownHomeButton()) { ?>
           <span class="menu">
-                    <a id="homeButton" class="internal" href="https://www.drdplus.info">
+                    <a id="homeButton" class="internal-url" href="https://www.drdplus.info">
                         <img class="home" src="/images/generic/skeleton/frontend-drd-plus-dragon-menu-2x22.png">
                     </a>
                 </span>

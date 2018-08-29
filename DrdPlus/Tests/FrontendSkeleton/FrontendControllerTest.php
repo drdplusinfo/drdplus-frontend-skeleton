@@ -152,7 +152,10 @@ class FrontendControllerTest extends AbstractContentTest
             /** @var Element $homeButton */
             $homeButton = $this->getHtmlDocument()->getElementById('home_button');
             self::assertNotEmpty($homeButton, 'Home button is missing');
-            self::assertSame('https://www.drdplus.info', $homeButton->getAttribute('href'), 'Link of home button should lead to home');
+            self::assertSame(
+                HtmlHelper::turnToLocalLink('https://www.drdplus.info'),
+                $homeButton->getAttribute('href'), 'Link of home button should lead to home'
+            );
         }
         $configurationWithHiddenHomeButton = $this->createCustomConfiguration([Configuration::WEB => [Configuration::SHOW_HOME_BUTTON => false]]);
         self::assertFalse($configurationWithHiddenHomeButton->isShowHomeButton(), 'Expected configuration with hidden home button');

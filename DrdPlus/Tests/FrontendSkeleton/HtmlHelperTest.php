@@ -218,6 +218,7 @@ HTML
 </head>
 <body>
   <a href="https://foo-bar.baz.drdplus.info" id="single_link">Sub-doména na DrD+ info</a>
+  <a href="https://qux.drdplus.info" id="marked_as_local">Sub-doména na DrD+ info označená jako local</a>
 </body>
 </htm>
 HTML
@@ -228,6 +229,10 @@ HTML
         $localizedLink = $htmlDocument->getElementById('single_link');
         self::assertNotEmpty($localizedLink, 'No element found by ID single_link');
         self::assertSame('http://foo-bar.baz.drdplus.loc:88', $localizedLink->getAttribute('href'));
+        /** @var Element $localizedLocalLikeLink */
+        $localizedLocalLikeLink = $htmlDocument->getElementById('marked_as_local');
+        self::assertNotEmpty($localizedLocalLikeLink, 'No element found by ID marked_as_local');
+        self::assertSame('http://qux.drdplus.loc:88', $localizedLocalLikeLink->getAttribute('href'));
     }
 
     /**
@@ -303,6 +308,6 @@ HTML
         self::assertSame('1', $htmlDocument->body->getAttribute('data-has-marked-external-urls'));
         /** @var Element $linkWithoutAnchor */
         $linkWithoutAnchor = $htmlDocument->getElementById('link_without_anchor');
-        self::assertFalse($linkWithoutAnchor->classList->contains(HtmlHelper::EXTERNAL_URL));
+        self::assertFalse($linkWithoutAnchor->classList->contains(HtmlHelper::EXTERNAL_URL_CLASS));
     }
 }

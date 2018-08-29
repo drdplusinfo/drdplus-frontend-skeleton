@@ -26,6 +26,6 @@ a.external-url:hover {
     text-shadow: 1px 0 1px #424242;
 }
 
-a.internal {
+a.internal-url {
     text-decoration: none;
 }

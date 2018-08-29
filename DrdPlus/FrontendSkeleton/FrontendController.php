@@ -23,10 +23,6 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
     private $request;
     /** @var array */
     private $bodyClasses;
-    /** @var bool */
-    private $menuPositionFixed;
-    /** @var bool */
-    private $showHomeButton;
     /** @var PageCache */
     protected $pageCache;
     /** @var Redirect|null */
@@ -39,8 +35,6 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
         $this->configuration = $configuration;
         $this->htmlHelper = $htmlHelper;
         $this->bodyClasses = $bodyClasses;
-        $this->menuPositionFixed = $configuration->isMenuPositionFixed();
-        $this->showHomeButton = $configuration->isShowHomeButton();
     }
 
     /**
@@ -191,17 +185,14 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
         $this->bodyClasses[] = $class;
     }
 
-    /**
-     * @return bool
-     */
     public function isMenuPositionFixed(): bool
     {
-        return $this->menuPositionFixed;
+        return $this->getConfiguration()->isMenuPositionFixed();
     }
 
     public function isShownHomeButton(): bool
     {
-        return $this->showHomeButton;
+        return $this->getConfiguration()->isShowHomeButton();
     }
 
     public function getPageCache(): PageCache

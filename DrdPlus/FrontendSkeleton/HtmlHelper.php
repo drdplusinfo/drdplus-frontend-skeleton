@@ -24,7 +24,8 @@ class HtmlHelper extends StrictObject
     public const INVISIBLE_ID_CLASS = 'invisible-id';
     public const CALCULATION_CLASS = 'calculation';
     public const DATA_ORIGINAL_ID = 'data-original-id';
-    public const EXTERNAL_URL = 'external-url';
+    public const EXTERNAL_URL_CLASS = 'external-url';
+    public const INTERNAL_URL_CLASS = 'internal-url';
 
     /** @var Dirs */
     private $dirs;
@@ -425,10 +426,10 @@ class HtmlHelper extends StrictObject
     {
         /** @var Element $anchor */
         foreach ($htmlDocument->getElementsByTagName('a') as $anchor) {
-            if (!$anchor->classList->contains('internal')
+            if (!$anchor->classList->contains(self::INTERNAL_URL_CLASS)
                 && \preg_match('~^(https?:)?//[^#]~', $anchor->getAttribute('href') ?? '')
             ) {
-                $anchor->classList->add(self::EXTERNAL_URL);
+                $anchor->classList->add(self::EXTERNAL_URL_CLASS);
             }
         }
         $htmlDocument->body->setAttribute('data-has-marked-external-urls', '1');
@@ -448,7 +449,7 @@ class HtmlHelper extends StrictObject
             );
         }
         /** @var Element $anchor */
-        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL_CLASS) as $anchor) {
             if (!$anchor->getAttribute('target')) {
                 $anchor->setAttribute('target', '_blank');
             }
@@ -469,7 +470,7 @@ class HtmlHelper extends StrictObject
         }
         $remoteDrdPlusLinks = [];
         /** @var Element $anchor */
-        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL_CLASS) as $anchor) {
             if (!\preg_match('~(?:https?:)?//(?<host>[[:alpha:]]+\.drdplus\.info)/[^#]*#(?<tableId>tabulka_\w+)~', $anchor->getAttribute('href'), $matches)) {
                 continue;
             }
@@ -510,7 +511,10 @@ class HtmlHelper extends StrictObject
                 'External links have to be marked first, use markExternalLinksByClass method for that'
             );
         }
-        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL) as $anchor) {
+        foreach ($htmlDocument->getElementsByClassName(self::EXTERNAL_URL_CLASS) as $anchor) {
+            $anchor->setAttribute('href', static::turnToLocalLink($anchor->getAttribute('href')));
+        }
+        foreach ($htmlDocument->getElementsByClassName(self::INTERNAL_URL_CLASS) as $anchor) {
             $anchor->setAttribute('href', static::turnToLocalLink($anchor->getAttribute('href')));
         }
         /** @var Element $iFrame */
