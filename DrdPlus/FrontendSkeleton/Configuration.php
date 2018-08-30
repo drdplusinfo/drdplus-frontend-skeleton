@@ -171,7 +171,7 @@ class Configuration extends StrictObject
         return $this->settings;
     }
 
-    public function getWebLastStableVersion(): string
+    public function getWebLastStableMinorVersion(): string
     {
         return $this->getSettings()[static::WEB][static::LAST_STABLE_VERSION];
     }

@@ -39,7 +39,7 @@ class ConfigurationTest extends AbstractContentTest
         $this->createYamlDistributionConfig($distributionYamlContent, $yamlTestingDir);
         $configuration = Configuration::createFromYml($dirs = $this->createDirs($yamlTestingDir));
         self::assertSame($expectedYamlContent, $configuration->getSettings());
-        self::assertSame($expectedYamlContent[Configuration::WEB][Configuration::LAST_STABLE_VERSION], $configuration->getWebLastStableVersion());
+        self::assertSame($expectedYamlContent[Configuration::WEB][Configuration::LAST_STABLE_VERSION], $configuration->getWebLastStableMinorVersion());
         self::assertSame($expectedYamlContent[Configuration::WEB][Configuration::REPOSITORY_URL], $configuration->getWebRepositoryUrl());
         self::assertSame($expectedYamlContent[Configuration::GOOGLE][Configuration::ANALYTICS_ID], $configuration->getGoogleAnalyticsId());
         self::assertSame($dirs, $configuration->getDirs());
@@ -83,7 +83,7 @@ class ConfigurationTest extends AbstractContentTest
         $completeSettings = $this->getCompleteSettings();
         $completeSettings[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = 'master';
         $configuration = new Configuration($this->createDirs(), $completeSettings);
-        self::assertSame('master', $configuration->getWebLastStableVersion());
+        self::assertSame('master', $configuration->getWebLastStableMinorVersion());
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlDocument;
+use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
@@ -59,7 +60,7 @@ class WebContentVersionTest extends AbstractContentTest
     public function I_can_switch_to_every_version(string $source): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        foreach ($webVersions->getAllVersions() as $webVersion) {
+        foreach ($webVersions->getAllMinorVersions() as $webVersion) {
             $post = [];
             $cookies = [];
             $url = $this->getTestsConfiguration()->getLocalUrl();
@@ -111,9 +112,9 @@ class WebContentVersionTest extends AbstractContentTest
         self::assertNotEmpty(
             $tags,
             'Some patch-version tags expected for versions: '
-            . \implode(',', $webVersions->getAllStableVersions())
+            . \implode(',', $webVersions->getAllStableMinorVersions())
         );
-        foreach ($webVersions->getAllStableVersions() as $stableVersion) {
+        foreach ($webVersions->getAllStableMinorVersions() as $stableVersion) {
             $stableVersionTags = [];
             foreach ($tags as $tag) {
                 if (\strpos($tag, $stableVersion) === 0) {
@@ -150,7 +151,7 @@ class WebContentVersionTest extends AbstractContentTest
         $webVersions = new WebVersions($configuration = $this->createConfiguration(), $this->createCurrentVersionProvider());
         $documentRoot = $configuration->getDirs()->getDocumentRoot();
         $checked = 0;
-        foreach ($webVersions->getAllStableVersions() as $stableVersion) {
+        foreach ($webVersions->getAllStableMinorVersions() as $stableVersion) {
             $htmlDocument = $this->getHtmlDocument(['version' => $stableVersion]);
             foreach ($htmlDocument->getElementsByTagName('img') as $image) {
                 $checked += $this->Asset_file_exists($image, 'src', $documentRoot);
@@ -174,5 +175,15 @@ class WebContentVersionTest extends AbstractContentTest
         self::assertFileExists($masterDocumentRoot . '/' . \ltrim($path, '/'), $element->outerHTML);
 
         return 1;
+    }
+
+    /**
+     * @test
+     */
+    public function I_will_get_content_of_last_stable_version_if_requested_does_not_exists(): void
+    {
+        $patchVersion = $this->getHtmlDocument([Request::VERSION => '999.9'])->documentElement->getAttribute('data-content-version');
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
+        self::assertSame($webVersions->getLastStablePatchVersion(), $patchVersion);
     }
 }

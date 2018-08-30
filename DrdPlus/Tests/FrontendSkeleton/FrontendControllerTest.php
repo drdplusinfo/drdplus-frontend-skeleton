@@ -244,9 +244,9 @@ class FrontendControllerTest extends AbstractContentTest
         $webVersionsProperty->setAccessible(true);
         $configuration = $this->mockery(Configuration::class);
         $webVersionsProperty->setValue($controller, $configuration);
-        $configuration->expects('getWebLastStableVersion')
+        $configuration->expects('getWebLastStableMinorVersion')
             ->andReturn('foo');
-        self::assertSame('foo', $controller->getCurrentVersion());
+        self::assertSame('foo', $controller->getCurrentMinorVersion());
     }
 
     /**

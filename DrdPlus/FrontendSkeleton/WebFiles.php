@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\Partials\CurrentVersionProvider;
+use DrdPlus\FrontendSkeleton\Partials\CurrentMinorVersionProvider;
 use Granam\Strict\Object\StrictObject;
 
 /**
@@ -16,10 +16,10 @@ class   WebFiles extends StrictObject implements \IteratorAggregate
     /** @var string */
     private $currentVersion;
 
-    public function __construct(Dirs $dirs, CurrentVersionProvider $currentVersionProvider)
+    public function __construct(Dirs $dirs, CurrentMinorVersionProvider $currentVersionProvider)
     {
         $this->dirs = $dirs;
-        $this->currentVersion = $currentVersionProvider->getCurrentVersion();
+        $this->currentVersion = $currentVersionProvider->getCurrentMinorVersion();
     }
 
     /**

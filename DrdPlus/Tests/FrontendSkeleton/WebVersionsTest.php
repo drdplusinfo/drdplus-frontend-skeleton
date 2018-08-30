@@ -15,7 +15,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_current_version(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider('foo'));
-        self::assertSame('foo', $webVersions->getCurrentVersion());
+        self::assertSame('foo', $webVersions->getCurrentMinorVersion());
     }
 
     /**
@@ -24,14 +24,14 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_current_patch_version(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        if ($webVersions->getCurrentVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
+        if ($webVersions->getCurrentMinorVersion() === $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
             self::assertSame(
                 $this->getTestsConfiguration()->getExpectedLastUnstableVersion(),
                 $webVersions->getCurrentPatchVersion()
             );
         } else {
             self::assertRegExp(
-                '~^' . \preg_quote($webVersions->getCurrentVersion(), '~') . '[.]\d+$~',
+                '~^' . \preg_quote($webVersions->getCurrentMinorVersion(), '~') . '[.]\d+$~',
                 $webVersions->getCurrentPatchVersion()
             );
         }
@@ -43,11 +43,11 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_ask_it_if_code_has_specific_version(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        self::assertTrue($webVersions->hasVersion($this->getTestsConfiguration()->getExpectedLastUnstableVersion()));
+        self::assertTrue($webVersions->hasMinorVersion($this->getTestsConfiguration()->getExpectedLastUnstableVersion()));
         if ($this->getTestsConfiguration()->hasMoreVersions()) {
-            self::assertTrue($webVersions->hasVersion('1.0'));
+            self::assertTrue($webVersions->hasMinorVersion('1.0'));
         }
-        self::assertFalse($webVersions->hasVersion('-1'));
+        self::assertFalse($webVersions->hasMinorVersion('-1'));
     }
 
     /**
@@ -56,9 +56,9 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_last_stable_version(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        $lastStableVersion = $webVersions->getLastStableVersion();
+        $lastStableVersion = $webVersions->getLastStableMinorVersion();
         if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
-            self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $webVersions->getLastStableVersion());
+            self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $webVersions->getLastStableMinorVersion());
         } else {
             self::assertNotSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $lastStableVersion);
             self::assertGreaterThanOrEqual(0, \version_compare($lastStableVersion, '1.0'));
@@ -77,7 +77,7 @@ class WebVersionsTest extends AbstractContentTest
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
         self::assertSame($this->getTestsConfiguration()->getExpectedLastUnstableVersion(), $webVersions->getLastUnstableVersion());
-        $versions = $webVersions->getAllVersions();
+        $versions = $webVersions->getAllMinorVersions();
         $lastVersion = \reset($versions);
         self::assertSame($lastVersion, $webVersions->getLastUnstableVersion());
     }
@@ -88,14 +88,14 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_all_stable_versions(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        $allVersions = $webVersions->getAllVersions();
+        $allVersions = $webVersions->getAllMinorVersions();
         $expectedStableVersions = [];
         foreach ($allVersions as $version) {
             if ($version !== $this->getTestsConfiguration()->getExpectedLastUnstableVersion()) {
                 $expectedStableVersions[] = $version;
             }
         }
-        self::assertSame($expectedStableVersions, $webVersions->getAllStableVersions());
+        self::assertSame($expectedStableVersions, $webVersions->getAllStableMinorVersions());
     }
 
     /**
@@ -151,7 +151,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_all_web_versions(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        $allWebVersions = $webVersions->getAllVersions();
+        $allWebVersions = $webVersions->getAllMinorVersions();
         self::assertNotEmpty($allWebVersions, 'At least single web version (from GIT) expected');
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertSame([$this->getTestsConfiguration()->getExpectedLastUnstableVersion()], $allWebVersions);
@@ -202,7 +202,7 @@ class WebVersionsTest extends AbstractContentTest
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
         self::assertNotEmpty(
             $expectedVersionTags,
-            'Some version tags expected as we have versions ' . \implode(',', $webVersions->getAllStableVersions())
+            'Some version tags expected as we have versions ' . \implode(',', $webVersions->getAllStableMinorVersions())
         );
         $sortedExpectedVersionTags = $this->sortVersionsFromLatest($expectedVersionTags);
         self::assertSame($sortedExpectedVersionTags, $webVersions->getPatchVersions());
@@ -218,7 +218,7 @@ class WebVersionsTest extends AbstractContentTest
 
     private function I_can_get_last_patch_version_for_every_stable_version(array $expectedVersionTags, WebVersions $webVersions): void
     {
-        foreach ($webVersions->getAllStableVersions() as $stableVersion) {
+        foreach ($webVersions->getAllStableMinorVersions() as $stableVersion) {
             $matchingPatchVersionTags = [];
             foreach ($expectedVersionTags as $expectedVersionTag) {
                 if (\strpos($expectedVersionTag, $stableVersion) === 0) {
@@ -253,7 +253,7 @@ class WebVersionsTest extends AbstractContentTest
         $nonExistingVersion = '-999.999';
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
         try {
-            self::assertNotContains($nonExistingVersion, $webVersions->getAllVersions(), 'This version really exists?');
+            self::assertNotContains($nonExistingVersion, $webVersions->getAllMinorVersions(), 'This version really exists?');
         } catch (\Exception $exception) {
             self::fail('No exception expected so far: ' . $exception->getMessage());
         }
@@ -266,7 +266,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_index_of_another_version(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        $versions = $webVersions->getAllVersions();
+        $versions = $webVersions->getAllMinorVersions();
         if (!$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');
 
@@ -285,7 +285,7 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_update_already_fetched_web_version(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
-        foreach ($webVersions->getAllVersions() as $version) {
+        foreach ($webVersions->getAllMinorVersions() as $version) {
             $result = $webVersions->update($version);
             self::assertNotEmpty($result);
         }
@@ -298,7 +298,7 @@ class WebVersionsTest extends AbstractContentTest
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
         $dirs = $this->createDirs();
-        foreach ($webVersions->getAllVersions() as $version) {
+        foreach ($webVersions->getAllMinorVersions() as $version) {
             $versionRoot = $dirs->getVersionRoot($version);
             if (\file_exists($versionRoot)) {
                 $versionRootEscaped = \escapeshellarg($versionRoot);

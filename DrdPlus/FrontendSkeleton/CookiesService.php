@@ -10,7 +10,7 @@ class CookiesService extends StrictObject
 {
     public const VERSION = 'version';
 
-    public function setVersionCookie(string $version): bool
+    public function setMinorVersionCookie(string $version): bool
     {
         return $this->setCookie(static::VERSION, $version, true /* not accessible from JS */, new \DateTime('+ 1 year'));
     }

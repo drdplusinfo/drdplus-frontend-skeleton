@@ -17,12 +17,12 @@ if (PHP_SAPI !== 'cli') {
 
 $configuration = $configuration ?? \DrdPlus\FrontendSkeleton\Configuration::createFromYml($dirs);
 $controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController($configuration, $htmlHelper);
-$controller->getCookiesService()->setVersionCookie($controller->getCurrentVersion());
-
 if ($controller->isRequestedWebVersionUpdate()) {
     $controller->updateWebVersion();
     echo 'OK';
-    exit;
+
+    return;
 }
+$controller->persistCurrentVersion();
 /** @noinspection PhpIncludeInspection */
 echo require $dirs->getGenericPartsRoot() . '/content.php';

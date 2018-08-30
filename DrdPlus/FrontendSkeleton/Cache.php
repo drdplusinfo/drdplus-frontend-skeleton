@@ -41,7 +41,7 @@ abstract class Cache extends StrictObject
      */
     public function getCacheDir(): string
     {
-        $currentVersion = $this->webVersions->getCurrentVersion();
+        $currentVersion = $this->webVersions->getCurrentMinorVersion();
         if (($this->cacheRoots[$currentVersion] ?? null) === null) {
             $cacheRoot = $this->cacheRootDir . '/' . $currentVersion;
             if (!\file_exists($cacheRoot)) {
@@ -194,7 +194,7 @@ abstract class Cache extends StrictObject
     {
         $foldersToSkip = ['.', '..', '.gitignore'];
         $currentCacheStamp = $this->webVersions->getCurrentCommitHash();
-        $currentVersion = $this->webVersions->getCurrentVersion();
+        $currentVersion = $this->webVersions->getCurrentMinorVersion();
         $cacheRoot = $this->cacheRoots[$currentVersion];
         foreach (\scandir($cacheRoot, \SCANDIR_SORT_NONE) as $folder) {
             if (\in_array($folder, $foldersToSkip, true)) {

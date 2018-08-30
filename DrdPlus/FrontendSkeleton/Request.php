@@ -8,6 +8,9 @@ use DeviceDetector\Parser\Bot;
 
 class Request extends StrictObject
 {
+
+    public const VERSION = 'version';
+    public const UPDATE = 'update';
     /**
      * @var Bot
      */

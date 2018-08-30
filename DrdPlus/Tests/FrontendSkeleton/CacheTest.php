@@ -21,7 +21,7 @@ class CacheTest extends TestWithMockery
     public function I_will_get_cache_dir_depending_on_current_version(): void
     {
         $webVersions = $this->mockery(WebVersions::class);
-        $webVersions->shouldReceive('getCurrentVersion')
+        $webVersions->shouldReceive('getCurrentMinorVersion')
             ->andReturnValues(['master', '9.8.7']); // sequential, returns different value for first and second call
         $dirs = $this->createDirs();
         /** @var WebVersions $webVersions */
