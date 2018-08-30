@@ -251,4 +251,21 @@ class FrontendController extends StrictObject implements CurrentVersionProvider
     {
         return $this->getRequest()->getValue('version') ?? $this->getConfiguration()->getWebLastStableVersion();
     }
+
+    public function isRequestedWebVersionUpdate(): bool
+    {
+        return $this->getRequest()->getValue('update') === 'web';
+    }
+
+    public function updateWebVersion(): int
+    {
+        $updatedVersions = 0;
+        // sadly we do not know which version has been updated, so we will update all of them
+        foreach ($this->getWebVersions()->getAllVersions() as $version) {
+            $this->getWebVersions()->update($version);
+            $updatedVersions++;
+        }
+
+        return $updatedVersions;
+    }
 }
