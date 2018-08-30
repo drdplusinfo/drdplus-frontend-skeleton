@@ -127,7 +127,7 @@ class FrontendController extends StrictObject implements CurrentMinorVersionProv
         return \ob_get_clean();
     }
 
-    public function getWebContent(): string
+    public function fetchWebContent(): string
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
         $controller = $this;
@@ -283,5 +283,13 @@ class FrontendController extends StrictObject implements CurrentMinorVersionProv
     public function persistCurrentVersion(): bool
     {
         return $this->getCookiesService()->setMinorVersionCookie($this->getCurrentMinorVersion());
+    }
+
+    public function getContent(): string
+    {
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $controller = $this;
+        /** @noinspection PhpIncludeInspection */
+        return require $this->getConfiguration()->getDirs()->getGenericPartsRoot() . '/content.php';
     }
 }

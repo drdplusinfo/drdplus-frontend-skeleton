@@ -24,5 +24,5 @@ if ($controller->isRequestedWebVersionUpdate()) {
     return;
 }
 $controller->persistCurrentVersion();
-/** @noinspection PhpIncludeInspection */
-echo require $dirs->getGenericPartsRoot() . '/content.php';
+
+echo $controller->getContent();
