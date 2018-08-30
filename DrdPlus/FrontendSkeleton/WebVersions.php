@@ -319,8 +319,10 @@ class WebVersions extends StrictObject
             return $this->clone($minorVersion, $toMinorVersionDir);
         }
         $toMinorVersionDirEscaped = \escapeshellarg($toMinorVersionDir);
+        $minorVersionEscaped = \escapeshellarg($minorVersion);
         $commands = [];
         $commands[] = "cd $toMinorVersionDirEscaped";
+        $commands[] = "git checkout $minorVersionEscaped";
         $commands[] = 'git pull --ff-only';
         $commands[] = 'git pull --tags';
         try {
