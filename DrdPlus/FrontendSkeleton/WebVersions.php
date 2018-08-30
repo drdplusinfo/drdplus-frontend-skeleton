@@ -223,8 +223,8 @@ class WebVersions extends StrictObject
     /**
      * @param string $minorVersion
      * @return bool
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateGitVersion
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneWebVersionViaGit
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateWebVersionViaGit
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
      */
     protected function ensureMinorVersionExists(string $minorVersion): bool
@@ -243,38 +243,82 @@ class WebVersions extends StrictObject
     /**
      * @param string $minorVersion
      * @param string $toVersionDir
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneGitVersion
+     * @return array
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneWebVersionViaGit
      */
-    private function clone(string $minorVersion, string $toVersionDir): void
+    private function clone(string $minorVersion, string $toVersionDir): array
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
         $toVersionEscaped = \escapeshellarg($minorVersion);
         $command = "git clone --branch $toVersionEscaped {$this->configuration->getWebRepositoryUrl()} $toVersionDirEscaped 2>&1";
         \exec($command, $rows, $returnCode);
         if ($returnCode !== 0) {
-            throw new Exceptions\CanNotLocallyCloneGitVersion(
-                "Can not git clone required version '{$minorVersion}' by command '{$command}'"
+            if ($this->remoteBranchExists($minorVersion)) {
+                throw new Exceptions\CanNotLocallyCloneWebVersionViaGit(
+                    "Can not git clone required version '{$minorVersion}' by command '{$command}'"
+                    . ", got return code '{$returnCode}' and output\n"
+                    . \implode("\n", $rows)
+                );
+            }
+            throw new Exceptions\UnknownWebVersion(
+                "Required web minor version $minorVersion as a GIT branch does not exists:\n'{$command}' => " . \implode("\n", $rows)
+            );
+        }
+
+        return $rows;
+    }
+
+    protected function remoteBranchExists(string $branchName): bool
+    {
+        $command = 'git branch --remotes 2>&1';
+        \exec($command, $rows, $returnCode);
+        if ($returnCode !== 0) {
+            throw new Exceptions\CanNotFindOutRemoteBranches(
+                "Can not get remote branches from git by command '{$command}'"
                 . ", got return code '{$returnCode}' and output\n"
                 . \implode("\n", $rows)
             );
         }
+        foreach ($rows as $remoteBranch) {
+            $branchFromRemote = \trim(\explode('/', $remoteBranch)[1] ?? '');
+            if ($branchName === $branchFromRemote) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public function update(string $minorVersion): void
+    /**
+     * @param string $minorVersion
+     * @return array
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotUpdateWebVersionViaGit
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneWebVersionViaGit
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownWebVersion
+     */
+    public function update(string $minorVersion): array
     {
-        $toVersionDir = $this->configuration->getDirs()->getVersionRoot($minorVersion);
-        $toVersionDirEscaped = \escapeshellarg($toVersionDir);
+        $toMinorVersionDir = $this->configuration->getDirs()->getVersionRoot($minorVersion);
+        if (!\file_exists($toMinorVersionDir)) {
+            return $this->clone($minorVersion, $toMinorVersionDir);
+        }
+        $toMinorVersionDirEscaped = \escapeshellarg($toMinorVersionDir);
         $commands = [];
-        $commands[] = "cd $toVersionDirEscaped";
+        $commands[] = "cd $toMinorVersionDirEscaped";
         $commands[] = 'git pull --ff-only';
         $commands[] = 'git pull --tags';
         try {
-            $this->executeCommandsChainArray($commands);
+            return $this->executeCommandsChainArray($commands);
         } catch (ExecutingCommandFailed $executingCommandFailed) {
-            throw new Exceptions\CanNotUpdateGitVersion(
-                "Can not update required version '{$minorVersion}': " . $executingCommandFailed->getMessage(),
-                $executingCommandFailed->getCode(),
-                $executingCommandFailed
+            if ($this->remoteBranchExists($minorVersion)) {
+                throw new Exceptions\CanNotUpdateWebVersionViaGit(
+                    "Can not update required version '{$minorVersion}': " . $executingCommandFailed->getMessage(),
+                    $executingCommandFailed->getCode(),
+                    $executingCommandFailed
+                );
+            }
+            throw new Exceptions\UnknownWebVersion(
+                "Required web minor version $minorVersion as a GIT branch does not exists:\n{$executingCommandFailed->getMessage()}"
             );
         }
     }

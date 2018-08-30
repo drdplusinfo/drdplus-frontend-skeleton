@@ -278,4 +278,46 @@ class WebVersionsTest extends AbstractContentTest
             'Expected at least two versions to test, got only ' . \implode(',', $versions)
         );
     }
+
+    /**
+     * @test
+     */
+    public function I_can_update_already_fetched_web_version(): void
+    {
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
+        foreach ($webVersions->getAllVersions() as $version) {
+            $result = $webVersions->update($version);
+            self::assertNotEmpty($result);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_update_web_version_even_if_not_yet_fetched_locally(): void
+    {
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
+        $dirs = $this->createDirs();
+        foreach ($webVersions->getAllVersions() as $version) {
+            $versionRoot = $dirs->getVersionRoot($version);
+            if (\file_exists($versionRoot)) {
+                $versionRootEscaped = \escapeshellarg($versionRoot);
+                \exec("rm -fr $versionRootEscaped 2>&1", $output, $returnCode);
+                self::assertSame(0, $returnCode, "Can not remove $versionRoot, got " . implode("\n", $output));
+            }
+            $result = $webVersions->update($version);
+            self::assertNotEmpty($result);
+        }
+    }
+
+    /**
+     * @test
+     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\UnknownWebVersion
+     * @expectedExceptionMessageRegExp ~999[.]999~
+     */
+    public function I_can_not_update_non_existing_web_version(): void
+    {
+        $webVersions = new WebVersions($this->createConfiguration(), $this->createCurrentVersionProvider());
+        $webVersions->update('999.999');
+    }
 }
