@@ -65,4 +65,67 @@ class RequestTest extends TestWithMockery
             );
         }
     }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     */
+    public function I_can_get_current_url_even_if_query_string_is_not_set(): void
+    {
+        $request = new Request(new Bot());
+        unset($_SERVER['QUERY_STRING']);
+        self::assertSame('', $request->getCurrentUrl());
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     */
+    public function I_can_get_current_url_with_updated_query_parameters(): void
+    {
+        $request = new Request(new Bot());
+        $_GET = ['foo' => 123, 'bar' => 456];
+        self::assertSame('?foo=0&bar=456&baz=OK', $request->getCurrentUrl(['foo' => false, 'baz' => 'OK']));
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     */
+    public function I_can_get_current_url_with_updated_query_parameters_even_if_get_is_not_set(): void
+    {
+        $request = new Request(new Bot());
+        unset($_GET);
+        $currentUrl = $request->getCurrentUrl(['foo' => true]);
+        global $_GET; // because backup globals do not works for unset global
+        $_GET = [];
+        self::assertSame('?foo=1', $currentUrl);
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     * @dataProvider provideRequestUri
+     * @param null|string $requestUri
+     * @param string $expectedCurrentUri
+     */
+    public function I_can_get_current_request_uri(?string $requestUri, string $expectedCurrentUri): void
+    {
+        $request = new Request(new Bot());
+        if ($requestUri === null) {
+            unset($_SERVER['REQUEST_URI']);
+        } else {
+            $_SERVER['REQUEST_URI'] = $requestUri;
+        }
+        self::assertSame($expectedCurrentUri, $request->getCurrentUri());
+    }
+
+    public function provideRequestUri(): array
+    {
+        return [
+            [null, ''],
+            ['/', '/'],
+            ['/update/web', '/update/web'],
+        ];
+    }
 }

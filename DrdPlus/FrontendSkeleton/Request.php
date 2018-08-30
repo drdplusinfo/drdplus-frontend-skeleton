@@ -42,11 +42,6 @@ class Request extends StrictObject
         return "{$protocol}://{$_SERVER['SERVER_NAME']}{$portString}";
     }
 
-    public function getRequestRelativeRootUrl(): string
-    {
-        return $this->getServerUrl() . '/' . \rtrim(\dirname($_SERVER['REQUEST_URI'], '/')); /* to get index relative to current URl */
-    }
-
     public function isVisitorBot(string $userAgent = null): bool
     {
         $this->botParser->setUserAgent($userAgent ?? $_SERVER['HTTP_USER_AGENT'] ?? '');
@@ -55,16 +50,22 @@ class Request extends StrictObject
         return (bool)$this->botParser->parse();
     }
 
+    public function getCurrentUri(): string
+    {
+        return $_SERVER['REQUEST_URI'] ?? '';
+    }
+
     public function getCurrentUrl(array $parameters = []): string
     {
+        $currentRequestUri = $this->getCurrentUri();
         if ($parameters === []) {
-            return $_SERVER['QUERY_STRING'] !== []
+            return $currentRequestUri . ($_SERVER['QUERY_STRING'] ?? '') !== ''
                 ? '?' . $_SERVER['QUERY_STRING']
                 : '';
         }
-        $queryParameters = \array_merge($_GET, $parameters);
+        $queryParameters = \array_merge($_GET ?? [], $parameters);
 
-        return '?' . \http_build_query($queryParameters);
+        return $currentRequestUri . '?' . \http_build_query($queryParameters);
     }
 
     public function getValue(string $name): ?string
