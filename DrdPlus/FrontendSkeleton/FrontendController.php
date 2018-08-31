@@ -19,8 +19,6 @@ class FrontendController extends StrictObject
     protected $pageCache;
     /** @var Redirect|null */
     private $redirect;
-    /** @var CookiesService */
-    private $cookiesService;
     /** @var Content */
     private $content;
 
@@ -80,15 +78,6 @@ class FrontendController extends StrictObject
         return $this->getConfiguration()->isShowHomeButton();
     }
 
-    public function getCookiesService(): CookiesService
-    {
-        if ($this->cookiesService === null) {
-            $this->cookiesService = new CookiesService();
-        }
-
-        return $this->cookiesService;
-    }
-
     public function isRequestedWebVersionUpdate(): bool
     {
         return $this->getRequest()->getValue(Request::UPDATE) === 'web';
@@ -108,7 +97,7 @@ class FrontendController extends StrictObject
 
     public function persistCurrentVersion(): bool
     {
-        return $this->getCookiesService()->setMinorVersionCookie(
+        return $this->getServicesContainer()->getCookiesService()->setMinorVersionCookie(
             $this->getServicesContainer()->getWebVersions()->getCurrentMinorVersion()
         );
     }

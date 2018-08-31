@@ -35,6 +35,8 @@ class ServicesContainer extends StrictObject
     protected $request;
     /** @var BotParser */
     protected $botParser;
+    /** @var CookiesService */
+    private $cookiesService;
 
     public function __construct(Configuration $configuration, HtmlHelper $htmlHelper)
     {
@@ -141,4 +143,14 @@ class ServicesContainer extends StrictObject
 
         return $this->webFiles;
     }
+
+    public function getCookiesService(): CookiesService
+    {
+        if ($this->cookiesService === null) {
+            $this->cookiesService = new CookiesService();
+        }
+
+        return $this->cookiesService;
+    }
+
 }

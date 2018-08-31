@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\CookiesService;
 use DrdPlus\FrontendSkeleton\ServicesContainer;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
@@ -14,9 +15,9 @@ class ServicesContainerTest extends AbstractContentTest
     public function I_can_get_web_versions(): void
     {
         $servicesContainerClass = static::getSutClass();
-        /** @var ServicesContainer $controller */
-        $controller = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertNotEmpty($controller->getWebVersions());
+        /** @var ServicesContainer $servicesContainer */
+        $servicesContainer = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
+        self::assertNotEmpty($servicesContainer->getWebVersions());
     }
 
     /**
@@ -25,9 +26,9 @@ class ServicesContainerTest extends AbstractContentTest
     public function I_can_get_web_files(): void
     {
         $servicesContainerClass = static::getSutClass();
-        /** @var ServicesContainer $controller */
-        $controller = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertNotEmpty($controller->getWebFiles());
+        /** @var ServicesContainer $servicesContainer */
+        $servicesContainer = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
+        self::assertNotEmpty($servicesContainer->getWebFiles());
     }
 
     /**
@@ -36,9 +37,9 @@ class ServicesContainerTest extends AbstractContentTest
     public function I_can_get_request(): void
     {
         $servicesContainerClass = static::getSutClass();
-        /** @var ServicesContainer $controller */
-        $controller = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertNotEmpty($controller->getRequest());
+        /** @var ServicesContainer $servicesContainer */
+        $servicesContainer = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
+        self::assertNotEmpty($servicesContainer->getRequest());
     }
 
     /**
@@ -47,13 +48,23 @@ class ServicesContainerTest extends AbstractContentTest
     public function I_can_get_page_cache_with_properly_set_production_mode(): void
     {
         $servicesContainerClass = static::getSutClass();
-        /** @var ServicesContainer $controller */
-        $controller = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper(null, true /* in production */));
-        self::assertTrue($controller->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
+        /** @var ServicesContainer $servicesContainer */
+        $servicesContainer = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper(null, true /* in production */));
+        self::assertTrue($servicesContainer->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
         $servicesContainerClass = static::getSutClass();
-        /** @var ServicesContainer $controller */
-        $controller = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper(null, false /* not in production */));
-        self::assertFalse($controller->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
+        /** @var ServicesContainer $servicesContainer */
+        $servicesContainer = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper(null, false /* not in production */));
+        self::assertFalse($servicesContainer->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
     }
 
+    /**
+     * @test
+     */
+    public function I_can_get_cookies_service(): void
+    {
+        $servicesContainerClass = static::getSutClass();
+        /** @var ServicesContainer $servicesContainer */
+        $servicesContainer = new $servicesContainerClass($this->createConfiguration(), $this->createHtmlHelper());
+        self::assertEquals(new CookiesService(), $servicesContainer->getCookiesService());
+    }
 }
