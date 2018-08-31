@@ -16,8 +16,10 @@ class WebContentTest extends AbstractContentTest
      */
     public function Page_has_title(): void
     {
+        $expectedPageTitle = $this->getTestsConfiguration()->getExpectedPageTitle();
         $currentPageTitle = $this->getCurrentPageTitle();
         self::assertNotEmpty($currentPageTitle, 'Page title is missing on page');
+        self::assertSame($expectedPageTitle, $currentPageTitle, 'Current page title differs from expected one');
     }
 
     /**

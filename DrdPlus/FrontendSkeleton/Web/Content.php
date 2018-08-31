@@ -6,48 +6,26 @@ namespace DrdPlus\FrontendSkeleton\Web;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\PageCache;
-use DrdPlus\FrontendSkeleton\Partials\CurrentPatchVersionProvider;
 use DrdPlus\FrontendSkeleton\Redirect;
+use DrdPlus\FrontendSkeleton\ServicesContainer;
 use Granam\Strict\Object\StrictObject;
 
 class Content extends StrictObject
 {
-    /** @var Menu */
-    private $menu;
-    /** @var PageCache */
-    private $pageCache;
-    /** @var HtmlHelper */
-    private $htmlHelper;
-    /** @var CurrentPatchVersionProvider */
-    private $currentPatchVersionProvider;
     /** @var Redirect|null */
     private $redirect;
     /** @var array */
     private $bodyClasses;
-    /** @var Head */
-    private $head;
-    /**
-     * @var Body
-     */
-    private $body;
+    /** @var ServicesContainer */
+    private $servicesContainer;
 
     public function __construct(
-        Menu $menu,
-        Head $head,
-        Body $body,
-        PageCache $pageCache,
-        HtmlHelper $htmlHelper,
-        CurrentPatchVersionProvider $currentPatchVersionProvider,
+        ServicesContainer $servicesContainer,
         ?Redirect $redirect,
         array $bodyClasses = []
     )
     {
-        $this->menu = $menu;
-        $this->head = $head;
-        $this->body = $body;
-        $this->pageCache = $pageCache;
-        $this->htmlHelper = $htmlHelper;
-        $this->currentPatchVersionProvider = $currentPatchVersionProvider;
+        $this->servicesContainer = $servicesContainer;
         $this->redirect = $redirect;
         $this->bodyClasses = $bodyClasses;
     }
@@ -104,7 +82,7 @@ class Content extends StrictObject
 
     private function getHtmlHelper(): HtmlHelper
     {
-        return $this->htmlHelper;
+        return $this->servicesContainer->getHtmlHelper();
     }
 
     private function injectCacheId(HtmlDocument $htmlDocument): void
@@ -114,27 +92,26 @@ class Content extends StrictObject
 
     private function composeContent(): string
     {
-        $bodyClasses = \implode(' ', $this->bodyClasses);
+        $patchVersion = $this->servicesContainer->getWebVersions()->getCurrentPatchVersion();
         $now = \date(\DATE_ATOM);
+        $head = $this->servicesContainer->getHead()->getHeadString();
+        $bodyClasses = \implode(' ', $this->bodyClasses);
+        $menu = $this->servicesContainer->getMenu()->getMenuString();
+        $body = $this->servicesContainer->getBody()->getBodyString();
 
         return <<<HTML
 <!DOCTYPE html>
-<html lang="cs" data-content-version="{$this->currentPatchVersionProvider->getCurrentPatchVersion()}" data-cached-at="{$now}">
+<html lang="cs" data-content-version="{$patchVersion}" data-cached-at="{$now}">
 <head>
-    {$this->getHead()->getHeadString()}
+    {$head}
 </head>
 <body class="container {$bodyClasses}">
   <div class="background-image"></div>
-    {$this->getMenu()->getMenuString()}
-    {$this->getBody()->getBodyString()}
+    {$menu}
+    {$body}
 </body>
 </html>
 HTML;
-    }
-
-    public function getMenu(): Menu
-    {
-        return $this->menu;
     }
 
     private function getCachedContent(): ?string
@@ -148,7 +125,7 @@ HTML;
 
     private function getPageCache(): PageCache
     {
-        return $this->pageCache;
+        return $this->servicesContainer->getPageCache();
     }
 
     private function injectRedirectIfAny(string $content): string
@@ -170,15 +147,4 @@ HTML;
     {
         return $this->redirect;
     }
-
-    private function getHead(): Head
-    {
-        return $this->head;
-    }
-
-    private function getBody(): Body
-    {
-        return $this->body;
-    }
-
 }

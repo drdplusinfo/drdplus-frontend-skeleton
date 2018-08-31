@@ -117,7 +117,7 @@ class RequestTest extends TestWithMockery
         } else {
             $_SERVER['REQUEST_URI'] = $requestUri;
         }
-        self::assertSame($expectedCurrentUri, $request->getCurrentUri());
+        self::assertSame($expectedCurrentUri, $request->getCurrentBaseUrl());
     }
 
     public function provideRequestUri(): array

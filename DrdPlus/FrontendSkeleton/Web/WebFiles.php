@@ -42,7 +42,7 @@ class   WebFiles extends StrictObject implements \IteratorAggregate
 
     /**
      * @return array|string[]
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownWebFilesDir
+     * @throws \DrdPlus\FrontendSkeleton\Web\Exceptions\UnknownWebFilesDir
      */
     private function getUnsortedWebFileNames(): array
     {

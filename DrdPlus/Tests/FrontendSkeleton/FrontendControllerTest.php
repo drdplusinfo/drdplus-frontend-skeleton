@@ -8,79 +8,12 @@ use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\Redirect;
-use DrdPlus\FrontendSkeleton\WebVersions;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
 
 class FrontendControllerTest extends AbstractContentTest
 {
-    /**
-     * @test
-     */
-    public function I_can_pass_every_sub_root(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertSame($this->getTestsConfiguration()->getExpectedGoogleAnalyticsId(), $controller->getGoogleAnalyticsId());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_get_web_name(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertSame($this->getTestsConfiguration()->getExpectedWebName(), $controller->getWebName());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_get_page_title(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertSame($this->getTestsConfiguration()->getExpectedPageTitle(), $controller->getPageTitle());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_get_web_versions(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertNotEmpty($controller->getWebVersions());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_get_web_files(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertNotEmpty($controller->getWebFiles());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_get_request(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        self::assertNotEmpty($controller->getRequest());
-    }
-
     /**
      * @test
      */
@@ -172,21 +105,6 @@ class FrontendControllerTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_can_get_page_cache_with_properly_set_production_mode(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper(null, true /* in production */));
-        self::assertTrue($controller->getPageCache()->isInProduction(), 'Expected page cache to be in production mode');
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper(null, false /* not in production */));
-        self::assertFalse($controller->getPageCache()->isInProduction(), 'Expected page cache to be not in production mode');
-    }
-
-    /**
-     * @test
-     */
     public function I_can_set_and_get_redirect(): void
     {
         $controllerClass = static::getSutClass();
@@ -233,7 +151,7 @@ class FrontendControllerTest extends AbstractContentTest
      * @test
      * @throws \ReflectionException
      */
-    public function I_can_get_current_version(): void
+    public function I_can_get_current_minor_version(): void
     {
         $controllerClass = static::getSutClass();
         /** @var FrontendController $controller */
@@ -247,25 +165,5 @@ class FrontendControllerTest extends AbstractContentTest
         $configuration->expects('getWebLastStableMinorVersion')
             ->andReturn('foo');
         self::assertSame('foo', $controller->getCurrentMinorVersion());
-    }
-
-    /**
-     * @test
-     * @throws \ReflectionException
-     */
-    public function I_can_get_current_patch_version(): void
-    {
-        $controllerClass = static::getSutClass();
-        /** @var FrontendController $controller */
-        $controller = new $controllerClass($this->createConfiguration(), $this->createHtmlHelper());
-        $reflection = new \ReflectionClass(FrontendController::class);
-        self::assertTrue($reflection->hasProperty('webVersions'), FrontendController::class . ' no more has webVersions property');
-        $webVersionsProperty = $reflection->getProperty('webVersions');
-        $webVersionsProperty->setAccessible(true);
-        $webVersions = $this->mockery(WebVersions::class);
-        $webVersionsProperty->setValue($controller, $webVersions);
-        $webVersions->expects('getCurrentPatchVersion')
-            ->andReturn('foo');
-        self::assertSame('foo', $controller->getCurrentPatchVersion());
     }
 }

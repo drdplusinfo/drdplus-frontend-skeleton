@@ -16,7 +16,8 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $configuration = $configuration ?? \DrdPlus\FrontendSkeleton\Configuration::createFromYml($dirs);
-$controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController($configuration, $htmlHelper);
+$servicesContainer = $servicesContainer ?? new \DrdPlus\FrontendSkeleton\ServicesContainer($configuration, $htmlHelper);
+$controller = $controller ?? new \DrdPlus\FrontendSkeleton\FrontendController($servicesContainer);
 if ($controller->isRequestedWebVersionUpdate()) {
     $controller->updateWebVersion();
     echo 'OK';

@@ -28,15 +28,11 @@ class Head extends StrictObject
 
     public function getHeadString(): string
     {
-        $googleAnalyticsId = $this->getConfiguration()->getGoogleAnalyticsId();
-
         return <<<HTML
 <title>{$this->getPageTitle()}</title>
 <link rel="shortcut icon" href="/favicon.ico">
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
-<script id="googleAnalyticsId" data-google-analytics-id="{$googleAnalyticsId}"
-async src="https://www.googletagmanager.com/gtag/js?id={$googleAnalyticsId}"></script>
 {$this->getRenderedJsScripts()}
 {$this->getRenderedCssFiles()}
 HTML;
@@ -62,7 +58,10 @@ HTML;
 
     private function getRenderedJsScripts(): string
     {
-        $renderedJsFiles = [];
+        $renderedJsFiles = [<<<HTML
+<script async src="https://www.googletagmanager.com/gtag/js?id={$this->getConfiguration()->getGoogleAnalyticsId()}"></script>
+HTML
+        ];
         foreach ($this->getJsFiles() as $jsFile) {
             $renderedJsFiles[] = "<script type='text/javascript' src='/js/{$jsFile}'></script>";
         }

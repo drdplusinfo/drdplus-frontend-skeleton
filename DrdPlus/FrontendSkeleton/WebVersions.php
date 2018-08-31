@@ -18,8 +18,6 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
 
     /** @var Configuration */
     private $configuration;
-    /** @var CurrentMinorVersionProvider */
-    private $currentMinorVersionProvider;
     /** @var string[] */
     private $allVersions;
     /** @var string */
@@ -40,11 +38,13 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
     private $lastPatchVersionsOf = [];
     /** @var string */
     private $lastUnstableVersionRoot;
+    /** @var Request */
+    private $request;
 
-    public function __construct(Configuration $configuration, CurrentMinorVersionProvider $currentVersionProvider)
+    public function __construct(Configuration $configuration, Request $request)
     {
         $this->configuration = $configuration;
-        $this->currentMinorVersionProvider = $currentVersionProvider;
+        $this->request = $request;
     }
 
     /**
@@ -195,12 +195,14 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
         return $this->currentPatchVersion;
     }
 
-    /**
-     * @return string
-     */
     public function getCurrentMinorVersion(): string
     {
-        return $this->currentMinorVersionProvider->getCurrentMinorVersion();
+        $minorVersion = $this->request->getValue(Request::VERSION);
+        if ($minorVersion && $this->hasMinorVersion($minorVersion)) {
+            return $minorVersion;
+        }
+
+        return $this->configuration->getWebLastStableMinorVersion();
     }
 
     /**

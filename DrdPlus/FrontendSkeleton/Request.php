@@ -53,22 +53,16 @@ class Request extends StrictObject
         return (bool)$this->botParser->parse();
     }
 
-    public function getCurrentUri(): string
-    {
-        return $_SERVER['REQUEST_URI'] ?? '';
-    }
-
     public function getCurrentUrl(array $parameters = []): string
     {
-        $currentRequestUri = $this->getCurrentUri();
         if ($parameters === []) {
-            return $currentRequestUri . ($_SERVER['QUERY_STRING'] ?? '') !== ''
+            return ($_SERVER['QUERY_STRING'] ?? '') !== ''
                 ? '?' . $_SERVER['QUERY_STRING']
                 : '';
         }
         $queryParameters = \array_merge($_GET ?? [], $parameters);
 
-        return $currentRequestUri . '?' . \http_build_query($queryParameters);
+        return '?' . \http_build_query($queryParameters);
     }
 
     public function getValue(string $name): ?string
