@@ -38,6 +38,7 @@ class FrontendController extends StrictObject
     public function setRedirect(Redirect $redirect): void
     {
         $this->redirect = $redirect;
+        $this->content = null; // reload content with new redirect
     }
 
     public function getRedirect(): ?Redirect

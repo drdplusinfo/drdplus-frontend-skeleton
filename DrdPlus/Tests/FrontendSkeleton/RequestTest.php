@@ -101,31 +101,4 @@ class RequestTest extends TestWithMockery
         $_GET = [];
         self::assertSame('?foo=1', $currentUrl);
     }
-
-    /**
-     * @test
-     * @backupGlobals enabled
-     * @dataProvider provideRequestUri
-     * @param null|string $requestUri
-     * @param string $expectedCurrentUri
-     */
-    public function I_can_get_current_request_uri(?string $requestUri, string $expectedCurrentUri): void
-    {
-        $request = new Request(new Bot());
-        if ($requestUri === null) {
-            unset($_SERVER['REQUEST_URI']);
-        } else {
-            $_SERVER['REQUEST_URI'] = $requestUri;
-        }
-        self::assertSame($expectedCurrentUri, $request->getCurrentBaseUrl());
-    }
-
-    public function provideRequestUri(): array
-    {
-        return [
-            [null, ''],
-            ['/', '/'],
-            ['/update/web', '/update/web'],
-        ];
-    }
 }

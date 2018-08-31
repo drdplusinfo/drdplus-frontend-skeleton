@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
-use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
-use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\Redirect;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
@@ -29,7 +27,7 @@ class TrialTest extends AbstractContentTest
         self::assertSame($cacheId, $firstWithoutRedirect->documentElement->getAttribute('data-cache-id'));
         /** @var Element $redirectElement */
         $redirectElement = $firstWithRedirect->getElementById('meta_redirect');
-        self::assertNotNull($redirectElement);
+        self::assertNotNull($redirectElement, 'Missing expected element with ID "meta_redirect"');
         self::assertSame('Refresh', $redirectElement->getAttribute('http-equiv'));
         self::assertSame('12345; url=/foo', $redirectElement->getAttribute('content'));
 
@@ -48,12 +46,5 @@ class TrialTest extends AbstractContentTest
         $secondWithoutRedirect = new HtmlDocument($content);
         self::assertSame($cacheId, $firstWithoutRedirect->documentElement->getAttribute('data-cache-id'));
         self::assertNull($secondWithoutRedirect->getElementById('meta_redirect'));
-    }
-
-    protected function createController(): FrontendController
-    {
-        $dirs = $this->createDirs();
-
-        return new FrontendController($this->createConfiguration($dirs), new HtmlHelper($dirs, true, false, false, false));
     }
 }
