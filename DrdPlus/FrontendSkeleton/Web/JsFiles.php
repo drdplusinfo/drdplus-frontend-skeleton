@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace DrdPlus\FrontendSkeleton;
+namespace DrdPlus\FrontendSkeleton\Web;
 
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\Partials\AbstractPublicFiles;
 
 class JsFiles extends AbstractPublicFiles
@@ -12,7 +13,7 @@ class JsFiles extends AbstractPublicFiles
      */
     private $jsRoot;
 
-    public function __construct(bool $preferMinified, Dirs $dirs)
+    public function __construct(Dirs $dirs, bool $preferMinified)
     {
         parent::__construct($preferMinified);
         $this->jsRoot = \rtrim($dirs->getJsRoot(), '\/');

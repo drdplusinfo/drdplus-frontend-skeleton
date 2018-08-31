@@ -151,13 +151,6 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $titles->current()->nodeValue;
     }
 
-    protected function getDefinedPageTitle(): string
-    {
-        $dirs = $this->createDirs();
-
-        return (new FrontendController($this->createConfiguration($dirs), $this->createHtmlHelper($dirs)))->getPageTitle();
-    }
-
     /**
      * @param Dirs $dirs
      * @param bool $inDevMode

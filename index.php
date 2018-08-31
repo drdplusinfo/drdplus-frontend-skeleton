@@ -25,4 +25,4 @@ if ($controller->isRequestedWebVersionUpdate()) {
 }
 $controller->persistCurrentVersion();
 
-echo $controller->getContent();
+echo $controller->getContent()->getStringContent();

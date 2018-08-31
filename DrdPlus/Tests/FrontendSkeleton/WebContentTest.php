@@ -5,11 +5,10 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
-use Granam\String\StringTools;
 use Gt\Dom\Element;
 use Gt\Dom\Node;
 
-class ContentTest extends AbstractContentTest
+class WebContentTest extends AbstractContentTest
 {
 
     /**
@@ -17,11 +16,8 @@ class ContentTest extends AbstractContentTest
      */
     public function Page_has_title(): void
     {
-        $definedPageTitle = $this->getDefinedPageTitle();
         $currentPageTitle = $this->getCurrentPageTitle();
-        self::assertNotEmpty($definedPageTitle, 'Page title is not defined');
         self::assertNotEmpty($currentPageTitle, 'Page title is missing on page');
-        self::assertSame($definedPageTitle, $currentPageTitle, 'Defined and current page titles should be the same');
     }
 
     /**

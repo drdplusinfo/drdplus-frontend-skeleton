@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace DrdPlus\FrontendSkeleton;
+namespace DrdPlus\FrontendSkeleton\Web;
 
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\Partials\CurrentMinorVersionProvider;
 use Granam\Strict\Object\StrictObject;
 

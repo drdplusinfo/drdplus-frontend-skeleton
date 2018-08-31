@@ -5,12 +5,13 @@ namespace DrdPlus\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed;
 use DrdPlus\FrontendSkeleton\Partials\CurrentMinorVersionProvider;
+use DrdPlus\FrontendSkeleton\Partials\CurrentPatchVersionProvider;
 use Granam\Strict\Object\StrictObject;
 
 /**
  * Reader of GIT tags defining available versions of web filesF
  */
-class WebVersions extends StrictObject
+class WebVersions extends StrictObject implements CurrentMinorVersionProvider, CurrentPatchVersionProvider
 {
 
     public const LAST_UNSTABLE_VERSION = 'master';
