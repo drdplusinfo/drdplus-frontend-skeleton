@@ -14,20 +14,13 @@ class Content extends StrictObject
 {
     /** @var Redirect|null */
     private $redirect;
-    /** @var array */
-    private $bodyClasses;
     /** @var ServicesContainer */
     private $servicesContainer;
 
-    public function __construct(
-        ServicesContainer $servicesContainer,
-        ?Redirect $redirect,
-        array $bodyClasses = []
-    )
+    public function __construct(ServicesContainer $servicesContainer, ?Redirect $redirect)
     {
         $this->servicesContainer = $servicesContainer;
         $this->redirect = $redirect;
-        $this->bodyClasses = $bodyClasses;
     }
 
     public function __toString()
@@ -59,7 +52,7 @@ class Content extends StrictObject
         return $updatedContent;
     }
 
-    private function buildHtmlDocument(string $content): HtmlDocument
+    protected function buildHtmlDocument(string $content): HtmlDocument
     {
         $htmlDocument = new HtmlDocument($content);
         $this->getHtmlHelper()->prepareSourceCodeLinks($htmlDocument);
@@ -95,7 +88,6 @@ class Content extends StrictObject
         $patchVersion = $this->servicesContainer->getWebVersions()->getCurrentPatchVersion();
         $now = \date(\DATE_ATOM);
         $head = $this->servicesContainer->getHead()->getHeadString();
-        $bodyClasses = \implode(' ', $this->bodyClasses);
         $menu = $this->servicesContainer->getMenu()->getMenuString();
         $body = $this->servicesContainer->getBody()->getBodyString();
 
@@ -105,7 +97,7 @@ class Content extends StrictObject
 <head>
     {$head}
 </head>
-<body class="container {$bodyClasses}">
+<body class="container">
   <div class="background-image"></div>
     {$menu}
     {$body}
