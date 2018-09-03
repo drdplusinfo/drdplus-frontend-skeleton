@@ -107,8 +107,7 @@ class FrontendController extends StrictObject
         if ($this->content === null) {
             $this->content = new Content(
                 $this->getServicesContainer(),
-                $this->getRedirect(),
-                $this->getBodyClasses()
+                $this->getRedirect()
             );
         }
 
