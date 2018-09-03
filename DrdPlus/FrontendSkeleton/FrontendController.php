@@ -20,7 +20,7 @@ class FrontendController extends StrictObject
     /** @var Redirect|null */
     private $redirect;
     /** @var Content */
-    private $content;
+    protected $content;
 
     public function __construct(ServicesContainer $servicesContainer, array $bodyClasses = [])
     {
