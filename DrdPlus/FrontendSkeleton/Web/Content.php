@@ -13,9 +13,9 @@ use Granam\Strict\Object\StrictObject;
 class Content extends StrictObject
 {
     /** @var Redirect|null */
-    private $redirect;
+    protected $redirect;
     /** @var ServicesContainer */
-    private $servicesContainer;
+    protected $servicesContainer;
 
     public function __construct(ServicesContainer $servicesContainer, ?Redirect $redirect)
     {
