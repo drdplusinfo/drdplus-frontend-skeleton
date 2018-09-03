@@ -13,9 +13,9 @@ use Granam\Strict\Object\StrictObject;
 class Content extends StrictObject
 {
     /** @var Redirect|null */
-    protected $redirect;
+    private $redirect;
     /** @var ServicesContainer */
-    protected $servicesContainer;
+    private $servicesContainer;
 
     public function __construct(ServicesContainer $servicesContainer, ?Redirect $redirect)
     {
@@ -106,6 +106,11 @@ class Content extends StrictObject
 HTML;
     }
 
+    protected function getServicesContainer(): ServicesContainer
+    {
+        return $this->servicesContainer;
+    }
+
     private function getCachedContent(): ?string
     {
         if ($this->getPageCache()->isCacheValid()) {
@@ -135,7 +140,7 @@ HTML;
         return $cachedDocument->saveHTML();
     }
 
-    private function getRedirect(): ?Redirect
+    protected function getRedirect(): ?Redirect
     {
         return $this->redirect;
     }
