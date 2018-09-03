@@ -12,14 +12,17 @@ use Granam\Strict\Object\StrictObject;
 
 class Content extends StrictObject
 {
-    /** @var Redirect|null */
-    private $redirect;
     /** @var ServicesContainer */
     private $servicesContainer;
+    /** @var Body */
+    private $body;
+    /** @var Redirect|null */
+    private $redirect;
 
-    public function __construct(ServicesContainer $servicesContainer, ?Redirect $redirect)
+    public function __construct(ServicesContainer $servicesContainer, Body $body, ?Redirect $redirect)
     {
         $this->servicesContainer = $servicesContainer;
+        $this->body = $body;
         $this->redirect = $redirect;
     }
 
@@ -89,7 +92,7 @@ class Content extends StrictObject
         $now = \date(\DATE_ATOM);
         $head = $this->servicesContainer->getHead()->getHeadString();
         $menu = $this->servicesContainer->getMenu()->getMenuString();
-        $body = $this->servicesContainer->getBody()->getBodyString();
+        $body = $this->body->getBodyString();
 
         return <<<HTML
 <!DOCTYPE html>
