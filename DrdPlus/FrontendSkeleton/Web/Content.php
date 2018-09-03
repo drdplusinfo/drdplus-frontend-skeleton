@@ -98,7 +98,6 @@ class Content extends StrictObject
     {$head}
 </head>
 <body class="container">
-  <div class="background-image"></div>
     {$menu}
     {$body}
 </body>

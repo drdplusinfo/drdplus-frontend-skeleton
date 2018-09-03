@@ -36,7 +36,12 @@ class Body extends StrictObject
             }
         }
 
-        return $content;
+        return <<<HTML
+<div class="main">
+  <div class="background-image"></div>
+  $content
+</div>
+HTML;
     }
 
     protected function getWebFiles(): WebFiles
