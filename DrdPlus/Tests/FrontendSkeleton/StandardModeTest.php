@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class StandardModeTest extends AbstractContentTest
@@ -14,13 +15,13 @@ class StandardModeTest extends AbstractContentTest
     {
         if (!$this->getTestsConfiguration()->hasNotes()) {
             self::assertEmpty(
-                $this->getHtmlDocument()->getElementsByClassName('note'),
-                "No elements with 'note' class expected according to tests config"
+                $this->getHtmlDocument()->getElementsByClassName(HtmlHelper::NOTE_CLASS),
+                "No elements with '" . HtmlHelper::NOTE_CLASS . "' class expected according to tests config"
             );
         } else {
             self::assertNotEmpty(
-                $this->getHtmlDocument()->getElementsByClassName('note'),
-                "Expected at least a single element with 'note' class according to tests config"
+                $this->getHtmlDocument()->getElementsByClassName(HtmlHelper::NOTE_CLASS),
+                "Expected at least a single element with '" . HtmlHelper::NOTE_CLASS . "' class according to tests config"
             );
         }
     }
@@ -31,8 +32,8 @@ class StandardModeTest extends AbstractContentTest
     public function I_am_not_distracted_by_development_classes(): void
     {
         $htmlDocument = $this->getHtmlDocument();
-        self::assertCount(0, $htmlDocument->getElementsByClassName('covered-by-code'));
-        self::assertCount(0, $htmlDocument->getElementsByClassName('generic'));
-        self::assertCount(0, $htmlDocument->getElementsByClassName('excluded'));
+        self::assertCount(0, $htmlDocument->getElementsByClassName(HtmlHelper::COVERED_BY_CODE_CLASS));
+        self::assertCount(0, $htmlDocument->getElementsByClassName(HtmlHelper::GENERIC_CLASS));
+        self::assertCount(0, $htmlDocument->getElementsByClassName(HtmlHelper::EXCLUDED_CLASS));
     }
 }
