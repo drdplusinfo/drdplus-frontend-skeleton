@@ -15,7 +15,7 @@ class FrontendController extends StrictObject
     private $request;
     /** @var array */
     private $bodyClasses;
-    /** @var PageCache */
+    /** @var WebCache */
     protected $pageCache;
     /** @var Redirect|null */
     private $redirect;
@@ -106,8 +106,12 @@ class FrontendController extends StrictObject
     {
         if ($this->content === null) {
             $this->content = new Content(
-                $this->getServicesContainer(),
+                $this->getServicesContainer()->getHtmlHelper(),
+                $this->getServicesContainer()->getWebVersions(),
+                $this->getServicesContainer()->getHead(),
+                $this->getServicesContainer()->getMenu(),
                 $this->getServicesContainer()->getBody(),
+                $this->getServicesContainer()->getWebCache(),
                 $this->getRedirect()
             );
         }

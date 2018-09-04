@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
-class PageCache extends Cache
+class WebCache extends Cache
 {
     public function __construct(WebVersions $webVersions, Dirs $dirs, bool $isInProduction, string $cachePrefix = null)
     {

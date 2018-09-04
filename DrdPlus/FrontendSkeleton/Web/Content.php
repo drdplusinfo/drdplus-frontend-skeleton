@@ -5,24 +5,44 @@ namespace DrdPlus\FrontendSkeleton\Web;
 
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
-use DrdPlus\FrontendSkeleton\PageCache;
+use DrdPlus\FrontendSkeleton\WebCache;
 use DrdPlus\FrontendSkeleton\Redirect;
-use DrdPlus\FrontendSkeleton\ServicesContainer;
+use DrdPlus\FrontendSkeleton\WebVersions;
 use Granam\Strict\Object\StrictObject;
 
 class Content extends StrictObject
 {
-    /** @var ServicesContainer */
-    private $servicesContainer;
+    /** @var HtmlHelper */
+    private $htmlHelper;
+    /** @var WebVersions */
+    private $webVersions;
+    /** @var Head */
+    private $head;
+    /** @var Menu */
+    private $menu;
     /** @var Body */
     private $body;
+    /** @var WebCache */
+    private $webCache;
     /** @var Redirect|null */
     private $redirect;
-
-    public function __construct(ServicesContainer $servicesContainer, Body $body, ?Redirect $redirect)
+    
+    public function __construct(
+        HtmlHelper $htmlHelper,
+        WebVersions $webVersions,
+        Head $head,
+        Menu $menu,
+        Body $body,
+        WebCache $webCache,
+        ?Redirect $redirect
+    )
     {
-        $this->servicesContainer = $servicesContainer;
+        $this->htmlHelper = $htmlHelper;
+        $this->webVersions = $webVersions;
+        $this->head = $head;
+        $this->menu = $menu;
         $this->body = $body;
+        $this->webCache = $webCache;
         $this->redirect = $redirect;
     }
 
@@ -41,10 +61,10 @@ class Content extends StrictObject
         $previousMemoryLimit = \ini_set('memory_limit', '1G');
 
         $content = $this->composeContent();
-        $this->getPageCache()->saveContentForDebug($content); // for debugging purpose
+        $this->getWebCache()->saveContentForDebug($content); // for debugging purpose
         $htmlDocument = $this->buildHtmlDocument($content);
         $updatedContent = $htmlDocument->saveHTML();
-        $this->getPageCache()->cacheContent($updatedContent);
+        $this->getWebCache()->cacheContent($updatedContent);
         // has to be AFTER cache as we do not want to cache it
         $updatedContent = $this->injectRedirectIfAny($updatedContent);
 
@@ -76,23 +96,23 @@ class Content extends StrictObject
         return $htmlDocument;
     }
 
-    private function getHtmlHelper(): HtmlHelper
+    protected function getHtmlHelper(): HtmlHelper
     {
-        return $this->servicesContainer->getHtmlHelper();
+        return $this->htmlHelper;
     }
 
-    private function injectCacheId(HtmlDocument $htmlDocument): void
+    protected function injectCacheId(HtmlDocument $htmlDocument): void
     {
-        $htmlDocument->documentElement->setAttribute('data-cache-stamp', $this->getPageCache()->getCacheId());
+        $htmlDocument->documentElement->setAttribute('data-cache-stamp', $this->getWebCache()->getCacheId());
     }
 
-    private function composeContent(): string
+    protected function composeContent(): string
     {
-        $patchVersion = $this->servicesContainer->getWebVersions()->getCurrentPatchVersion();
+        $patchVersion = $this->getWebVersions()->getCurrentPatchVersion();
         $now = \date(\DATE_ATOM);
-        $head = $this->servicesContainer->getHead()->getHeadString();
-        $menu = $this->servicesContainer->getMenu()->getMenuString();
-        $body = $this->body->getBodyString();
+        $head = $this->getHead()->getHeadString();
+        $menu = $this->getMenu()->getMenuString();
+        $body = $this->getBody()->getBodyString();
 
         return <<<HTML
 <!DOCTYPE html>
@@ -108,26 +128,41 @@ class Content extends StrictObject
 HTML;
     }
 
-    protected function getServicesContainer(): ServicesContainer
+    protected function getHead(): Head
     {
-        return $this->servicesContainer;
+        return $this->head;
     }
 
-    private function getCachedContent(): ?string
+    protected function getMenu(): Menu
     {
-        if ($this->getPageCache()->isCacheValid()) {
-            return $this->getPageCache()->getCachedContent();
+        return $this->menu;
+    }
+
+    protected function getBody(): Body
+    {
+        return $this->body;
+    }
+
+    protected function getWebVersions(): WebVersions
+    {
+        return $this->webVersions;
+    }
+
+    protected function getCachedContent(): ?string
+    {
+        if ($this->getWebCache()->isCacheValid()) {
+            return $this->getWebCache()->getCachedContent();
         }
 
         return null;
     }
 
-    private function getPageCache(): PageCache
+    protected function getWebCache(): WebCache
     {
-        return $this->servicesContainer->getPageCache();
+        return $this->webCache;
     }
 
-    private function injectRedirectIfAny(string $content): string
+    protected function injectRedirectIfAny(string $content): string
     {
         if (!$this->getRedirect()) {
             return $content;

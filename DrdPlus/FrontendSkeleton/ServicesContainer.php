@@ -19,7 +19,7 @@ class ServicesContainer extends StrictObject
     protected $configuration;
     /** @var HtmlHelper */
     protected $htmlHelper;
-    /** @var PageCache */
+    /** @var WebCache */
     protected $pageCache;
     /** @var Head */
     protected $head;
@@ -81,10 +81,10 @@ class ServicesContainer extends StrictObject
         return $this->htmlHelper;
     }
 
-    public function getPageCache(): PageCache
+    public function getWebCache(): WebCache
     {
         if ($this->pageCache === null) {
-            $this->pageCache = new PageCache(
+            $this->pageCache = new WebCache(
                 $this->getWebVersions(),
                 $this->getConfiguration()->getDirs(),
                 $this->getHtmlHelper()->isInProduction()
