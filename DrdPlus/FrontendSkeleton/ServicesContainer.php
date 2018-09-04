@@ -6,6 +6,7 @@ namespace DrdPlus\FrontendSkeleton;
 use DeviceDetector\Parser\Bot as BotParser;
 use DrdPlus\FrontendSkeleton\Web\Body;
 use DrdPlus\FrontendSkeleton\Web\Head;
+use DrdPlus\FrontendSkeleton\Web\JsFiles;
 use DrdPlus\FrontendSkeleton\Web\Menu;
 use DrdPlus\FrontendSkeleton\Web\WebFiles;
 use Granam\Strict\Object\StrictObject;
@@ -29,6 +30,8 @@ class ServicesContainer extends StrictObject
     protected $body;
     /** @var CssFiles */
     protected $cssFiles;
+    /** @var JsFiles */
+    protected $jsFiles;
     /** @var WebFiles */
     protected $webFiles;
     /** @var Request */
@@ -106,7 +109,7 @@ class ServicesContainer extends StrictObject
     public function getHead(): Head
     {
         if ($this->head === null) {
-            $this->head = new Head($this->getConfiguration(), $this->getHtmlHelper(), $this->getCssFiles());
+            $this->head = new Head($this->getConfiguration(), $this->getHtmlHelper(), $this->getCssFiles(), $this->getJsFiles());
         }
 
         return $this->head;
@@ -128,6 +131,15 @@ class ServicesContainer extends StrictObject
         }
 
         return $this->cssFiles;
+    }
+
+    public function getJsFiles(): JsFiles
+    {
+        if ($this->jsFiles === null) {
+            $this->jsFiles = new JsFiles($this->getConfiguration()->getDirs(), $this->getHtmlHelper()->isInProduction());
+        }
+
+        return $this->jsFiles;
     }
 
     public function getDirs(): Dirs

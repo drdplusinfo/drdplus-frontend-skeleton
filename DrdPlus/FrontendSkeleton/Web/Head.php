@@ -16,14 +16,15 @@ class Head extends StrictObject
     private $htmlHelper;
     /** @var CssFiles */
     private $cssFiles;
-    /** @var string */
-    private $pageTitle;
+    /** @var JsFiles */
+    private $jsFiles;
 
-    public function __construct(Configuration $configuration, HtmlHelper $htmlHelper, CssFiles $cssFiles)
+    public function __construct(Configuration $configuration, HtmlHelper $htmlHelper, CssFiles $cssFiles, JsFiles $jsFiles)
     {
         $this->configuration = $configuration;
         $this->htmlHelper = $htmlHelper;
         $this->cssFiles = $cssFiles;
+        $this->jsFiles = $jsFiles;
     }
 
     public function getHeadString(): string
@@ -40,15 +41,12 @@ HTML;
 
     protected function getPageTitle(): string
     {
-        if ($this->pageTitle === null) {
-            $name = $this->getConfiguration()->getWebName();
-            $smiley = $this->getConfiguration()->getTitleSmiley();
-            $this->pageTitle = ($smiley !== '')
-                ? ($smiley . ' ' . $name)
-                : $name;
-        }
+        $name = $this->getConfiguration()->getWebName();
+        $smiley = $this->getConfiguration()->getTitleSmiley();
 
-        return $this->pageTitle;
+        return $smiley !== ''
+            ? ($smiley . ' ' . $name)
+            : $name;
     }
 
     protected function getConfiguration(): Configuration
@@ -71,7 +69,7 @@ HTML
 
     protected function getJsFiles(): JsFiles
     {
-        return new JsFiles($this->getConfiguration()->getDirs(), $this->getHtmlHelper()->isInProduction());
+        return $this->jsFiles;
     }
 
     protected function getHtmlHelper(): HtmlHelper
