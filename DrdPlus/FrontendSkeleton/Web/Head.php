@@ -38,7 +38,7 @@ class Head extends StrictObject
 HTML;
     }
 
-    private function getPageTitle(): string
+    protected function getPageTitle(): string
     {
         if ($this->pageTitle === null) {
             $name = $this->getConfiguration()->getWebName();
@@ -56,7 +56,7 @@ HTML;
         return $this->configuration;
     }
 
-    private function getRenderedJsScripts(): string
+    protected function getRenderedJsScripts(): string
     {
         $renderedJsFiles = [<<<HTML
 <script async src="https://www.googletagmanager.com/gtag/js?id={$this->getConfiguration()->getGoogleAnalyticsId()}"></script>
@@ -69,7 +69,7 @@ HTML
         return \implode("\n", $renderedJsFiles);
     }
 
-    private function getJsFiles(): JsFiles
+    protected function getJsFiles(): JsFiles
     {
         return new JsFiles($this->getConfiguration()->getDirs(), $this->getHtmlHelper()->isInProduction());
     }
@@ -79,7 +79,7 @@ HTML
         return $this->htmlHelper;
     }
 
-    private function getRenderedCssFiles(): string
+    protected function getRenderedCssFiles(): string
     {
         $renderedCssFiles = [];
         foreach ($this->getCssFiles() as $cssFile) {
