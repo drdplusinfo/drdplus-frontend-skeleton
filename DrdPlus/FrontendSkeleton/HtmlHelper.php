@@ -26,6 +26,15 @@ class HtmlHelper extends StrictObject
     public const DATA_ORIGINAL_ID = 'data-original-id';
     public const EXTERNAL_URL_CLASS = 'external-url';
     public const INTERNAL_URL_CLASS = 'internal-url';
+    public const INTRODUCTION_CLASS = 'introduction';
+    public const COVERED_BY_CODE_CLASS = 'covered-by-code';
+    public const QUOTE_CLASS = 'quote';
+    public const BACKGROUND_IMAGE_CLASS = 'background-image';
+    public const GENERIC_CLASS = 'generic';
+    public const NOTE_CLASS = 'note';
+    public const EXCLUDED_CLASS = 'excluded';
+    public const RULES_AUTHORS_CLASS = 'rules-authors';
+    public const HIDDEN_CLASS = 'hidden';
 
     /** @var Dirs */
     private $dirs;
@@ -86,7 +95,7 @@ class HtmlHelper extends StrictObject
     {
         if (!$this->inDevMode) {
             foreach ($html->getElementsByClassName('source-code-title') as $withSourceCode) {
-                $withSourceCode->className = \str_replace('source-code-title', 'hidden', $withSourceCode->className);
+                $withSourceCode->className = \str_replace('source-code-title', static::HIDDEN_CLASS, $withSourceCode->className);
                 $withSourceCode->removeAttribute('data-source-code');
             }
         } else {
@@ -264,30 +273,24 @@ class HtmlHelper extends StrictObject
     public function resolveDisplayMode(HtmlDocument $html): void
     {
         if ($this->inDevMode) {
-            foreach ($html->getElementsByTagName('body') as $body) {
-                $this->removeImages($body);
-            }
+            $this->removeImages($html->body);
         } else {
-            foreach ($html->getElementsByTagName('body') as $body) {
-                $this->removeClassesAboutCodeCoverage($body);
-            }
+            $this->removeClassesAboutCodeCoverage($html->body);
         }
         if ($this->showIntroductionOnly) {
-            foreach ($html->getElementsByTagName('body') as $body) {
-                $this->removeNonIntroduction($body);
-                $this->removeFollowingImageDelimiters($body);
-            }
+            $this->removeNonIntroduction($html->body);
+            $this->removeFollowingImageDelimiters($html->body);
         }
         if (!$this->inDevMode || !$this->shouldHideCovered) {
             return;
         }
-        $classesToHide = ['covered-by-code', 'quote', 'generic', 'note', 'excluded', 'rules-authors'];
+        $classesToHide = [static::COVERED_BY_CODE_CLASS, static::QUOTE_CLASS, static::GENERIC_CLASS, static::NOTE_CLASS, static::EXCLUDED_CLASS, static::RULES_AUTHORS_CLASS];
         if (!$this->showIntroductionOnly) {
-            $classesToHide[] = 'introduction';
+            $classesToHide[] = static::INTRODUCTION_CLASS;
         }
         foreach ($classesToHide as $classToHide) {
             foreach ($html->getElementsByClassName($classToHide) as $nodeToHide) {
-                $nodeToHide->className = str_replace($classToHide, 'hidden', $nodeToHide->className);
+                $nodeToHide->className = \str_replace($classToHide, static::HIDDEN_CLASS, $nodeToHide->className);
             }
         }
     }
@@ -313,7 +316,7 @@ class HtmlHelper extends StrictObject
                 if ($childNode->nodeType === XML_TEXT_NODE
                     || !($childNode instanceof \DOMElement)
                     || ($childNode->nodeName !== 'img'
-                        && !preg_match('~\s*(introduction|quote|background-image)\s*~', (string)$childNode->getAttribute('class'))
+                        && !\preg_match('~\s*(' . static::INTRODUCTION_CLASS . '|' . static::QUOTE_CLASS . '|' . static::BACKGROUND_IMAGE_CLASS . ')\s*~', (string)$childNode->getAttribute('class'))
                     )
                 ) {
                     $html->removeChild($childNode);
@@ -321,7 +324,7 @@ class HtmlHelper extends StrictObject
                 }
                 // introduction is expected only as direct descendant of the given element (body)
                 if ($childNode instanceof Element) {
-                    $childNode->classList->remove('generic');
+                    $childNode->classList->remove(static::GENERIC_CLASS);
                 }
             }
         } while ($somethingRemoved); // do not know why, but some nodes are simply skipped on first removal so have to remove them again
@@ -349,7 +352,7 @@ class HtmlHelper extends StrictObject
 
     private function removeClassesAboutCodeCoverage(Element $html): void
     {
-        $classesToRemove = ['covered-by-code', 'generic', 'excluded'];
+        $classesToRemove = [static::COVERED_BY_CODE_CLASS, static::GENERIC_CLASS, static::EXCLUDED_CLASS];
         foreach ($html->children as $child) {
             foreach ($classesToRemove as $classToRemove) {
                 $child->classList->remove($classToRemove);
@@ -476,8 +479,7 @@ class HtmlHelper extends StrictObject
         if (\count($remoteDrdPlusLinks) === 0) {
             return $htmlDocument;
         }
-        /** @var Element $body */
-        $body = $htmlDocument->getElementsByTagName('body')[0];
+        $body = $htmlDocument->body;
         foreach ($remoteDrdPlusLinks as $remoteDrdPlusHost => $tableIds) {
             $iFrame = $htmlDocument->createElement('iframe');
             $body->appendChild($iFrame);
