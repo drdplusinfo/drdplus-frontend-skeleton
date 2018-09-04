@@ -163,7 +163,7 @@ class HtmlHelper extends StrictObject
 
     private function unifyId(string $id): string
     {
-        return StringTools::toConstantLikeValue(StringTools::camelCaseToSnakeCase($id));
+        return StringTools::toSnakeCaseId($id);
     }
 
     public function replaceDiacriticsFromAnchorHashes(HtmlDocument $html): void
@@ -370,22 +370,22 @@ class HtmlHelper extends StrictObject
         $requiredIds = \array_unique($requiredIds);
         $lowerCasedRequiredIds = [];
         foreach ($requiredIds as $requiredId) {
-            $unifiedId = $this->unifyId($requiredId);
-            if (\array_key_exists($unifiedId, $lowerCasedRequiredIds)) {
+            $unifiedRequiredId = $this->unifyId($requiredId);
+            if (\array_key_exists($unifiedRequiredId, $lowerCasedRequiredIds)) {
                 $requiredIdsAsString = \implode(',', $requiredIds);
                 throw new Exceptions\DuplicatedRequiredTableId(
                     'IDs of tables are lower-cased and some required table IDs are same in lowercase: '
-                    . "'{$requiredId}' => '{$unifiedId}' ($requiredIdsAsString)"
+                    . "'{$requiredId}' => '{$unifiedRequiredId}' ($requiredIdsAsString)"
                 );
             }
-            $lowerCasedRequiredIds[$unifiedId] = $unifiedId;
+            $lowerCasedRequiredIds[$unifiedRequiredId] = $unifiedRequiredId;
         }
         $tablesWithIds = [];
         /** @var Element $table */
         foreach ($html->getElementsByTagName('table') as $table) {
-            $lowerId = $table->getAttribute('id');
-            if ($lowerId) {
-                $tablesWithIds[$lowerId] = $table;
+            $unifiedExistingId = $this->unifyId($table->getAttribute('id'));
+            if ($unifiedExistingId) {
+                $tablesWithIds[$unifiedExistingId] = $table;
                 continue;
             }
             $childId = $this->getChildId($table->children);
@@ -393,11 +393,8 @@ class HtmlHelper extends StrictObject
                 $tablesWithIds[$childId] = $table;
             }
         }
-        if (\count($requiredIds) === 0) {
-            return $tablesWithIds;
-        }
         if (!$requiredIds) {
-            return $tablesWithIds;
+            return $tablesWithIds; // all of them, no filter
         }
 
         return \array_intersect_key($tablesWithIds, $lowerCasedRequiredIds);
