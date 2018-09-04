@@ -20,7 +20,7 @@ class ServicesContainer extends StrictObject
     /** @var HtmlHelper */
     protected $htmlHelper;
     /** @var WebCache */
-    protected $pageCache;
+    protected $webCache;
     /** @var Head */
     protected $head;
     /** @var Menu */
@@ -83,15 +83,15 @@ class ServicesContainer extends StrictObject
 
     public function getWebCache(): WebCache
     {
-        if ($this->pageCache === null) {
-            $this->pageCache = new WebCache(
+        if ($this->webCache === null) {
+            $this->webCache = new WebCache(
                 $this->getWebVersions(),
                 $this->getConfiguration()->getDirs(),
                 $this->getHtmlHelper()->isInProduction()
             );
         }
 
-        return $this->pageCache;
+        return $this->webCache;
     }
 
     public function getMenu(): Menu

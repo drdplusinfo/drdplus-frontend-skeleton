@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton\Web;
 
+use DrdPlus\FrontendSkeleton\Cache;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
-use DrdPlus\FrontendSkeleton\WebCache;
 use DrdPlus\FrontendSkeleton\Redirect;
 use DrdPlus\FrontendSkeleton\WebVersions;
 use Granam\Strict\Object\StrictObject;
@@ -22,18 +22,18 @@ class Content extends StrictObject
     private $menu;
     /** @var Body */
     private $body;
-    /** @var WebCache */
-    private $webCache;
+    /** @var Cache */
+    private $cache;
     /** @var Redirect|null */
     private $redirect;
-    
+
     public function __construct(
         HtmlHelper $htmlHelper,
         WebVersions $webVersions,
         Head $head,
         Menu $menu,
         Body $body,
-        WebCache $webCache,
+        Cache $cache,
         ?Redirect $redirect
     )
     {
@@ -42,7 +42,7 @@ class Content extends StrictObject
         $this->head = $head;
         $this->menu = $menu;
         $this->body = $body;
-        $this->webCache = $webCache;
+        $this->cache = $cache;
         $this->redirect = $redirect;
     }
 
@@ -61,10 +61,10 @@ class Content extends StrictObject
         $previousMemoryLimit = \ini_set('memory_limit', '1G');
 
         $content = $this->composeContent();
-        $this->getWebCache()->saveContentForDebug($content); // for debugging purpose
+        $this->getCache()->saveContentForDebug($content); // for debugging purpose
         $htmlDocument = $this->buildHtmlDocument($content);
         $updatedContent = $htmlDocument->saveHTML();
-        $this->getWebCache()->cacheContent($updatedContent);
+        $this->getCache()->cacheContent($updatedContent);
         // has to be AFTER cache as we do not want to cache it
         $updatedContent = $this->injectRedirectIfAny($updatedContent);
 
@@ -103,7 +103,7 @@ class Content extends StrictObject
 
     protected function injectCacheId(HtmlDocument $htmlDocument): void
     {
-        $htmlDocument->documentElement->setAttribute('data-cache-stamp', $this->getWebCache()->getCacheId());
+        $htmlDocument->documentElement->setAttribute('data-cache-stamp', $this->getCache()->getCacheId());
     }
 
     protected function composeContent(): string
@@ -150,16 +150,16 @@ HTML;
 
     protected function getCachedContent(): ?string
     {
-        if ($this->getWebCache()->isCacheValid()) {
-            return $this->getWebCache()->getCachedContent();
+        if ($this->getCache()->isCacheValid()) {
+            return $this->getCache()->getCachedContent();
         }
 
         return null;
     }
 
-    protected function getWebCache(): WebCache
+    protected function getCache(): Cache
     {
-        return $this->webCache;
+        return $this->cache;
     }
 
     protected function injectRedirectIfAny(string $content): string

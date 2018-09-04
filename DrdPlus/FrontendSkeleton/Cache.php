@@ -5,7 +5,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use Granam\Strict\Object\StrictObject;
 
-abstract class Cache extends StrictObject
+class Cache extends StrictObject
 {
     public const CACHE = 'cache';
     public const DISABLE = 'disable';
