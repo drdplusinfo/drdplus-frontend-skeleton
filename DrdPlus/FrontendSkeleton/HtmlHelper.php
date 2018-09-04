@@ -383,7 +383,7 @@ class HtmlHelper extends StrictObject
         $tablesWithIds = [];
         /** @var Element $table */
         foreach ($html->getElementsByTagName('table') as $table) {
-            $unifiedExistingId = $this->unifyId($table->getAttribute('id'));
+            $unifiedExistingId = $this->unifyId($table->getAttribute('id') ?? '');
             if ($unifiedExistingId) {
                 $tablesWithIds[$unifiedExistingId] = $table;
                 continue;

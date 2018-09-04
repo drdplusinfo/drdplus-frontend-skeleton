@@ -105,6 +105,30 @@ class HtmlHelperTest extends AbstractContentTest
     /**
      * @test
      */
+    public function Filtering_tables_by_id_does_not_crash_on_table_without_id(): void
+    {
+        /** @var HtmlHelper $htmlHelperClass */
+        $htmlHelperClass = static::getSutClass();
+        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
+
+        $allTables = $htmlHelper->findTablesWithIds(new HtmlDocument(<<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <table>No ID here</table>
+</body>
+</htm>
+HTML
+        ));
+        self::assertCount(0, $allTables);
+    }
+
+    /**
+     * @test
+     */
     public function Same_table_ids_are_filtered_on_tables_only_mode(): void
     {
         if (!$this->getTestsConfiguration()->hasTables()) {
