@@ -26,7 +26,6 @@ class HtmlHelper extends StrictObject
     public const DATA_ORIGINAL_ID = 'data-original-id';
     public const EXTERNAL_URL_CLASS = 'external-url';
     public const INTERNAL_URL_CLASS = 'internal-url';
-    public const INTRODUCTION_CLASS = 'introduction';
     public const COVERED_BY_CODE_CLASS = 'covered-by-code';
     public const QUOTE_CLASS = 'quote';
     public const BACKGROUND_IMAGE_CLASS = 'background-image';
@@ -35,6 +34,7 @@ class HtmlHelper extends StrictObject
     public const EXCLUDED_CLASS = 'excluded';
     public const RULES_AUTHORS_CLASS = 'rules-authors';
     public const HIDDEN_CLASS = 'hidden';
+    public const DELIMITER_CLASS = 'delimiter';
 
     /** @var Dirs */
     private $dirs;
@@ -44,8 +44,6 @@ class HtmlHelper extends StrictObject
     private $inForcedProductionMode;
     /** @var bool */
     private $shouldHideCovered;
-    /** @var bool */
-    private $showIntroductionOnly;
 
     public static function createFromGlobals(Dirs $dirs): HtmlHelper
     {
@@ -53,8 +51,7 @@ class HtmlHelper extends StrictObject
             $dirs,
             !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'dev') === 0,
             !empty($_GET['mode']) && \strpos(\trim($_GET['mode']), 'prod') === 0,
-            !empty($_GET['hide']) && \strpos(\trim($_GET['hide']), 'cover') === 0,
-            !empty($_GET['show']) && \strpos(\trim($_GET['show']), 'intro') === 0
+            !empty($_GET['hide']) && \strpos(\trim($_GET['hide']), 'cover') === 0
         );
     }
 
@@ -77,15 +74,13 @@ class HtmlHelper extends StrictObject
         Dirs $dirs,
         bool $inDevMode,
         bool $inForcedProductionMode,
-        bool $shouldHideCovered,
-        bool $showIntroductionOnly
+        bool $shouldHideCovered
     )
     {
         $this->dirs = $dirs;
         $this->inDevMode = $inDevMode;
         $this->inForcedProductionMode = $inForcedProductionMode;
         $this->shouldHideCovered = $shouldHideCovered;
-        $this->showIntroductionOnly = $showIntroductionOnly;
     }
 
     /**
@@ -277,17 +272,10 @@ class HtmlHelper extends StrictObject
         } else {
             $this->removeClassesAboutCodeCoverage($html->body);
         }
-        if ($this->showIntroductionOnly) {
-            $this->removeNonIntroduction($html->body);
-            $this->removeFollowingImageDelimiters($html->body);
-        }
         if (!$this->inDevMode || !$this->shouldHideCovered) {
             return;
         }
         $classesToHide = [static::COVERED_BY_CODE_CLASS, static::QUOTE_CLASS, static::GENERIC_CLASS, static::NOTE_CLASS, static::EXCLUDED_CLASS, static::RULES_AUTHORS_CLASS];
-        if (!$this->showIntroductionOnly) {
-            $classesToHide[] = static::INTRODUCTION_CLASS;
-        }
         foreach ($classesToHide as $classToHide) {
             foreach ($html->getElementsByClassName($classToHide) as $nodeToHide) {
                 $nodeToHide->className = \str_replace($classToHide, static::HIDDEN_CLASS, $nodeToHide->className);
@@ -305,49 +293,6 @@ class HtmlHelper extends StrictObject
                 $somethingRemoved = true;
             }
         } while ($somethingRemoved); // do not know why, but some nodes are simply skipped on first removal so have to remove them again
-    }
-
-    private function removeNonIntroduction(Element $html): void
-    {
-        do {
-            $somethingRemoved = false;
-            /** @var \DOMNode $childNode */
-            foreach ($html->childNodes as $childNode) {
-                if ($childNode->nodeType === XML_TEXT_NODE
-                    || !($childNode instanceof \DOMElement)
-                    || ($childNode->nodeName !== 'img'
-                        && !\preg_match('~\s*(' . static::INTRODUCTION_CLASS . '|' . static::QUOTE_CLASS . '|' . static::BACKGROUND_IMAGE_CLASS . ')\s*~', (string)$childNode->getAttribute('class'))
-                    )
-                ) {
-                    $html->removeChild($childNode);
-                    $somethingRemoved = true;
-                }
-                // introduction is expected only as direct descendant of the given element (body)
-                if ($childNode instanceof Element) {
-                    $childNode->classList->remove(static::GENERIC_CLASS);
-                }
-            }
-        } while ($somethingRemoved); // do not know why, but some nodes are simply skipped on first removal so have to remove them again
-    }
-
-    private function removeFollowingImageDelimiters(Element $html): void
-    {
-        $followingDelimiter = false;
-        do {
-            $somethingRemoved = false;
-            /** @var Element $child */
-            foreach ($html->childNodes as $child) {
-                if ($child->nodeName === 'img' && $child->classList->contains('delimiter')) {
-                    if ($followingDelimiter) {
-                        $html->removeChild($child);
-                        $somethingRemoved = true;
-                    }
-                    $followingDelimiter = true;
-                } else {
-                    $followingDelimiter = false;
-                }
-            }
-        } while ($somethingRemoved);
     }
 
     private function removeClassesAboutCodeCoverage(Element $html): void
