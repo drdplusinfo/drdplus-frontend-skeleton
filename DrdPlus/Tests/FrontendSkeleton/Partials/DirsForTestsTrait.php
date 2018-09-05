@@ -32,16 +32,6 @@ trait DirsForTestsTrait
         return $this->getDocumentRoot() . '/vendor';
     }
 
-    protected function getPartsRoot(): string
-    {
-        return $this->getDocumentRoot() . '/parts';
-    }
-
-    protected function getGenericPartsRoot(): string
-    {
-        return __DIR__ . '/../../../../parts/frontend-skeleton';
-    }
-
     protected function unifyPath(string $path): string
     {
         $path = \str_replace('\\', '/', $path);
@@ -59,5 +49,14 @@ trait DirsForTestsTrait
         }
 
         return $this->squashTwoDots($path);
+    }
+
+    protected function getSkeletonDocumentRoot(): string
+    {
+        if ($this->isFrontendSkeletonChecked()) {
+            return $this->getDocumentRoot();
+        }
+
+        return $this->createDirs()->getVendorRoot() . '/drdplus/frontend-skeleton';
     }
 }

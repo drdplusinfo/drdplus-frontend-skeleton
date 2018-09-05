@@ -18,7 +18,6 @@ class DirsTest extends AbstractContentTest
         $dirs = new $dirsClass('foo');
         self::assertSame('foo', $dirs->getDocumentRoot());
         self::assertSame('foo/vendor', $dirs->getVendorRoot());
-        self::assertSame('foo/parts', $dirs->getPartsRoot());
         self::assertSame('foo/versions', $dirs->getDirForVersions());
         self::assertSame('foo/cache/' . \PHP_SAPI, $dirs->getCacheRoot());
         self::assertSame('foo/versions/1.2', $dirs->getVersionRoot('1.2'));

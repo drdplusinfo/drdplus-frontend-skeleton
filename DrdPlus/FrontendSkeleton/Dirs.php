@@ -64,14 +64,6 @@ class Dirs extends StrictObject
     /**
      * @return string
      */
-    public function getPartsRoot(): string
-    {
-        return $this->partsRoot;
-    }
-
-    /**
-     * @return string
-     */
     public function getCssRoot(): string
     {
         return $this->cssRoot;
