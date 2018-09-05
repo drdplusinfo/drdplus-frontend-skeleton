@@ -74,6 +74,30 @@ class WebVersionsTest extends AbstractContentTest
     /**
      * @test
      */
+    public function I_will_get_unstable_version_if_there_are_no_last_stable_version(): void
+    {
+        $webVersions = $this->getWebVersionsWithEmptyStableMinorVersions();
+        self::assertSame($webVersions->getLastUnstableVersion(), $webVersions->getLastStableMinorVersion());
+    }
+
+    private function getWebVersionsWithEmptyStableMinorVersions(): WebVersions
+    {
+        $configuration = $this->getConfiguration();
+        $request = $this->createRequest();
+
+        return new class($configuration, $request) extends WebVersions
+        {
+            public function getAllStableMinorVersions(): array
+            {
+                return [];
+            }
+
+        };
+    }
+
+    /**
+     * @test
+     */
     public function I_can_get_last_unstable_version(): void
     {
         $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest());

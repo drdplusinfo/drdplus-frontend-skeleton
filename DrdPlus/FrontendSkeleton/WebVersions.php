@@ -117,6 +117,9 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
         if ($this->lastStableMinorVersion === null) {
             $stableMinorVersions = $this->getAllStableMinorVersions();
             $this->lastStableMinorVersion = \reset($stableMinorVersions);
+            if ($this->lastStableMinorVersion === false) {
+                $this->lastStableMinorVersion = $this->getLastUnstableVersion();
+            }
         }
 
         return $this->lastStableMinorVersion;
