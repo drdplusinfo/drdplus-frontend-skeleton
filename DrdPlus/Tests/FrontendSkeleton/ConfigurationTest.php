@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Configuration;
-use DrdPlus\FrontendSkeleton\WebVersions;
+use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class ConfigurationTest extends AbstractContentTest
@@ -47,7 +47,7 @@ class ConfigurationTest extends AbstractContentTest
 
     public function provideCompleteLocalAndDistributionYamlContent(): array
     {
-        $completeYamlContent = $this->getCompleteSettings();
+        $completeYamlContent = $this->getSomeCompleteSettings();
         $limitedWebSection = $completeYamlContent;
         $limitedWebSection[Configuration::WEB] = [Configuration::LAST_STABLE_VERSION => '456.789'];
         $changedCompleteYamlContent = $completeYamlContent;
@@ -60,7 +60,7 @@ class ConfigurationTest extends AbstractContentTest
         ];
     }
 
-    private function getCompleteSettings(): array
+    private function getSomeCompleteSettings(): array
     {
         return [
             Configuration::WEB => [
@@ -80,7 +80,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_create_it_with_master_as_last_stable_version(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         $completeSettings[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = 'master';
         $configuration = new Configuration($this->createDirs(), $completeSettings);
         self::assertSame('master', $configuration->getWebLastStableMinorVersion());
@@ -93,7 +93,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_with_invalid_last_stable_version(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         $completeSettings[Configuration::WEB][Configuration::LAST_STABLE_VERSION] = 'public enemy';
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -105,7 +105,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_with_invalid_web_repository_url(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         $completeSettings[Configuration::WEB][Configuration::REPOSITORY_URL] = '/somewhere://over.the?rainbow=GPS';
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -117,7 +117,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_with_invalid_google_analytics_id(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         $completeSettings[Configuration::GOOGLE][Configuration::ANALYTICS_ID] = 'GoogleItself';
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -128,7 +128,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_without_defining_if_menu_should_be_fixed(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         unset($completeSettings[Configuration::WEB][Configuration::MENU_POSITION_FIXED]);
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -139,7 +139,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_without_defining_if_show_home_button(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         unset($completeSettings[Configuration::WEB][Configuration::SHOW_HOME_BUTTON]);
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -150,7 +150,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_without_web_name(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         $completeSettings[Configuration::WEB][Configuration::NAME] = '';
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -161,7 +161,7 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function I_can_not_create_it_without_set_title_smiley(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         unset($completeSettings[Configuration::WEB][Configuration::TITLE_SMILEY]);
         new Configuration($this->createDirs(), $completeSettings);
     }
@@ -169,11 +169,45 @@ class ConfigurationTest extends AbstractContentTest
     /**
      * @test
      */
-    public function I_can_create_it_title_smiley_as_null(): void
+    public function I_can_create_it_with_title_smiley_as_null(): void
     {
-        $completeSettings = $this->getCompleteSettings();
+        $completeSettings = $this->getSomeCompleteSettings();
         $completeSettings[Configuration::WEB][Configuration::TITLE_SMILEY] = null;
         $configuration = new Configuration($this->createDirs(), $completeSettings);
         self::assertSame('', $configuration->getTitleSmiley());
+    }
+
+    /**
+     * @test
+     */
+    public function Web_repository_is_changed_from_skeleton(): void
+    {
+        if ($this->isFrontendSkeletonChecked()) {
+            self::assertFalse(false, 'We are still in frontend skeleton, nothing to test here');
+
+            return;
+        }
+        $skeletonConfiguration = $this->getSkeletonConfiguration();
+        $currentConfiguration = $this->getConfiguration();
+        self::assertNotSame(
+            $skeletonConfiguration->getWebRepositoryUrl(),
+            $currentConfiguration->getWebRepositoryUrl(),
+            'Current web repository seems to be forgotten from skeleton copy'
+        );
+    }
+
+    protected function getSkeletonConfiguration(): Configuration
+    {
+        $configurationClass = $this->getConfigurationClass();
+
+        return $configurationClass::createFromYml(new Dirs($this->getSkeletonDocumentRoot()));
+    }
+
+    /**
+     * @return string|Configuration
+     */
+    protected function getConfigurationClass(): string
+    {
+        return Configuration::class;
     }
 }

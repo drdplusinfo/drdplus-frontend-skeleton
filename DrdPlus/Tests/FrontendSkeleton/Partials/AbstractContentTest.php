@@ -22,6 +22,8 @@ abstract class AbstractContentTest extends SkeletonTestCase
     private static $htmlDocuments = [];
     protected $needPassIn = true;
     protected $needPassOut = false;
+    /** @var Configuration */
+    private $configuration;
 
     protected function setUp(): void
     {
@@ -277,9 +279,13 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return ['output' => $output, 'result' => $result];
     }
 
-    protected function createConfiguration(Dirs $dirs = null): Configuration
+    protected function getConfiguration(Dirs $dirs = null): Configuration
     {
-        return Configuration::createFromYml($dirs ?? $this->createDirs());
+        if ($this->configuration === null) {
+            $this->configuration = Configuration::createFromYml($dirs ?? $this->createDirs());
+        }
+
+        return $this->configuration;
     }
 
     protected function createRequest(string $currentVersion = null): Request
@@ -299,7 +305,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
      */
     protected function createCustomConfiguration(array $customSettings): Configuration
     {
-        $originalConfiguration = $this->createConfiguration();
+        $originalConfiguration = $this->getConfiguration();
         $configurationClass = \get_class($originalConfiguration);
         $customConfiguration = new $configurationClass(
             $originalConfiguration->getDirs(),
@@ -334,8 +340,8 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $dirs = $this->createDirs($documentRoot);
 
         return new ServicesContainer(
-            $configuration ?? $this->createConfiguration(),
-            $htmlHelper ?? $this->createHtmlHelper($dirs, false, false, false, false)
+            $configuration ?? $this->getConfiguration(),
+            $htmlHelper ?? $this->createHtmlHelper($dirs, false, false, false)
         );
     }
 }
