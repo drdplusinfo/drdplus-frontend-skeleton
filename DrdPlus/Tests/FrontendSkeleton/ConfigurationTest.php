@@ -181,8 +181,8 @@ class ConfigurationTest extends AbstractContentTest
      */
     public function Web_repository_is_changed_from_skeleton(): void
     {
-        if ($this->isFrontendSkeletonChecked()) {
-            self::assertFalse(false, 'We are still in frontend skeleton, nothing to test here');
+        if ($this->isSkeletonChecked()) {
+            self::assertFalse(false, 'We are still in skeleton, nothing to test here');
 
             return;
         }
