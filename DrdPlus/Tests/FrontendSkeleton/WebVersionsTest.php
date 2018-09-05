@@ -115,11 +115,12 @@ class WebVersionsTest extends AbstractContentTest
     public function I_can_get_current_commit_hash(): void
     {
         $webVersions = new WebVersions($this->createConfiguration(), $this->createRequest());
+        $currentCommitHash = $webVersions->getCurrentCommitHash(); // called before reading .git/HEAD to ensure it exists
         self::assertSame(
             $this->getLastCommitHashFromHeadFile(
                 $this->createDirs()->getVersionRoot($this->getTestsConfiguration()->getExpectedLastVersion())
             ),
-            $webVersions->getCurrentCommitHash()
+            $currentCommitHash
         );
     }
 
