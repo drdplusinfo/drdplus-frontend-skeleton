@@ -282,10 +282,19 @@ abstract class AbstractContentTest extends SkeletonTestCase
     protected function getConfiguration(Dirs $dirs = null): Configuration
     {
         if ($this->configuration === null) {
-            $this->configuration = Configuration::createFromYml($dirs ?? $this->createDirs());
+            $configurationClass = $this->getConfigurationClass();
+            $this->configuration = $configurationClass::createFromYml($dirs ?? $this->createDirs());
         }
 
         return $this->configuration;
+    }
+
+    /**
+     * @return string|Configuration
+     */
+    protected function getConfigurationClass(): string
+    {
+        return Configuration::class;
     }
 
     protected function createRequest(string $currentVersion = null): Request
