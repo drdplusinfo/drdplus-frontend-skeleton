@@ -59,7 +59,7 @@ class ConfigurationTest extends AbstractContentTest
         ];
     }
 
-    private function getSomeCompleteSettings(): array
+    protected function getSomeCompleteSettings(): array
     {
         return [
             Configuration::WEB => [
