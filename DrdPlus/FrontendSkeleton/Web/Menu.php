@@ -56,7 +56,7 @@ HTML;
                 }
                 $otherVersionsArray[] = <<<HTML
 <li>
-    <a href="{$this->getRequest()->getCurrentUrl(['version' => $webVersion])}">
+    <a href="{$this->getRequest()->getCurrentUrl([Request::VERSION => $webVersion])}">
         {$webVersions->getVersionHumanName($webVersion)}
     </a>
 </li>

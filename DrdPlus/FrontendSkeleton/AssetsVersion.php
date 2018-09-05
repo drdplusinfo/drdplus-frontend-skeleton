@@ -203,10 +203,10 @@ class AssetsVersion extends StrictObject
             [$name, $value] = \explode('=', $queryChunk);
             $queryParts[$name] = $value;
         }
-        if (!empty($queryParts['version']) && $queryParts['version'] === $version) {
+        if (!empty($queryParts[Request::VERSION]) && $queryParts[Request::VERSION] === $version) {
             return $link; // nothing to change
         }
-        $queryParts['version'] = $version;
+        $queryParts[Request::VERSION] = $version;
         $newQueryChunks = [];
         foreach ($queryParts as $name => $value) {
             $newQueryChunks[] = \urlencode($name) . '=' . \urlencode($value);
