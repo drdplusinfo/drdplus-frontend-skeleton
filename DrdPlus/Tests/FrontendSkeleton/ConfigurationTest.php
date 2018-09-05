@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton;
 
 use DrdPlus\FrontendSkeleton\Configuration;
-use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 
 class ConfigurationTest extends AbstractContentTest
@@ -200,14 +199,6 @@ class ConfigurationTest extends AbstractContentTest
     {
         $configurationClass = $this->getConfigurationClass();
 
-        return $configurationClass::createFromYml(new Dirs($this->getSkeletonDocumentRoot()));
-    }
-
-    /**
-     * @return string|Configuration
-     */
-    protected function getConfigurationClass(): string
-    {
-        return Configuration::class;
+        return $configurationClass::createFromYml($this->createDirs($this->getSkeletonDocumentRoot()));
     }
 }
