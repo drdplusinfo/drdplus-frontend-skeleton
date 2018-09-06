@@ -152,10 +152,10 @@ class Cache extends StrictObject
     public function saveContentForDebug(string $content): void
     {
         $cacheDebugFileName = $this->getCacheDebugFileName();
-        if (!\file_put_contents($this->getCacheDebugFileName(), $content, \LOCK_EX)) {
+        if (!\file_put_contents($cacheDebugFileName, $content, \LOCK_EX)) {
             throw new Exceptions\CanNotSaveContentForDebug('Can not save content for debugging purpose into ' . $cacheDebugFileName);
         }
-        if (!@\chmod($this->getCacheDebugFileName(), 0664)) {
+        if (!@\chmod($cacheDebugFileName, 0664)) {
             throw new Exceptions\CanNotChangeAccessToFileWithContentForDebug(
                 'Can not change access to 0644 for file with content for debug ' . $cacheDebugFileName
             );
@@ -187,8 +187,9 @@ class Cache extends StrictObject
      */
     public function cacheContent(string $content): void
     {
-        \file_put_contents($this->getCacheFileName(), $content, \LOCK_EX);
-        \chmod($this->getCacheFileName(), 0664);
+        $cacheFileName = $this->getCacheFileName();
+        \file_put_contents($cacheFileName, $content, \LOCK_EX);
+        \chmod($cacheFileName, 0664);
         $this->clearOldCache();
     }
 
