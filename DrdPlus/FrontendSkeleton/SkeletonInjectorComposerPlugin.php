@@ -29,6 +29,7 @@ class SkeletonInjectorComposerPlugin extends AbstractSkeletonInjectorComposerPlu
         $this->copyGoogleVerification($documentRoot);
         $this->copyPhpUnitConfig($documentRoot);
         $this->copyProjectConfig($documentRoot);
+        $this->copyGitignoreToCache($documentRoot);
         $this->copyFavicon($documentRoot);
         $this->alreadyInjected = true;
         $this->io->write("Injection of {$this->skeletonPackageName} finished");
@@ -85,9 +86,22 @@ class SkeletonInjectorComposerPlugin extends AbstractSkeletonInjectorComposerPlu
     {
         $this->passThrough(['cp --no-clobber ./vendor/drdplus/frontend-skeleton/config.distribution.yml .'], $documentRoot);
     }
+    protected function copyGitignoreToCache(string $documentRoot): void
+    {
+        $this->passThrough(
+            [
+                'mkdir -p cache',
+                'chmod 0775 cache',
+                'chgrp www-data cache',
+                'cp ./vendor/drdplus/frontend-skeleton/cache/.gitignore ./cache/.gitignore'
+            ],
+            $documentRoot
+        );
+    }
 
     protected function copyFavicon(string $documentRoot): void
     {
         $this->passThrough(['cp ./vendor/drdplus/frontend-skeleton/favicon.ico .'], $documentRoot);
     }
+
 }

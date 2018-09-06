@@ -48,4 +48,21 @@ class GitTest extends AbstractContentTest
         self::assertSame(0, $result, 'config.local.yml should be ignored'); // GIT check-ignore results into 0 if dir is ignored
         self::assertSame(['config.local.yml'], $output, 'config.local.yml should be ignored');
     }
+
+    /**
+     * @test
+     */
+    public function Cache_dir_is_ignored(): void
+    {
+        $cacheBaseRoot = \dirname($this->createDirs()->getCacheRoot()); // cache/cli => cache
+        $cacheGitIgnore = $cacheBaseRoot . '/.gitignore';
+        self::assertFileExists($cacheGitIgnore, 'Expected .gitignore in cache dir');
+        self::assertSame(<<<TEXT
+*
+!/.gitignore
+TEXT
+            , \file_get_contents($cacheGitIgnore),
+            'Expected different content in ' . $cacheGitIgnore
+        );
+    }
 }
