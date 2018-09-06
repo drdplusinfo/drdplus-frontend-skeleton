@@ -90,6 +90,7 @@ class ServicesContainer extends StrictObject
             $this->webCache = new WebCache(
                 $this->getWebVersions(),
                 $this->getConfiguration()->getDirs(),
+                $this->getRequest(),
                 $this->getHtmlHelper()->isInProduction()
             );
         }

@@ -7,15 +7,14 @@ use Granam\Strict\Object\StrictObject;
 
 class Cache extends StrictObject
 {
-    public const CACHE = 'cache';
-    public const DISABLE = 'disable';
-
     /** @var string */
     protected $cacheRootDir;
     /** @var array|string[] */
     protected $cacheRoots;
     /** @var WebVersions */
     protected $webVersions;
+    /** @var Request */
+    private $request;
     /** @var string */
     protected $cachePrefix;
     /** @var bool */
@@ -25,13 +24,15 @@ class Cache extends StrictObject
      * @param WebVersions $webVersions
      * @param Dirs $dirs
      * @param bool $isInProduction
+     * @param Request $request
      * @param string $cachePrefix
      * @throws \RuntimeException
      */
-    public function __construct(WebVersions $webVersions, Dirs $dirs, bool $isInProduction, string $cachePrefix)
+    public function __construct(WebVersions $webVersions, Dirs $dirs, Request $request, bool $isInProduction, string $cachePrefix)
     {
-        $this->cacheRootDir = $dirs->getCacheRoot();
         $this->webVersions = $webVersions;
+        $this->cacheRootDir = $dirs->getCacheRoot();
+        $this->request = $request;
         $this->isInProduction = $isInProduction;
         $this->cachePrefix = $cachePrefix;
     }
@@ -48,7 +49,7 @@ class Cache extends StrictObject
                 if (!@\mkdir($cacheRoot, 0775, true /* with parents */) && !\is_dir($cacheRoot)) {
                     throw new \RuntimeException('Can not create directory for page cache ' . $cacheRoot);
                 }
-                if (PHP_SAPI === 'cli') {
+                if ($this->request->isCliRequest()) {
                     \chgrp($cacheRoot, 'www-data');
                 }
                 \chmod($cacheRoot, 0775); // because umask could suppress it
@@ -66,7 +67,7 @@ class Cache extends StrictObject
 
     protected function getCurrentRequestHash(): string
     {
-        return \md5(\serialize($_GET));
+        return \md5(\serialize($this->request->getValuesFromGet()));
     }
 
     /**
@@ -75,7 +76,7 @@ class Cache extends StrictObject
      */
     public function isCacheValid(): bool
     {
-        return ($_GET[static::CACHE] ?? '') !== static::DISABLE && \is_readable($this->getCacheFileName());
+        return ($this->request->getValue(Request::CACHE) ?? '') !== Request::DISABLE && \is_readable($this->getCacheFileName());
     }
 
     public function getCacheId(): string

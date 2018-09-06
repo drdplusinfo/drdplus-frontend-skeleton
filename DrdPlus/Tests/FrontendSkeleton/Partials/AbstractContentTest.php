@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
-use DrdPlus\FrontendSkeleton\Cache;
 use DrdPlus\FrontendSkeleton\Configuration;
 use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
@@ -17,6 +16,7 @@ use Mockery\MockInterface;
 abstract class AbstractContentTest extends SkeletonTestCase
 {
     use DirsForTestsTrait;
+    use ClassesTrait;
 
     private static $contents = [];
     private static $htmlDocuments = [];
@@ -178,7 +178,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $originalCookies = $_COOKIE;
         /** @noinspection PhpUnusedLocalVariableInspection */
         $controller = $controller ?? null;
-        $_GET[Cache::CACHE] = Cache::DISABLE;
+        $_GET[Request::CACHE] = Request::DISABLE;
         \ob_start();
         /** @noinspection PhpIncludeInspection */
         include $this->getDocumentRoot() . '/index.php';
@@ -289,17 +289,9 @@ abstract class AbstractContentTest extends SkeletonTestCase
         return $this->configuration;
     }
 
-    /**
-     * @return string|Configuration
-     */
-    protected function getConfigurationClass(): string
-    {
-        return Configuration::class;
-    }
-
     protected function createRequest(string $currentVersion = null): Request
     {
-        $request = $this->mockery(Request::class);
+        $request = $this->mockery($this->getRequestClass());
         $request->allows('getValue')
             ->with(Request::VERSION)
             ->andReturn($currentVersion);
@@ -333,11 +325,6 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $controllerClass = $this->getControllerClass();
 
         return new $controllerClass($this->createServicesContainer($documentRoot, $configuration, $htmlHelper));
-    }
-
-    protected function getControllerClass(): string
-    {
-        return FrontendController::class;
     }
 
     protected function createServicesContainer(
