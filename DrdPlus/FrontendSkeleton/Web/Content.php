@@ -61,7 +61,11 @@ class Content extends StrictObject
         $previousMemoryLimit = \ini_set('memory_limit', '1G');
 
         $content = $this->composeContent();
-        $this->getCache()->saveContentForDebug($content); // for debugging purpose
+        try {
+            $this->getCache()->saveContentForDebug($content);
+        } catch (\RuntimeException $runtimeException) {
+            \trigger_error($runtimeException->getMessage() . '; ' . $runtimeException->getTraceAsString(), \E_USER_WARNING);
+        }
         $htmlDocument = $this->buildHtmlDocument($content);
         $updatedContent = $htmlDocument->saveHTML();
         $this->getCache()->cacheContent($updatedContent);

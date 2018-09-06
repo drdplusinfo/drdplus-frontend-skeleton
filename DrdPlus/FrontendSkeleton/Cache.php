@@ -25,8 +25,9 @@ class Cache extends StrictObject
     /**
      * @param WebVersions $webVersions
      * @param Dirs $dirs
-     * @param bool $isInProduction
      * @param Request $request
+     * @param Git $git
+     * @param bool $isInProduction
      * @param string $cachePrefix
      * @throws \RuntimeException
      */
@@ -132,7 +133,6 @@ class Cache extends StrictObject
     /**
      * @return string
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotReadCachedContent
-     * @throws \RuntimeException
      */
     public function getCachedContent(): string
     {
@@ -146,12 +146,20 @@ class Cache extends StrictObject
 
     /**
      * @param string $content
-     * @throws \RuntimeException
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotSaveContentForDebug
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotChangeAccessToFileWithContentForDebug
      */
     public function saveContentForDebug(string $content): void
     {
-        \file_put_contents($this->getCacheDebugFileName(), $content, \LOCK_EX);
-        \chmod($this->getCacheDebugFileName(), 0664);
+        $cacheDebugFileName = $this->getCacheDebugFileName();
+        if (!\file_put_contents($this->getCacheDebugFileName(), $content, \LOCK_EX)) {
+            throw new Exceptions\CanNotSaveContentForDebug('Can not save content for debugging purpose into ' . $cacheDebugFileName);
+        }
+        if (!\chmod($this->getCacheDebugFileName(), 0664)) {
+            throw new Exceptions\CanNotChangeAccessToFileWithContentForDebug(
+                'Can not change access to 0644 for file with content for debug ' . $cacheDebugFileName
+            );
+        }
     }
 
     /**
