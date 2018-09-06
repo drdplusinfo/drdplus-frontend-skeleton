@@ -155,7 +155,7 @@ class Cache extends StrictObject
         if (!\file_put_contents($this->getCacheDebugFileName(), $content, \LOCK_EX)) {
             throw new Exceptions\CanNotSaveContentForDebug('Can not save content for debugging purpose into ' . $cacheDebugFileName);
         }
-        if (!\chmod($this->getCacheDebugFileName(), 0664)) {
+        if (!@\chmod($this->getCacheDebugFileName(), 0664)) {
             throw new Exceptions\CanNotChangeAccessToFileWithContentForDebug(
                 'Can not change access to 0644 for file with content for debug ' . $cacheDebugFileName
             );

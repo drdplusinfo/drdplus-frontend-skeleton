@@ -64,7 +64,7 @@ class Content extends StrictObject
         try {
             $this->getCache()->saveContentForDebug($content);
         } catch (\RuntimeException $runtimeException) {
-            \trigger_error($runtimeException->getMessage() . '; ' . $runtimeException->getTraceAsString(), \E_USER_WARNING);
+            \trigger_error($runtimeException->getMessage() . "\n" . $runtimeException->getTraceAsString(), \E_USER_WARNING);
         }
         $htmlDocument = $this->buildHtmlDocument($content);
         $updatedContent = $htmlDocument->saveHTML();
