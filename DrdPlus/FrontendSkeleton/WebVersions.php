@@ -267,38 +267,40 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
      * @param string $toVersionDir
      * @return array
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\CanNotLocallyCloneWebVersionViaGit
+     * @throws \DrdPlus\FrontendSkeleton\Exceptions\UnknownWebVersion
      */
     private function clone(string $minorVersion, string $toVersionDir): array
     {
         $toVersionDirEscaped = \escapeshellarg($toVersionDir);
         $toVersionEscaped = \escapeshellarg($minorVersion);
         $command = "git clone --branch $toVersionEscaped {$this->configuration->getWebRepositoryUrl()} $toVersionDirEscaped 2>&1";
-        \exec($command, $rows, $returnCode);
-        if ($returnCode !== 0) {
+        try {
+            return $this->executeArray($command);
+        } catch (Exceptions\ExecutingCommandFailed $executingCommandFailed) {
             if ($this->remoteBranchExists($minorVersion)) {
                 throw new Exceptions\CanNotLocallyCloneWebVersionViaGit(
-                    "Can not git clone required version '{$minorVersion}' by command '{$command}'"
-                    . ", got return code '{$returnCode}' and output\n"
-                    . \implode("\n", $rows)
+                    "Can not git clone required version '{$minorVersion}':\n"
+                    . $executingCommandFailed->getMessage(),
+                    $executingCommandFailed->getCode(),
+                    $executingCommandFailed
                 );
             }
             throw new Exceptions\UnknownWebVersion(
-                "Required web minor version $minorVersion as a GIT branch does not exists:\n'{$command}' => " . \implode("\n", $rows)
+                "Required web minor version $minorVersion as a GIT branch does not exists:\n"
+                . $executingCommandFailed->getMessage()
             );
         }
-
-        return $rows;
     }
 
     protected function remoteBranchExists(string $branchName): bool
     {
-        $command = 'git branch --remotes 2>&1';
-        \exec($command, $rows, $returnCode);
-        if ($returnCode !== 0) {
+        try {
+            $rows = $this->executeArray('git branch --remotes 2>&1');
+        } catch (Exceptions\ExecutingCommandFailed $executingCommandFailed) {
             throw new Exceptions\CanNotFindOutRemoteBranches(
-                "Can not get remote branches from git by command '{$command}'"
-                . ", got return code '{$returnCode}' and output\n"
-                . \implode("\n", $rows)
+                $executingCommandFailed->getMessage(),
+                $executingCommandFailed->getCode(),
+                $executingCommandFailed
             );
         }
         foreach ($rows as $remoteBranch) {
