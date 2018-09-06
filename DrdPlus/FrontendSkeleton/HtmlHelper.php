@@ -21,6 +21,8 @@ class HtmlHelper extends StrictObject
         return \preg_replace('~https?://((?:[^.]+[.])*)drdplus\.info~', 'http://$1drdplus.loc:88', $link);
     }
 
+    public const GOOGLE_ANALYTICS_ID = 'google_analytics_id';
+
     public const INVISIBLE_ID_CLASS = 'invisible-id';
     public const CALCULATION_CLASS = 'calculation';
     public const DATA_ORIGINAL_ID = 'data-original-id';
@@ -34,6 +36,7 @@ class HtmlHelper extends StrictObject
     public const EXCLUDED_CLASS = 'excluded';
     public const RULES_AUTHORS_CLASS = 'rules-authors';
     public const HIDDEN_CLASS = 'hidden';
+    public const INVISIBLE_CLASS = 'invisible';
     public const DELIMITER_CLASS = 'delimiter';
 
     /** @var Dirs */

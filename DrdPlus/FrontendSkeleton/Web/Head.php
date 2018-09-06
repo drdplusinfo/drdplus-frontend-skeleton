@@ -56,8 +56,9 @@ HTML;
 
     protected function getRenderedJsScripts(): string
     {
+        $googleAnalyticsId = HtmlHelper::GOOGLE_ANALYTICS_ID;
         $renderedJsFiles = [<<<HTML
-<script async src="https://www.googletagmanager.com/gtag/js?id={$this->getConfiguration()->getGoogleAnalyticsId()}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={$this->getConfiguration()->getGoogleAnalyticsId()}" id="{$googleAnalyticsId}"></script>
 HTML
         ];
         foreach ($this->getJsFiles() as $jsFile) {
