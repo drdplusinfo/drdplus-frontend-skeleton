@@ -296,6 +296,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
         $request->allows('getValue')
             ->with(Request::VERSION)
             ->andReturn($currentVersion);
+        $request->makePartial();
 
         /** @var Request $request */
         return $request;
