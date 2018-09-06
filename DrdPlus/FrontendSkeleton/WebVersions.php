@@ -19,7 +19,7 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
     /** @var Configuration */
     private $configuration;
     /** @var string[] */
-    private $allVersions;
+    private $allMinorVersions;
     /** @var string */
     private $lastStableMinorVersion;
     /** @var string */
@@ -40,11 +40,14 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
     private $lastUnstableVersionRoot;
     /** @var Request */
     private $request;
+    /** @var Git */
+    private $git;
 
-    public function __construct(Configuration $configuration, Request $request)
+    public function __construct(Configuration $configuration, Request $request, Git $git)
     {
         $this->configuration = $configuration;
         $this->request = $request;
+        $this->git = $git;
     }
 
     /**
@@ -54,16 +57,14 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
      */
     public function getAllMinorVersions(): array
     {
-        if ($this->allVersions === null) {
-            $escapedLatestVersionWebRoot = \escapeshellarg($this->getLastUnstableVersionWebRoot());
-            $command = "git -C $escapedLatestVersionWebRoot branch -r | cut -d '/' -f2 | grep HEAD --invert-match | grep -P 'v?\d+\.\d+' --only-matching | sort --version-sort --reverse";
-            $branches = $this->executeArray($command);
-            \array_unshift($branches, $this->getLastUnstableVersion());
+        if ($this->allMinorVersions === null) {
+            $allBranches = $this->git->getAllVersionedBranches($this->getLastUnstableVersionWebRoot());
+            \array_unshift($allBranches, $this->getLastUnstableVersion());
 
-            $this->allVersions = $branches;
+            $this->allMinorVersions = $allBranches;
         }
 
-        return $this->allVersions;
+        return $this->allMinorVersions;
     }
 
     protected function getLastUnstableVersionWebRoot(): string
@@ -74,37 +75,6 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
         }
 
         return $this->lastUnstableVersionRoot;
-    }
-
-    /**
-     * @param string $command
-     * @param bool $sendErrorsToStdOut = true
-     * @param bool $solveMissingHomeDir = true
-     * @return string[]|array
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     */
-    private function executeArray(string $command, bool $sendErrorsToStdOut = true, bool $solveMissingHomeDir = true): array
-    {
-        if ($sendErrorsToStdOut) {
-            $command .= ' 2>&1';
-        }
-        if ($solveMissingHomeDir) {
-            $homeDir = \exec('echo $HOME 2>&1', $output, $returnCode);
-            $this->guardCommandWithoutError($returnCode, $command, $output);
-            if (!$homeDir) {
-                if (\file_exists('/home/www-data')) {
-                    $command = 'export HOME=/home/www-data 2>&1 && ' . $command;
-                } elseif (\file_exists('/var/www')) {
-                    $command = 'export HOME=/var/www 2>&1 && ' . $command;
-                } // else we will hope it will somehow pass without fatal: failed to expand user dir in: '~/.gitignore'
-            }
-        }
-        $returnCode = 0;
-        $output = [];
-        \exec($command, $output, $returnCode);
-        $this->guardCommandWithoutError($returnCode, $command, $output);
-
-        return $output;
     }
 
     /**
@@ -160,26 +130,6 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
     }
 
     /**
-     * @param int $returnCode
-     * @param string $command
-     * @param array $output
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     */
-    private function guardCommandWithoutError(int $returnCode, string $command, ?array $output): void
-    {
-        if ($returnCode !== 0) {
-            throw new Exceptions\ExecutingCommandFailed(
-                "Error while executing '$command', expected return '0', got '$returnCode'"
-                . ($output !== null ?
-                    ("with output: '" . \implode("\n", $output) . "'")
-                    : ''
-                ),
-                $returnCode
-            );
-        }
-    }
-
-    /**
      * @param string $version
      * @return bool
      * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
@@ -208,20 +158,6 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
         return $this->configuration->getWebLastStableMinorVersion();
     }
 
-    /**
-     * @param string $command
-     * @param bool $sendErrorsToStdOut = true
-     * @param bool $solveMissingHomeDir = true
-     * @return string
-     * @throws \DrdPlus\FrontendSkeleton\Exceptions\ExecutingCommandFailed
-     */
-    private function execute(string $command, bool $sendErrorsToStdOut = true, bool $solveMissingHomeDir = true): string
-    {
-        $rows = $this->executeArray($command, $sendErrorsToStdOut, $solveMissingHomeDir);
-
-        return \end($rows);
-    }
-
     public function getVersionHumanName(string $version): string
     {
         return $version !== $this->getLastUnstableVersion() ? "verze $version" : 'testovací!';
@@ -235,8 +171,9 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
     {
         if ($this->currentCommitHash === null) {
             $this->ensureMinorVersionExists($this->getCurrentMinorVersion());
-            $escapedVersionRoot = \escapeshellarg($this->configuration->getDirs()->getVersionRoot($this->getCurrentMinorVersion()));
-            $this->currentCommitHash = $this->execute("git -C $escapedVersionRoot log --max-count=1 --format=%H --no-abbrev-commit");
+            $this->currentCommitHash = $this->git->getLastCommitHash(
+                $this->configuration->getDirs()->getVersionRoot($this->getCurrentMinorVersion())
+            );
         }
 
         return $this->currentCommitHash;
@@ -271,46 +208,7 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
      */
     private function clone(string $minorVersion, string $toVersionDir): array
     {
-        $toVersionDirEscaped = \escapeshellarg($toVersionDir);
-        $toVersionEscaped = \escapeshellarg($minorVersion);
-        $command = "git clone --branch $toVersionEscaped {$this->configuration->getWebRepositoryUrl()} $toVersionDirEscaped 2>&1";
-        try {
-            return $this->executeArray($command);
-        } catch (Exceptions\ExecutingCommandFailed $executingCommandFailed) {
-            if ($this->remoteBranchExists($minorVersion)) {
-                throw new Exceptions\CanNotLocallyCloneWebVersionViaGit(
-                    "Can not git clone required version '{$minorVersion}':\n"
-                    . $executingCommandFailed->getMessage(),
-                    $executingCommandFailed->getCode(),
-                    $executingCommandFailed
-                );
-            }
-            throw new Exceptions\UnknownWebVersion(
-                "Required web minor version $minorVersion as a GIT branch does not exists:\n"
-                . $executingCommandFailed->getMessage()
-            );
-        }
-    }
-
-    protected function remoteBranchExists(string $branchName): bool
-    {
-        try {
-            $rows = $this->executeArray('git branch --remotes 2>&1');
-        } catch (Exceptions\ExecutingCommandFailed $executingCommandFailed) {
-            throw new Exceptions\CanNotFindOutRemoteBranches(
-                $executingCommandFailed->getMessage(),
-                $executingCommandFailed->getCode(),
-                $executingCommandFailed
-            );
-        }
-        foreach ($rows as $remoteBranch) {
-            $branchFromRemote = \trim(\explode('/', $remoteBranch)[1] ?? '');
-            if ($branchName === $branchFromRemote) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->git->cloneBranch($minorVersion, $this->configuration->getWebRepositoryUrl(), $toVersionDir);
     }
 
     /**
@@ -326,17 +224,10 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
         if (!\file_exists($toMinorVersionDir)) {
             return $this->clone($minorVersion, $toMinorVersionDir);
         }
-        $toMinorVersionDirEscaped = \escapeshellarg($toMinorVersionDir);
-        $minorVersionEscaped = \escapeshellarg($minorVersion);
-        $commands = [];
-        $commands[] = "cd $toMinorVersionDirEscaped";
-        $commands[] = "git checkout $minorVersionEscaped";
-        $commands[] = 'git pull --ff-only';
-        $commands[] = 'git pull --tags';
         try {
-            return $this->executeCommandsChainArray($commands);
+            return $this->git->updateBranch($minorVersion, $toMinorVersionDir);
         } catch (ExecutingCommandFailed $executingCommandFailed) {
-            if ($this->remoteBranchExists($minorVersion)) {
+            if ($this->git->remoteBranchExists($minorVersion)) {
                 throw new Exceptions\CanNotUpdateWebVersionViaGit(
                     "Can not update required version '{$minorVersion}': " . $executingCommandFailed->getMessage(),
                     $executingCommandFailed->getCode(),
@@ -347,20 +238,6 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
                 "Required web minor version $minorVersion as a GIT branch does not exists:\n{$executingCommandFailed->getMessage()}"
             );
         }
-    }
-
-    private function executeCommandsChainArray(array $commands): array
-    {
-        return $this->executeArray($this->getChainedCommands($commands), false);
-    }
-
-    private function getChainedCommands(array $commands): string
-    {
-        foreach ($commands as &$command) {
-            $command .= ' 2>&1';
-        }
-
-        return \implode(' && ', $commands);
     }
 
     /**
@@ -406,11 +283,7 @@ class WebVersions extends StrictObject implements CurrentMinorVersionProvider, C
     public function getPatchVersions(): array
     {
         if ($this->patchVersions === null) {
-            $escapedWebVersionsRootDir = \escapeshellarg($this->getLastUnstableVersionWebRoot());
-            $this->patchVersions = $this->executeArray(<<<CMD
-git -C $escapedWebVersionsRootDir tag | grep -E "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching | sort --version-sort --reverse
-CMD
-            );
+            $this->patchVersions = $this->git->getPatchVersions($this->getLastUnstableVersionWebRoot());
         }
 
         return $this->patchVersions;

@@ -6,6 +6,7 @@ namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 use DrdPlus\FrontendSkeleton\Configuration;
 use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
+use DrdPlus\FrontendSkeleton\Git;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\FrontendSkeleton\ServicesContainer;
@@ -298,6 +299,11 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
         /** @var Request $request */
         return $request;
+    }
+
+    protected function createGit(): Git
+    {
+        return new Git();
     }
 
     /**

@@ -60,7 +60,7 @@ class WebContentVersionTest extends AbstractContentTest
      */
     public function I_can_switch_to_every_version(string $source): void
     {
-        $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest());
+        $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest(), $this->createGit());
         foreach ($webVersions->getAllMinorVersions() as $webVersion) {
             $post = [];
             $cookies = [];
@@ -108,7 +108,7 @@ class WebContentVersionTest extends AbstractContentTest
 
             return;
         }
-        $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest());
+        $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest(), $this->createGit());
         $tags = $this->runCommand('git tag | grep -P "([[:digit:]]+[.]){2}[[:alnum:]]+([.][[:digit:]]+)?" --only-matching');
         self::assertNotEmpty(
             $tags,
@@ -149,7 +149,7 @@ class WebContentVersionTest extends AbstractContentTest
 
             return;
         }
-        $webVersions = new WebVersions($configuration = $this->getConfiguration(), $this->createRequest());
+        $webVersions = new WebVersions($configuration = $this->getConfiguration(), $this->createRequest(), $this->createGit());
         $documentRoot = $configuration->getDirs()->getDocumentRoot();
         $checked = 0;
         foreach ($webVersions->getAllStableMinorVersions() as $stableVersion) {
@@ -164,6 +164,7 @@ class WebContentVersionTest extends AbstractContentTest
                 $checked += $this->Asset_file_exists($script, 'src', $documentRoot);
             }
         }
+        self::assertGreaterThan(0, $checked, 'No assets has been checked');
     }
 
     private function Asset_file_exists(Element $element, string $parameterName, string $masterDocumentRoot): int
@@ -184,7 +185,7 @@ class WebContentVersionTest extends AbstractContentTest
     public function I_will_get_content_of_last_stable_version_if_requested_does_not_exists(): void
     {
         $patchVersion = $this->getHtmlDocument([Request::VERSION => '999.9'])->documentElement->getAttribute('data-content-version');
-        $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest());
+        $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest(), $this->createGit());
         self::assertSame($webVersions->getLastStablePatchVersion(), $patchVersion);
     }
 }

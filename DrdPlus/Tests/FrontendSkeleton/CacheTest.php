@@ -21,7 +21,7 @@ class CacheTest extends AbstractContentTest
         /** @var WebVersions $webVersions */
         $cacheClass = $this->getCacheClass();
         /** @var Cache $cache */
-        $cache = new $cacheClass($webVersions, $dirs, $this->createRequest(), false, 'foo');
+        $cache = new $cacheClass($webVersions, $dirs, $this->createRequest(), $this->createGit(), false, 'foo');
         self::assertSame($dirs->getCacheRoot() . '/master', $cache->getCacheDir());
         self::assertSame($dirs->getCacheRoot() . '/9.8.7', $cache->getCacheDir());
     }

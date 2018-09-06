@@ -15,6 +15,8 @@ class Cache extends StrictObject
     protected $webVersions;
     /** @var Request */
     private $request;
+    /** @var Git */
+    private $git;
     /** @var string */
     protected $cachePrefix;
     /** @var bool */
@@ -28,11 +30,12 @@ class Cache extends StrictObject
      * @param string $cachePrefix
      * @throws \RuntimeException
      */
-    public function __construct(WebVersions $webVersions, Dirs $dirs, Request $request, bool $isInProduction, string $cachePrefix)
+    public function __construct(WebVersions $webVersions, Dirs $dirs, Request $request, Git $git, bool $isInProduction, string $cachePrefix)
     {
         $this->webVersions = $webVersions;
         $this->cacheRootDir = $dirs->getCacheRoot();
         $this->request = $request;
+        $this->git = $git;
         $this->isInProduction = $isInProduction;
         $this->cachePrefix = $cachePrefix;
     }
@@ -120,17 +123,10 @@ class Cache extends StrictObject
         if ($this->isInProduction()) {
             return 'production';
         }
-        // GIT status is same for any working dir, if it is a sub-dir of wanted GIT project root
-        \exec('git status', $statusRows, $return);
-        if ($return !== 0) {
-            throw new Exceptions\CanNotGetGitStatus('Can not run `git status`, got result code ' . $return);
-        }
-        \exec('git diff origin/master', $diffRows, $return);
-        if ($return !== 0) {
-            throw new Exceptions\CanNotGetGitDiff('Can not run `git diff`, got result code ' . $return);
-        }
+        $gitStatus = $this->git->getGitStatus();
+        $diffAgainstOriginMaster = $this->git->getDiffAgainstOriginMaster();
 
-        return \md5(\implode(\array_merge($statusRows, $diffRows)));
+        return \md5(\implode(\array_merge($gitStatus, $diffAgainstOriginMaster)));
     }
 
     /**

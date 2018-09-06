@@ -16,6 +16,8 @@ class ServicesContainer extends StrictObject
 
     /** @var WebVersions */
     protected $webVersions;
+    /** @var Git */
+    protected $git;
     /** @var Configuration */
     protected $configuration;
     /** @var HtmlHelper */
@@ -55,7 +57,7 @@ class ServicesContainer extends StrictObject
     public function getWebVersions(): WebVersions
     {
         if ($this->webVersions === null) {
-            $this->webVersions = new WebVersions($this->getConfiguration(), $this->getRequest());
+            $this->webVersions = new WebVersions($this->getConfiguration(), $this->getRequest(), $this->getGit());
         }
 
         return $this->webVersions;
@@ -68,6 +70,15 @@ class ServicesContainer extends StrictObject
         }
 
         return $this->request;
+    }
+
+    public function getGit(): Git
+    {
+        if ($this->git === null) {
+            $this->git = new Git();
+        }
+
+        return $this->git;
     }
 
     public function getBotParser(): BotParser
@@ -91,6 +102,7 @@ class ServicesContainer extends StrictObject
                 $this->getWebVersions(),
                 $this->getConfiguration()->getDirs(),
                 $this->getRequest(),
+                $this->getGit(),
                 $this->getHtmlHelper()->isInProduction()
             );
         }
