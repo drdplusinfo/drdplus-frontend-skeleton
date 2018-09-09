@@ -65,7 +65,7 @@ class TestsTest extends AbstractContentTest
         return $controllerTestClass;
     }
 
-    private function getClassesFromDir(string $dir): array
+    protected function getClassesFromDir(string $dir): array
     {
         $classes = [];
         foreach (\scandir($dir, SCANDIR_SORT_NONE) as $folder) {
