@@ -26,7 +26,7 @@ class TestsTest extends AbstractContentTest
             ) {
                 continue;
             }
-            $testedClass = self::getSutClass($testClass);
+            $testedClass = static::getSutClass($testClass);
             self::assertTrue(
                 \class_exists($testedClass),
                 "What is testing $testClass? Class $testedClass has not been found."
