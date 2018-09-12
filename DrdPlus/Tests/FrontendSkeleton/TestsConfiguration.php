@@ -45,6 +45,8 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     private $expectedLastVersion = '1.0';
     /** @var string */
     private $expectedLastUnstableVersion = 'master';
+    /** @var bool */
+    private $hasHeadings = true;
 
     /**
      * @param string $localUrl
@@ -357,10 +359,6 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
         return $this->expectedLastVersion;
     }
 
-    /**
-     * @param string $expectedLastVersion
-     * @return TestsConfiguration
-     */
     public function setExpectedLastVersion(string $expectedLastVersion): TestsConfiguration
     {
         $this->expectedLastVersion = $expectedLastVersion;
@@ -373,13 +371,21 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
         return $this->expectedLastUnstableVersion;
     }
 
-    /**
-     * @param string $expectedLastUnstableVersion
-     * @return TestsConfiguration
-     */
     public function setExpectedLastUnstableVersion(string $expectedLastUnstableVersion): TestsConfiguration
     {
         $this->expectedLastUnstableVersion = $expectedLastUnstableVersion;
+
+        return $this;
+    }
+
+    public function hasHeadings(): bool
+    {
+        return $this->hasHeadings;
+    }
+
+    public function disableHasHeadings(): TestsConfiguration
+    {
+        $this->hasHeadings = false;
 
         return $this;
     }

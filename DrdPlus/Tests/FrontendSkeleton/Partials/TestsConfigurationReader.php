@@ -34,4 +34,6 @@ interface TestsConfigurationReader
     public function getExpectedLastVersion(): string;
 
     public function getExpectedLastUnstableVersion(): string;
+
+    public function hasHeadings(): bool;
 }

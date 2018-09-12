@@ -199,8 +199,7 @@ class TestsConfigurationTest extends AbstractContentTest
      * @expectedException \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
      * @expectedExceptionMessageRegExp ~říčany u čeho chceš~
      */
-    public
-    function I_can_not_add_allowed_calculation_id_prefix_with_lowercase_first_letter(): void
+    public function I_can_not_add_allowed_calculation_id_prefix_with_lowercase_first_letter(): void
     {
         (new TestsConfiguration('https://example.com'))->addAllowedCalculationIdPrefix('říčany u čeho chceš');
     }
@@ -210,8 +209,7 @@ class TestsConfigurationTest extends AbstractContentTest
      * @expectedException \DrdPlus\Tests\FrontendSkeleton\Exceptions\AllowedCalculationPrefixShouldStartByUpperLetter
      * @expectedExceptionMessageRegExp ~žbrdloch~
      */
-    public
-    function I_can_not_set_allowed_calculation_id_prefixes_with_even_single_one_with_lowercase_first_letter(): void
+    public function I_can_not_set_allowed_calculation_id_prefixes_with_even_single_one_with_lowercase_first_letter(): void
     {
         (new TestsConfiguration('https://example.com'))->setAllowedCalculationIdPrefixes([
             'Potvora na entou',
@@ -223,8 +221,7 @@ class TestsConfigurationTest extends AbstractContentTest
     /**
      * @test
      */
-    public
-    function I_will_get_some_stable_version_if_has_more_versions(): void
+    public function I_will_get_some_stable_version_if_has_more_versions(): void
     {
         $testsConfiguration = new TestsConfiguration('https://example.com');
         if ($this->isSkeletonChecked() && !$testsConfiguration->hasMoreVersions()) {
@@ -243,8 +240,7 @@ class TestsConfigurationTest extends AbstractContentTest
     /**
      * @test
      */
-    public
-    function I_can_get_last_unstable_version(): void
+    public function I_can_get_last_unstable_version(): void
     {
         $testsConfiguration = new TestsConfiguration('https://example.com');
         self::assertSame('master', $testsConfiguration->getExpectedLastUnstableVersion());
@@ -255,5 +251,16 @@ class TestsConfigurationTest extends AbstractContentTest
                 'Expected same last version and last unstable version as only a single version is expected'
             );
         }
+    }
+
+    /**
+     * @test
+     */
+    public function I_can_disable_test_of_headings(): void
+    {
+        $testsConfiguration = new TestsConfiguration('https://example.com');
+        self::assertTrue($testsConfiguration->hasHeadings(), 'Test of headings should be enabled by default');
+        $testsConfiguration->disableHasHeadings();
+        self::assertFalse($testsConfiguration->hasHeadings(), 'Can not disable test of headings');
     }
 }
