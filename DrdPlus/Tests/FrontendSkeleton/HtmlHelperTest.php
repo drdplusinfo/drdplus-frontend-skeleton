@@ -74,7 +74,7 @@ class HtmlHelperTest extends AbstractContentTest
         $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
 
         $allTables = $htmlHelper->findTablesWithIds($this->getHtmlDocument());
-        if (!$this->getTestsConfiguration()->hasTables()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasTables()) {
             self::assertCount(0, $allTables);
 
             return;
@@ -82,7 +82,7 @@ class HtmlHelperTest extends AbstractContentTest
         self::assertGreaterThan(0, \count($allTables));
         self::assertEmpty($htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['nonExistingTableId']));
         $someExpectedTableIds = $this->getTestsConfiguration()->getSomeExpectedTableIds();
-        if (!$this->getTestsConfiguration()->hasTables()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasTables()) {
             self::assertCount(0, $someExpectedTableIds, 'No tables expected');
 
             return;
@@ -131,7 +131,7 @@ HTML
      */
     public function Same_table_ids_are_filtered_on_tables_only_mode(): void
     {
-        if (!$this->getTestsConfiguration()->hasTables()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasTables()) {
             self::assertCount(
                 0,
                 $this->getHtmlDocument()->getElementsByTagName('table'),

@@ -13,7 +13,7 @@ class StandardModeTest extends AbstractContentTest
      */
     public function I_get_notes_styled(): void
     {
-        if (!$this->getTestsConfiguration()->hasNotes()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasNotes()) {
             self::assertEmpty(
                 $this->getHtmlDocument()->getElementsByClassName(HtmlHelper::NOTE_CLASS),
                 "No elements with '" . HtmlHelper::NOTE_CLASS . "' class expected according to tests config"

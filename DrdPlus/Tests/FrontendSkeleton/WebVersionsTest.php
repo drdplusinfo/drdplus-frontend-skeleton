@@ -45,7 +45,7 @@ class WebVersionsTest extends AbstractContentTest
     {
         $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest(), $this->createGit());
         self::assertTrue($webVersions->hasMinorVersion($this->getTestsConfiguration()->getExpectedLastUnstableVersion()));
-        if ($this->getTestsConfiguration()->hasMoreVersions()) {
+        if ($this->isSkeletonChecked() || $this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertTrue($webVersions->hasMinorVersion('1.0'));
         }
         self::assertFalse($webVersions->hasMinorVersion('-1'));
@@ -180,7 +180,7 @@ class WebVersionsTest extends AbstractContentTest
         $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest(), $this->createGit());
         $allWebVersions = $webVersions->getAllMinorVersions();
         self::assertNotEmpty($allWebVersions, 'At least single web version (from GIT) expected');
-        if (!$this->getTestsConfiguration()->hasMoreVersions()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertSame([$this->getTestsConfiguration()->getExpectedLastUnstableVersion()], $allWebVersions);
         } else {
             self::assertSame(
@@ -294,7 +294,7 @@ class WebVersionsTest extends AbstractContentTest
     {
         $webVersions = new WebVersions($this->getConfiguration(), $this->createRequest(), $this->createGit());
         $versions = $webVersions->getAllMinorVersions();
-        if (!$this->getTestsConfiguration()->hasMoreVersions()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasMoreVersions()) {
             self::assertCount(1, $versions, 'Only a single version expected due to a config');
 
             return;

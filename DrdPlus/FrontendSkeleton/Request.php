@@ -13,6 +13,8 @@ class Request extends StrictObject
     public const UPDATE = 'update';
     public const CACHE = 'cache';
     public const DISABLE = 'disable';
+    public const TABLES = 'tables';
+    public const TABULKY = 'tabulky';
 
     /** @var Bot */
     private $botParser;

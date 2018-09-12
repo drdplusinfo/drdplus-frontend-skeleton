@@ -26,6 +26,7 @@ abstract class AbstractContentTest extends SkeletonTestCase
     protected $needPassOut = false;
     /** @var Configuration */
     private $configuration;
+    private $frontendSkeletonChecked;
 
     protected function setUp(): void
     {
@@ -136,10 +137,14 @@ abstract class AbstractContentTest extends SkeletonTestCase
 
     protected function isFrontendSkeletonChecked(): bool
     {
-        $documentRootRealPath = \realpath($this->getDocumentRoot());
-        $frontendSkeletonRealPath = \realpath(__DIR__ . '/../../../..');
+        if ($this->frontendSkeletonChecked === null) {
+            $documentRootRealPath = \realpath($this->getDocumentRoot());
+            $frontendSkeletonRealPath = \realpath(__DIR__ . '/../../../..');
 
-        return $documentRootRealPath === $frontendSkeletonRealPath;
+            $this->frontendSkeletonChecked = $documentRootRealPath === $frontendSkeletonRealPath;
+        }
+
+        return $this->frontendSkeletonChecked;
     }
 
     protected function getCurrentPageTitle(HTMLDocument $document = null): string

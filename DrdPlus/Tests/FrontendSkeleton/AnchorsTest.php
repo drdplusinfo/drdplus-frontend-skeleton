@@ -48,7 +48,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $html = $this->getHtmlDocument();
         $localAnchors = $this->getLocalAnchors();
-        if (!$this->getTestsConfiguration()->hasLocalLinks()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasLocalLinks()) {
             self::assertCount(
                 0,
                 $localAnchors,
@@ -222,7 +222,7 @@ class AnchorsTest extends AbstractContentTest
     public function External_anchors_with_hashes_point_to_existing_ids(): void
     {
         $externalAnchorsWithHash = $this->getExternalAnchorsWithHash();
-        if (!$this->getTestsConfiguration()->hasExternalAnchorsWithHashes()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasExternalAnchorsWithHashes()) {
             self::assertCount(
                 0,
                 $externalAnchorsWithHash,
@@ -353,7 +353,7 @@ class AnchorsTest extends AbstractContentTest
     {
         $document = $this->getHtmlDocument();
         $originalIds = $document->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS);
-        if (!$this->getTestsConfiguration()->hasIds()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasIds()) {
             self::assertCount(
                 0,
                 $originalIds,
@@ -480,7 +480,7 @@ class AnchorsTest extends AbstractContentTest
             }
             $linksToAltar[] = $link;
         }
-        if (!$this->getTestsConfiguration()->hasLinksToAltar()) {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasLinksToAltar()) {
             self::assertCount(0, $linksToAltar, 'No link to Altar expected according to tests config');
 
             return;

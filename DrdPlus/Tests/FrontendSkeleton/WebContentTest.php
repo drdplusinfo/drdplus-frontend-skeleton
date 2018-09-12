@@ -106,10 +106,10 @@ class WebContentTest extends AbstractContentTest
                 self::assertSame($id, $idFromText, "Expected different ID as created from '$headingText' heading");
             }
         }
-        if ($this->getTestsConfiguration()->hasHeadings()) {
-            self::assertGreaterThan(0, $totalHeadingsCount, 'Expected some headings');
-        } else {
+        if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasHeadings()) {
             self::assertSame(0, $totalHeadingsCount, 'No headings expected due to tests configurationF');
+        } else {
+            self::assertGreaterThan(0, $totalHeadingsCount, 'Expected some headings');
         }
     }
 }
