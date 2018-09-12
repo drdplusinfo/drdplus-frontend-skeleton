@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace DrdPlus\Tests\FrontendSkeleton\Partials;
 
 use DrdPlus\FrontendSkeleton\Configuration;
+use DrdPlus\FrontendSkeleton\CookiesService;
 use DrdPlus\FrontendSkeleton\Dirs;
 use DrdPlus\FrontendSkeleton\FrontendController;
 use DrdPlus\FrontendSkeleton\Git;
@@ -55,13 +56,14 @@ abstract class AbstractContentTest extends SkeletonTestCase
             if ($cookies) {
                 $_COOKIE = \array_merge($_COOKIE, $cookies);
             }
+            if (empty($_GET[Request::VERSION]) && empty($_COOKIE[CookiesService::VERSION])) {
+                $_GET[Request::VERSION] = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
+            }
             if ($this->needPassIn()) {
                 $this->passIn();
             } elseif ($this->needPassOut()) {
                 $this->passOut();
             }
-            /** @noinspection PhpUnusedLocalVariableInspection */
-            $latestVersion = $this->getTestsConfiguration()->getExpectedLastUnstableVersion();
             \ob_start();
             /** @noinspection PhpIncludeInspection */
             include DRD_PLUS_INDEX_FILE_NAME_TO_TEST;
