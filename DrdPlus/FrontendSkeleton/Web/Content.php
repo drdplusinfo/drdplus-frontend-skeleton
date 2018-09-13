@@ -198,9 +198,14 @@ HTML;
         return $this->contentType === self::TABLES;
     }
 
-    public function containsPassed(): bool
+    public function containsFull(): bool
     {
         return $this->contentType === self::FULL;
+    }
+
+    protected function getContentType(): string
+    {
+        return $this->contentType;
     }
 
 }
