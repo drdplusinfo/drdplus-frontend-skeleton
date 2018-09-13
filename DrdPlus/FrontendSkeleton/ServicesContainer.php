@@ -5,6 +5,7 @@ namespace DrdPlus\FrontendSkeleton;
 
 use DeviceDetector\Parser\Bot as BotParser;
 use DrdPlus\FrontendSkeleton\Web\Body;
+use DrdPlus\FrontendSkeleton\Web\Content;
 use DrdPlus\FrontendSkeleton\Web\Head;
 use DrdPlus\FrontendSkeleton\Web\JsFiles;
 use DrdPlus\FrontendSkeleton\Web\Menu;
@@ -219,4 +220,30 @@ class ServicesContainer extends StrictObject
         return $this->cookiesService;
     }
 
+    public function createContent(?Redirect $redirect): Content
+    {
+        if ($this->getRequest()->areRequestedTables()) {
+            return new Content(
+                $this->getHtmlHelper(),
+                $this->getWebVersions(),
+                $this->getHeadForTables(),
+                $this->getMenu(),
+                $this->getTablesBody(),
+                $this->getTablesWebCache(),
+                Content::TABLES,
+                $redirect
+            );
+        }
+
+        return new Content(
+            $this->getHtmlHelper(),
+            $this->getWebVersions(),
+            $this->getHead(),
+            $this->getMenu(),
+            $this->getBody(),
+            $this->getWebCache(),
+            Content::FULL,
+            $redirect
+        );
+    }
 }

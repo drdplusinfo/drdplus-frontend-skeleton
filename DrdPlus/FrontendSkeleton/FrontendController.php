@@ -93,31 +93,7 @@ class FrontendController extends StrictObject
     public function getContent(): Content
     {
         if ($this->content === null) {
-            if ($this->getServicesContainer()->getRequest()->getValueFromGet(Request::TABLES) !== null
-                || $this->getServicesContainer()->getRequest()->getValueFromGet(Request::TABULKY) !== null
-            ) { // we do not require licence confirmation for tables only
-                $this->content = new Content(
-                    $this->getServicesContainer()->getHtmlHelper(),
-                    $this->getServicesContainer()->getWebVersions(),
-                    $this->getServicesContainer()->getHeadForTables(),
-                    $this->getServicesContainer()->getMenu(),
-                    $this->getServicesContainer()->getTablesBody(),
-                    $this->getServicesContainer()->getTablesWebCache(),
-                    Content::TABLES,
-                    $this->getRedirect()
-                );
-            } else {
-                $this->content = new Content(
-                    $this->getServicesContainer()->getHtmlHelper(),
-                    $this->getServicesContainer()->getWebVersions(),
-                    $this->getServicesContainer()->getHead(),
-                    $this->getServicesContainer()->getMenu(),
-                    $this->getServicesContainer()->getBody(),
-                    $this->getServicesContainer()->getWebCache(),
-                    Content::FULL,
-                    $this->getRedirect()
-                );
-            }
+            $this->content = $this->getServicesContainer()->createContent($this->getRedirect());
         }
 
         return $this->content;

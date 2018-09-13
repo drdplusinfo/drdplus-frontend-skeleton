@@ -82,6 +82,7 @@ class Request extends StrictObject
     {
         return $_GET ?? [];
     }
+
     public function getValueFromPost(string $name)
     {
         return $_POST[$name] ?? null;
@@ -110,5 +111,10 @@ class Request extends StrictObject
                 return $id !== '';
             }
         );
+    }
+
+    public function areRequestedTables(): bool
+    {
+        return $this->getValueFromGet(self::TABLES) !== null || $this->getValueFromGet(self::TABULKY) !== null;
     }
 }
