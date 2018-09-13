@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace DrdPlus\FrontendSkeleton;
 
-use DeviceDetector\Parser\Bot;
 use DrdPlus\FrontendSkeleton\Web\Content;
 use Granam\Strict\Object\StrictObject;
 
@@ -11,8 +10,6 @@ class FrontendController extends StrictObject
 {
     /** @var ServicesContainer */
     private $servicesContainer;
-    /** @var Request */
-    private $request;
     /** @var array */
     private $bodyClasses;
     /** @var WebCache */
@@ -49,15 +46,6 @@ class FrontendController extends StrictObject
         return $this->getServicesContainer()->getConfiguration();
     }
 
-    protected function getRequest(): Request
-    {
-        if ($this->request === null) {
-            $this->request = new Request(new Bot());
-        }
-
-        return $this->request;
-    }
-
     public function getBodyClasses(): array
     {
         return $this->bodyClasses;
@@ -80,7 +68,7 @@ class FrontendController extends StrictObject
 
     public function isRequestedWebVersionUpdate(): bool
     {
-        return $this->getRequest()->getValue(Request::UPDATE) === 'web';
+        return $this->getServicesContainer()->getRequest()->getValue(Request::UPDATE) === 'web';
     }
 
     public function updateWebVersion(): int
