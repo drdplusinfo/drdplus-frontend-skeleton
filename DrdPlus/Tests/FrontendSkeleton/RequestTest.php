@@ -14,7 +14,7 @@ class RequestTest extends TestWithMockery
         return [
             'Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)',
             'User-Agent: Mozilla/5.0 (compatible; SeznamBot/3.2-test4; +http://napoveda.seznam.cz/en/seznambot-intro/)',
-            'Googlebot'
+            'Googlebot',
         ];
     }
 
@@ -100,5 +100,60 @@ class RequestTest extends TestWithMockery
         global $_GET; // because backup globals do not works for unset global
         $_GET = [];
         self::assertSame('?foo=1', $currentUrl);
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     */
+    public function I_can_get_value_from_get(): void
+    {
+        $request = new Request(new Bot());
+        unset($_GET);
+        self::assertNull($request->getValueFromGet('foo'));
+        global $_GET; // because backup globals do not works for unset global
+        $_GET = ['foo' => 'bar'];
+        self::assertSame('bar', $request->getValueFromGet('foo'));
+
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     */
+    public function I_can_get_value_from_post(): void
+    {
+        $request = new Request(new Bot());
+        unset($_POST);
+        self::assertNull($request->getValueFromPost('foo'));
+        global $_POST; // because backup globals do not works for unset global
+        $_POST = ['foo' => 'bar'];
+        self::assertSame('bar', $request->getValueFromPost('foo'));
+    }
+
+    /**
+     * @test
+     * @backupGlobals enabled
+     * @dataProvider provideTablesIdsParameterName
+     * @param string $parameterName
+     */
+    public function I_can_get_wanted_tables_ids(string $parameterName): void
+    {
+        self::assertSame([], (new Request(new Bot()))->getWantedTablesIds());
+        $_GET[$parameterName] = '    ';
+        self::assertSame([], (new Request(new Bot()))->getWantedTablesIds());
+        $_GET[$parameterName] = 'foo';
+        self::assertSame(['foo'], (new Request(new Bot()))->getWantedTablesIds());
+        $_GET[$parameterName] .= ',bar,baz';
+        self::assertSame(['foo', 'bar', 'baz'], (new Request(new Bot()))->getWantedTablesIds());
+        unset($_GET[$parameterName]); // to avoid using this in next iteration as @backupGlobals does not work
+    }
+
+    public function provideTablesIdsParameterName(): array
+    {
+        return [
+            [Request::TABLES],
+            [Request::TABULKY],
+        ];
     }
 }

@@ -152,19 +152,6 @@ HTML
 
     /**
      * @test
-     * @expectedException \DrdPlus\FrontendSkeleton\Exceptions\DuplicatedRequiredTableId
-     * @expectedExceptionMessageRegExp ~IAmSoAlone~
-     */
-    public function I_can_not_request_tables_with_ids_with_same_ids_after_their_unification(): void
-    {
-        /** @var HtmlHelper $htmlHelperClass */
-        $htmlHelperClass = static::getSutClass();
-        $htmlHelper = $htmlHelperClass::createFromGlobals($this->createDirs());
-        $htmlHelper->findTablesWithIds($this->getHtmlDocument(), ['IAmSoAlone', 'iAmSóAlóne']);
-    }
-
-    /**
-     * @test
      */
     public function It_will_not_add_anchor_into_anchor_with_id(): void
     {

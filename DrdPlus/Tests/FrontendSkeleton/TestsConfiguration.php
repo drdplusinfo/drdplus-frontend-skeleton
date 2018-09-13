@@ -18,7 +18,7 @@ class TestsConfiguration extends StrictObject implements TestsConfigurationReade
     /** @var bool */
     private $hasTables = true;
     /** @var array|string[] */
-    private $someExpectedTableIds = ['IAmSoAlone'];
+    private $someExpectedTableIds = [];
     /** @var bool */
     private $hasExternalAnchorsWithHashes = true;
     /** @var bool */

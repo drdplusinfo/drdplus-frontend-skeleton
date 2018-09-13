@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace DrdPlus\Tests\FrontendSkeleton;
 
+use DrdPlus\FrontendSkeleton\HtmlDocument;
+use DrdPlus\FrontendSkeleton\HtmlHelper;
 use DrdPlus\FrontendSkeleton\Request;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
-use Granam\String\StringTools;
 
 class TablesTest extends AbstractContentTest
 {
@@ -14,13 +15,32 @@ class TablesTest extends AbstractContentTest
      */
     public function I_can_get_tables_only(): void
     {
-        $withTables = $this->getHtmlDocument([Request::TABLES => '' /* all of them */]);
-        $body = $withTables->getElementsByTagName('body')[0];
-        $tables = $body->getElementsByTagName('table');
+        $htmlDocument = $this->getHtmlDocument([Request::TABLES => '' /* all of them */]);
+        $tables = $htmlDocument->body->getElementsByTagName('table');
         if (!$this->isSkeletonChecked() && !$this->getTestsConfiguration()->hasTables()) {
             self::assertCount(0, $tables, 'No tables expected due to tests configuration');
         } else {
             self::assertGreaterThan(0, \count($tables), 'Expected some tables');
+        }
+        $this->There_is_no_other_content_than_tables($htmlDocument);
+    }
+
+    protected function There_is_no_other_content_than_tables(HtmlDocument $htmlDocument): void
+    {
+        $menu = $htmlDocument->getElementById(HtmlHelper::MENU_ID);
+        $menu->remove();
+        foreach ($htmlDocument->getElementsByClassName(HtmlHelper::INVISIBLE_ID_CLASS) as $invisible) {
+            $invisible->remove();
+        }
+        foreach ($htmlDocument->getElementsByClassName(HtmlHelper::INVISIBLE_CLASS) as $invisible) {
+            $invisible->remove();
+        }
+        foreach ($htmlDocument->body->children as $child) {
+            self::assertSame(
+                'table',
+                $child->tagName,
+                'Expected only tables, seems tables content filter does not work at all'
+            );
         }
     }
 
@@ -39,10 +59,10 @@ class TablesTest extends AbstractContentTest
         $tables = $htmlDocument->body->getElementsByTagName('table');
         self::assertNotEmpty($tables, 'No tables have been fetched, when required IDs ' . $implodedTables);
         foreach ($this->getTestsConfiguration()->getSomeExpectedTableIds() as $tableId) {
-            $tableId = StringTools::toConstantLikeValue(StringTools::camelCaseToSnakeCase($tableId));
             self::assertNotNull(
-                $htmlDocument->getElementById(StringTools::toConstantLikeValue($tableId)), 'Missing table of ID ' . $tableId
+                $htmlDocument->getElementById(HtmlHelper::toId($tableId)), 'Missing table of ID ' . $tableId
             );
         }
+        $this->There_is_no_other_content_than_tables($htmlDocument);
     }
 }

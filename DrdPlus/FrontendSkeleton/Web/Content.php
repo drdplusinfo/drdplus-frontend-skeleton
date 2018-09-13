@@ -12,6 +12,9 @@ use Granam\Strict\Object\StrictObject;
 
 class Content extends StrictObject
 {
+    public const TABLES = 'tables';
+    public const FULL = ' full';
+
     /** @var HtmlHelper */
     private $htmlHelper;
     /** @var WebVersions */
@@ -24,6 +27,8 @@ class Content extends StrictObject
     private $body;
     /** @var Cache */
     private $cache;
+    /** @var string */
+    private $contentType;
     /** @var Redirect|null */
     private $redirect;
 
@@ -34,6 +39,7 @@ class Content extends StrictObject
         Menu $menu,
         Body $body,
         Cache $cache,
+        string $contentType,
         ?Redirect $redirect
     )
     {
@@ -43,6 +49,7 @@ class Content extends StrictObject
         $this->menu = $menu;
         $this->body = $body;
         $this->cache = $cache;
+        $this->contentType = $contentType;
         $this->redirect = $redirect;
     }
 
@@ -185,4 +192,15 @@ HTML;
     {
         return $this->redirect;
     }
+
+    public function containsTables(): bool
+    {
+        return $this->contentType === self::TABLES;
+    }
+
+    public function containsPassed(): bool
+    {
+        return $this->contentType === self::FULL;
+    }
+
 }

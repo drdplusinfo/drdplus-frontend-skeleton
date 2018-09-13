@@ -7,6 +7,8 @@ use Granam\Strict\Object\StrictObject;
 
 class Cache extends StrictObject
 {
+    public const TABLES = 'tables';
+
     /** @var string */
     protected $cacheRootDir;
     /** @var array|string[] */
