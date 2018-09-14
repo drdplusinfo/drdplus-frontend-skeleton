@@ -48,6 +48,8 @@ class ServicesContainer extends StrictObject
     protected $botParser;
     /** @var CookiesService */
     private $cookiesService;
+    /** @var Redirect */
+    private $redirect;
 
     public function __construct(Configuration $configuration, HtmlHelper $htmlHelper)
     {
@@ -220,7 +222,7 @@ class ServicesContainer extends StrictObject
         return $this->cookiesService;
     }
 
-    public function createContent(?Redirect $redirect): Content
+    public function createContent(): Content
     {
         if ($this->getRequest()->areRequestedTables()) {
             return new Content(
@@ -231,7 +233,7 @@ class ServicesContainer extends StrictObject
                 $this->getTablesBody(),
                 $this->getTablesWebCache(),
                 Content::TABLES,
-                $redirect
+                $this->getRedirect()
             );
         }
 
@@ -243,7 +245,22 @@ class ServicesContainer extends StrictObject
             $this->getBody(),
             $this->getWebCache(),
             Content::FULL,
-            $redirect
+            $this->getRedirect()
         );
+    }
+
+    protected function setRedirect(Redirect $redirect): void
+    {
+        $this->redirect = $redirect;
+    }
+
+    protected function getRedirect(): ?Redirect
+    {
+        return $this->redirect;
+    }
+
+    public function getNow(): \DateTime
+    {
+        return new \DateTime();
     }
 }
