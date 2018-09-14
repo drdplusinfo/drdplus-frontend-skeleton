@@ -14,8 +14,6 @@ class FrontendController extends StrictObject
     private $bodyClasses;
     /** @var WebCache */
     protected $pageCache;
-    /** @var Redirect|null */
-    private $redirect;
     /** @var Content */
     protected $content;
 
@@ -28,17 +26,6 @@ class FrontendController extends StrictObject
     protected function getServicesContainer(): ServicesContainer
     {
         return $this->servicesContainer;
-    }
-
-    public function setRedirect(Redirect $redirect): void
-    {
-        $this->redirect = $redirect;
-        $this->content = null; // reload content with new redirect
-    }
-
-    public function getRedirect(): ?Redirect
-    {
-        return $this->redirect;
     }
 
     protected function getConfiguration(): Configuration
@@ -93,7 +80,7 @@ class FrontendController extends StrictObject
     public function getContent(): Content
     {
         if ($this->content === null) {
-            $this->content = $this->getServicesContainer()->createContent($this->getRedirect());
+            $this->content = $this->getServicesContainer()->createContent();
         }
 
         return $this->content;

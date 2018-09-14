@@ -6,7 +6,6 @@ namespace DrdPlus\Tests\FrontendSkeleton;
 use DrdPlus\FrontendSkeleton\Configuration;
 use DrdPlus\FrontendSkeleton\HtmlDocument;
 use DrdPlus\FrontendSkeleton\HtmlHelper;
-use DrdPlus\FrontendSkeleton\Redirect;
 use DrdPlus\Tests\FrontendSkeleton\Partials\AbstractContentTest;
 use Gt\Dom\Element;
 use Gt\Dom\TokenList;
@@ -97,32 +96,5 @@ class FrontendControllerTest extends AbstractContentTest
             $homeButton = $htmlDocument->getElementById('home_button');
             self::assertEmpty($homeButton, 'Home button should not be used at all');
         }
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_set_and_get_redirect(): void
-    {
-        $controller = $this->createController();
-        self::assertNull($controller->getRedirect());
-        $controller->setRedirect($redirect = new Redirect('redirect to the future', 999));
-        self::assertSame($redirect, $controller->getRedirect());
-    }
-
-    /**
-     * @test
-     */
-    public function I_can_set_redirect_via_html_meta(): void
-    {
-        self::assertCount(0, $this->getMetaRefreshes($this->getHtmlDocument()), 'No meta tag with refresh meaning expected so far');
-        $controller = $this->createController();
-        $controller->setRedirect(new Redirect('https://example.com/outsider', 12));
-        $content = $this->fetchNonCachedContent($controller);
-        $htmlDocument = new HtmlDocument($content);
-        $metaRefreshes = $this->getMetaRefreshes($htmlDocument);
-        self::assertCount(1, $metaRefreshes, 'One meta tag with refresh meaning expected');
-        $metaRefresh = \current($metaRefreshes);
-        self::assertSame('12; url=https://example.com/outsider', $metaRefresh->getAttribute('content'));
     }
 }
