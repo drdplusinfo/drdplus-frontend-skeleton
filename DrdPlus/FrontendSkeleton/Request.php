@@ -15,6 +15,8 @@ class Request extends StrictObject
     public const DISABLE = 'disable';
     public const TABLES = 'tables';
     public const TABULKY = 'tabulky';
+    public const CONFIRM = 'confirm';
+    public const TRIAL = 'trial';
 
     /** @var Bot */
     private $botParser;
