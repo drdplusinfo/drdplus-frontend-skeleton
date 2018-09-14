@@ -79,9 +79,33 @@ class FrontendController extends StrictObject
 
     public function getContent(): Content
     {
-        if ($this->content === null) {
-            $this->content = $this->getServicesContainer()->createContent();
+        if ($this->content) {
+            return $this->content;
         }
+        $servicesContainer = $this->getServicesContainer();
+        if ($servicesContainer->getRequest()->areRequestedTables()) {
+            $this->content = new Content(
+                $servicesContainer->getHtmlHelper(),
+                $servicesContainer->getWebVersions(),
+                $servicesContainer->getHeadForTables(),
+                $servicesContainer->getMenu(),
+                $servicesContainer->getTablesBody(),
+                $servicesContainer->getTablesWebCache(),
+                Content::TABLES
+            );
+
+            return $this->content;
+        }
+
+        $this->content = new Content(
+            $servicesContainer->getHtmlHelper(),
+            $servicesContainer->getWebVersions(),
+            $servicesContainer->getHead(),
+            $servicesContainer->getMenu(),
+            $servicesContainer->getBody(),
+            $servicesContainer->getWebCache(),
+            Content::FULL
+        );
 
         return $this->content;
     }

@@ -5,7 +5,6 @@ namespace DrdPlus\FrontendSkeleton;
 
 use DeviceDetector\Parser\Bot as BotParser;
 use DrdPlus\FrontendSkeleton\Web\Body;
-use DrdPlus\FrontendSkeleton\Web\Content;
 use DrdPlus\FrontendSkeleton\Web\Head;
 use DrdPlus\FrontendSkeleton\Web\JsFiles;
 use DrdPlus\FrontendSkeleton\Web\Menu;
@@ -48,8 +47,6 @@ class ServicesContainer extends StrictObject
     protected $botParser;
     /** @var CookiesService */
     private $cookiesService;
-    /** @var Redirect */
-    private $redirect;
 
     public function __construct(Configuration $configuration, HtmlHelper $htmlHelper)
     {
@@ -220,43 +217,6 @@ class ServicesContainer extends StrictObject
         }
 
         return $this->cookiesService;
-    }
-
-    public function createContent(): Content
-    {
-        if ($this->getRequest()->areRequestedTables()) {
-            return new Content(
-                $this->getHtmlHelper(),
-                $this->getWebVersions(),
-                $this->getHeadForTables(),
-                $this->getMenu(),
-                $this->getTablesBody(),
-                $this->getTablesWebCache(),
-                Content::TABLES,
-                $this->getRedirect()
-            );
-        }
-
-        return new Content(
-            $this->getHtmlHelper(),
-            $this->getWebVersions(),
-            $this->getHead(),
-            $this->getMenu(),
-            $this->getBody(),
-            $this->getWebCache(),
-            Content::FULL,
-            $this->getRedirect()
-        );
-    }
-
-    protected function setRedirect(Redirect $redirect): void
-    {
-        $this->redirect = $redirect;
-    }
-
-    protected function getRedirect(): ?Redirect
-    {
-        return $this->redirect;
     }
 
     public function getNow(): \DateTime
